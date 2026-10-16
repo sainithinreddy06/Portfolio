@@ -1,177 +1,227 @@
-<div align="center">
-
-# Sai Nithin Reddy
+# Sai Nithin Reddy — Personal Portfolio
 
 **AI Engineer · Full-Stack Developer · Systems Builder**
 
-Building practical software with thoughtful engineering, AI, and modern web technologies.
+Welcome to my portfolio repository! I'm Sai Nithin Reddy, a Computer Science and Engineering student interested in building useful software, exploring AI, and solving real-world problems through technology.
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-typed%20JavaScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-build%20tool-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-runtime-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-API%20server-000000?logo=express&logoColor=white)](https://expressjs.com/)
-[![Netlify](https://img.shields.io/badge/Netlify-deployment-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
+This portfolio is where I bring my work together — from projects and technical experiments to my experience, skills, and engineering journey. I built it to share what I'm working on, what I've learned, and how I approach software development.
 
-</div>
+## About the Project
 
----
+My portfolio is more than a collection of project links. It's a responsive personal website designed to present my work, technical background, and experience in one place.
 
-## About the Portfolio
+Along with the frontend, the project includes backend services and serverless functions for managing portfolio content, synchronizing GitHub projects, handling resume and profile assets, and supporting an optional admin workflow.
 
-This repository contains my personal engineering portfolio: a responsive website presenting my background, technical skills, selected projects, case studies, experience, education, and resume.
+## Tech Stack
 
-The project also includes server-side functionality for portfolio content, GitHub project synchronization, resume and profile-asset management, and an optional admin workflow.
-
-## Technology Stack
-
-| Domain | Technologies and responsibilities |
+| Area | Technologies |
 |---|---|
-| **Frontend** | React, TypeScript, Vite, Tailwind CSS, React Router |
-| **UI and motion** | Lucide React icons, Motion animations, custom responsive components |
-| **Backend** | Node.js, Express, TypeScript |
-| **Serverless APIs** | Netlify Functions for portfolio content, projects, resume, status, synchronization, and webhook endpoints |
-| **GitHub integration** | Repository discovery and synchronization through the GitHub API; optional personal access token for higher rate limits |
-| **AI integration** | Optional server-side Google Gemini integration for supported resume/README extraction workflows |
-| **Data persistence** | JSON file-backed portfolio store and local asset management in the server implementation |
-| **Optional cloud storage** | Supabase Storage integration for uploaded assets when configured; repository-based static asset fallback |
-| **Build and deployment** | Vite production build, Netlify redirects and Functions configuration |
-| **Security** | Environment-based configuration, admin authentication, session handling, login rate limiting, and GitHub webhook signature verification |
+| Frontend | React, TypeScript, Vite |
+| UI and Animations | Tailwind CSS, Lucide React, Motion |
+| Backend | Node.js, Express, TypeScript |
+| Serverless Functions | Netlify Functions |
+| GitHub Integration | GitHub API |
+| Data Storage | JSON-based portfolio store |
+| Cloud Asset Storage | Optional Supabase Storage integration |
+| AI Integration | Optional Google Gemini integration |
+| Deployment | Netlify |
+| Development Tools | Git, GitHub, npm / Bun |
 
-> **Database note:** The current implementation uses a JSON file-backed store by default. Supabase is an optional asset-storage integration; this project should not be described as using a SQL or NoSQL database unless a database is separately configured and implemented.
+*The stack above reflects the project's intended integrations. Optional services require configuration, and not every integration is enabled by default.*
 
-## Architecture at a Glance
+## What It Includes
+
+- **Personal portfolio:** An overview of my background, technical skills, experience, and education.
+- **Project showcase:** Selected projects with supporting details and case studies.
+- **Resume section:** Access to my resume through the portfolio interface.
+- **GitHub synchronization:** Functionality for discovering and synchronizing project information from GitHub.
+- **Content management:** Supporting services for managing portfolio data and uploaded assets.
+- **Admin workflow:** An optional interface for managing supported portfolio content.
+- **Responsive design:** A layout designed to work across desktop, tablet, and mobile screens.
+- **Deployment support:** Configuration for hosting the frontend and serverless functions on Netlify.
+
+## How the Project Works
+
+The frontend presents the portfolio and handles user interaction. Depending on the deployment setup, API requests can be handled by the Express server or by Netlify Functions.
+
+These backend components support portfolio content, project synchronization, and asset-related workflows. Optional integrations can extend the application with AI-assisted extraction and cloud asset storage.
 
 ```text
-Visitor
-  |
-  v
-React + TypeScript frontend
-  |
-  +---- Portfolio pages, case studies, resume, project showcase
-  |
-  v
-API layer
-  |
-  +---- Express server (local / Node hosting)
-  |
-  +---- Netlify Functions (Netlify deployment)
-          |
-          +---- Portfolio JSON store and asset management
-          +---- GitHub repository synchronization
-          +---- Optional Gemini-powered extraction
-          +---- Optional Supabase Storage
+                    Visitor
+                       |
+                       v
+             React + TypeScript UI
+                       |
+                       v
+                   API Layer
+                  /         \
+                 v           v
+          Express Server   Netlify Functions
+                 \           /
+                  \         /
+                   v       v
+              Portfolio Services
+                       |
+          +------------+------------+
+          |            |            |
+          v            v            v
+      JSON Store   GitHub API   Asset Storage
+                                (optional)
 ```
 
-## Repository Structure
+The Express server and Netlify Functions are separate execution paths, so their supported features and configuration should be verified for the chosen hosting environment.
+
+## Project Structure
 
 ```text
-.
+Portfolio/
+├── data/                  # Portfolio content and assets
+├── netlify/
+│   └── functions/         # Serverless API endpoints
+├── public/
+│   └── images/            # Public static images
+├── server/                # Backend services and integrations
 ├── src/
-│   ├── components/       # Shared UI, layout, admin, and page sections
-│   ├── content/          # Portfolio content and content types
-│   ├── pages/            # Home, case study, admin, and not-found pages
-│   ├── services/         # Project synchronization and pipeline logic
-│   └── utils/            # Resume and supporting utilities
-├── server/               # Express-side services, authentication, storage, GitHub
-├── netlify/functions/    # Serverless API handlers
-├── data/                 # Portfolio content and uploaded/static assets
-├── public/                # Public static assets
+│   ├── components/        # Reusable UI components
+│   ├── content/           # Portfolio content and types
+│   ├── pages/             # Application pages
+│   ├── services/          # Project sync and application logic
+│   └── utils/             # Utility functions
 ├── server.ts              # Express application entry point
-├── netlify.toml           # Build, function, and redirect configuration
-├── package.json           # Scripts and dependencies
-└── .env.example           # Environment-variable template
+├── index.html             # Application HTML entry
+├── netlify.toml           # Netlify configuration
+├── package.json           # Dependencies and scripts
+├── tsconfig.json          # TypeScript configuration
+├── vite.config.ts         # Vite configuration
+└── .env.example           # Environment variable template
 ```
 
-## Run Locally
+## Getting Started
+
+Want to run the project locally? Follow these steps.
 
 ### Prerequisites
 
-- Node.js compatible with the installed Vite version
-- npm (or Bun, if you prefer the included lockfile's package manager)
+- Node.js compatible with the project's dependencies
+- npm or Bun
 
-### 1. Install dependencies
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/sainithinreddy06/Portfolio.git
+cd Portfolio
+```
+
+### 2. Install dependencies
+
+Using npm:
 
 ```bash
 npm install
 ```
 
-### 2. Configure environment variables
+Or, if you prefer Bun:
 
-Copy `.env.example` to `.env` and set the values required for the features you intend to use.
+```bash
+bun install
+```
 
-At minimum, configure a strong admin password and a unique session secret before enabling the admin workflow. GitHub, Gemini, Netlify, and Supabase integrations are optional and require their respective credentials only when those features are needed.
+### 3. Configure environment variables
 
-**Never commit a real `.env` file, access tokens, service-role keys, passwords, or session secrets.**
+Copy `.env.example` to `.env` and configure the settings required for the features you want to use.
 
-### 3. Start the development server
+For example, in PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Set secure values for any enabled admin authentication features. Optional integrations such as GitHub API access, Gemini, and Supabase require their respective configuration.
+
+**Keep your `.env` file private. Never commit API keys, passwords, session secrets, or service-role credentials to GitHub.**
+
+### 4. Start the development server
 
 ```bash
 npm run dev
 ```
 
-### 4. Create a production build
+Vite will display the local URL in your terminal.
+
+### 5. Build for production
 
 ```bash
 npm run build
 ```
 
-To run the server in production mode after building:
+To start the Express server, if supported by the configured package scripts:
 
 ```bash
 npm run start
 ```
 
-Available scripts can be checked in `package.json`.
+Check `package.json` for the available scripts and their exact behavior.
 
 ## Deployment
 
-### Netlify
+The repository includes a `netlify.toml` file for configuring the production build, published directory, serverless functions, and redirects.
 
-The repository includes `netlify.toml`, which defines the build command, published `dist` directory, serverless functions directory, API redirects, and SPA fallback.
+To deploy through Netlify:
 
-1. Import the repository into Netlify.
-2. Set the build command to `npm run build`.
+1. Import this GitHub repository into Netlify.
+2. Configure the build command as `npm run build`.
 3. Set the publish directory to `dist`.
-4. Configure only the environment variables needed by enabled features.
-5. Deploy and test the portfolio pages and API routes.
+4. Add the environment variables required by the enabled features.
+5. Deploy the site and test the pages, API endpoints, resume access, and any integrations you use.
 
-The Express server and Netlify Functions are separate execution paths. Verify the endpoints required by your chosen deployment target before relying on server-specific features.
+If automatic deployments are enabled, pushing new commits to the configured GitHub branch can trigger a new deployment.
 
-## Environment Variables
+Before deploying, verify that the selected hosting environment supports the backend features you intend to use.
 
-See [`.env.example`](.env.example) for the full template. Common settings include:
+## Environment Configuration
 
-- `GITHUB_USERNAME` — GitHub account used for repository synchronization.
-- `GITHUB_TOKEN` — optional GitHub API token.
-- `GEMINI_API_KEY` — optional Gemini integration.
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET` — admin authentication configuration.
-- `APP_URL`, `PORT`, `NODE_ENV` — application and server configuration.
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` — optional asset storage.
+The `.env.example` file contains the project's environment-variable template. Depending on your setup, you may encounter settings such as:
 
-Use real credentials only in your local environment or hosting provider's secret settings.
+| Variable | Purpose |
+|---|---|
+| `GITHUB_USERNAME` | GitHub account used for project synchronization |
+| `GITHUB_TOKEN` | Optional GitHub API authentication |
+| `GEMINI_API_KEY` | Optional Gemini integration |
+| `ADMIN_EMAIL` | Admin account configuration |
+| `ADMIN_PASSWORD` | Admin authentication |
+| `SESSION_SECRET` | Session security |
+| `APP_URL` | Application URL |
+| `PORT` | Express server port |
+| `NODE_ENV` | Runtime environment |
+| `SUPABASE_URL` | Optional Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional server-side Supabase credential |
+| `SUPABASE_STORAGE_BUCKET` | Optional asset storage bucket |
 
-## Engineering Focus
+Refer to `.env.example` and the implementation for the actual requirements. You do not need to configure every optional integration to work on the frontend.
 
-- Responsive portfolio UI and reusable React components
-- Type-safe application development with TypeScript
-- REST-style API routes and serverless function integration
-- GitHub API integration and repository synchronization
-- File-backed content persistence and asset handling
-- Optional AI and cloud-storage integrations
-- Authentication, rate limiting, webhook verification, and deployment configuration
+## A Few Engineering Priorities
 
-## Notes
+While developing this project, I focus on:
 
-- Portfolio copy, project details, resume, photos, and existing visual design are maintained from the supplied project.
-- Optional integrations remain optional; configure their credentials before using them.
-- Do not publish local session files, real credentials, or private tokens to a public repository.
-- Test the build and deployment configuration in your environment before release.
+- Keeping the interface clean, responsive, and easy to navigate.
+- Organizing the code into reusable components and understandable modules.
+- Connecting frontend features to appropriate backend services.
+- Integrating external services without making optional dependencies mandatory.
+- Handling authentication and configuration carefully.
+- Making the project easier to run, maintain, and deploy.
+
+## Future Improvements
+
+The portfolio will continue to evolve as I build new projects and improve my engineering skills. Areas I may explore include better testing, stronger observability, improved content management, and further refinements to accessibility and performance.
+
+## Connect With Me
+
+I'm always happy to connect with fellow developers, learn from other engineers, and explore interesting opportunities.
+
+- **GitHub:** [@sainithinreddy06](https://github.com/sainithinreddy06)
+- **LinkedIn:** [Sai Nithin Reddy](https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372)
+- **Email:** [sainithinreddytadugam@gmail.com](mailto:sainithinreddytadugam@gmail.com)
 
 ---
 
-<div align="center">
-
-Made by **Sai Nithin Reddy**
-
-</div>
+*Designed, developed, and maintained by Sai Nithin Reddy.*
