@@ -1,0 +1,544 @@
+import { PortfolioContent } from './types';
+
+export const initialPortfolioContent: PortfolioContent = {
+  profile: {
+    name: 'Sai Nithin Reddy',
+    wordmark: 'SAI NITHIN REDDY',
+    positioning: 'AI ENGINEER · FULL-STACK DEVELOPER · SYSTEMS BUILDER',
+    headline: 'I BUILD INTELLIGENT SYSTEMS FOR REAL-WORLD PROBLEMS.',
+    supportingCopy:
+      'Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad building AI-powered products, full-stack applications and practical software systems.',
+    institution: 'Chaitanya Bharathi Institute of Technology (CBIT)',
+    degree: 'Computer Science & Engineering',
+    batchPeriod: '2024 – 2028',
+    email: 'sainithinreddytadugam@gmail.com',
+    githubUrl: 'https://github.com/sainithinreddy06',
+    linkedinUrl: 'https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372',
+    leetcodeUrl: 'https://leetcode.com/u/Nithinreddy_06/',
+    leetcodeUsername: 'Nithinreddy_06',
+    aboutText: [
+      'I am an engineering undergraduate and software builder focused on applying machine learning, computer vision, and robust backend engineering to practical, physical-world problems.',
+      'Rather than assembling toy demos, I prioritize building end-to-end architectures from data ingestion pipelines and mathematical modeling to reactive client interfaces and geospatial visualizations.',
+      'My work centers on intelligent navigation, environmental sensing, and predictive systems where latency, correctness, and reliable data flow matter.',
+    ],
+    currentLearningDirection:
+      'Deepening systems programming, distributed backend architectures, and production-grade ML inference optimization.',
+    learningDirectionVerifyNote: undefined,
+    photo: {
+      url: '/api/portfolio/photo',
+      altText: 'Portrait of Sai Nithin Reddy, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)',
+      showInHero: true,
+      showInAbout: false,
+      isPlaceholder: false,
+    },
+    resume: {
+      fileUrl: '#resume-view',
+      isAvailable: true,
+      comingSoonMessage: 'Verified curriculum vitae available to view and download.',
+    },
+  },
+  projects: [
+    {
+      id: 'tapas',
+      name: 'TAPAS',
+      tagline: 'Thermal Analytics & Public-health Advisory System (SIH26083)',
+      category: 'FULL STACK',
+      stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
+      description:
+        'An India-ready public heat-safety prototype engineered for the Smart India Hackathon. Integrates geospatial place discovery, public weather feeds, interactive MapLibre mapped emergency shelters, and verified reference health guidance with D3 contour thermal risk modeling without invented boundary data.',
+      summary:
+        'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows developed for SIH26083.',
+      status: 'Implemented',
+      features: [
+        { name: 'MapLibre Geospatial Mapping & Emergency Help GIS', status: 'Implemented' },
+        { name: 'D3 Contour Thermal Risk Modeling', status: 'Implemented' },
+        { name: 'Public Weather Telemetry & Heat Advisory Engine', status: 'Implemented' },
+        { name: 'Next.js 15 & React 19 Client Architecture', status: 'Implemented' },
+        { name: 'SIH26083 Public Health Protocol Alignment', status: 'Implemented' },
+        { name: 'Dynamic Recharts Heat Trend Visualizer', status: 'Implemented' },
+      ],
+      githubUrl: 'https://github.com/sainithinreddy06/TAPAS',
+      liveUrl: 'https://tapas-heat-intelligence.netlify.app/',
+      caseStudySlug: 'tapas',
+      hasArchitecture: true,
+      architectureFlow: {
+        title: 'TAPAS Architecture Flow',
+        summary:
+          'Geospatial heat-safety pipeline routing public weather inputs and coordinates through thermal contour modeling to MapLibre GIS layers.',
+        nodes: [
+          { id: '1', label: 'User Client', sublabel: 'Next.js 15 & React 19 UI', status: 'Implemented' },
+          { id: '2', label: 'Place Discovery', sublabel: 'Geocoding & Telemetry', status: 'Implemented' },
+          { id: '3', label: 'Thermal Modeling', sublabel: 'D3 Contour Engine', status: 'Implemented' },
+          { id: '4', label: 'MapLibre GIS', sublabel: 'Vector Heat Shelters & Maps', status: 'Implemented' },
+          { id: '5', label: 'Health Advisories', sublabel: 'SIH Reference Protocols', status: 'Implemented' },
+        ],
+      },
+    },
+    {
+      id: 'surestep',
+      name: 'SureStep',
+      tagline: 'AI-Powered Outdoor Safety & Navigation Platform',
+      category: 'COMPUTER VISION',
+      stack: ['React', 'TypeScript', 'Node.js', 'Python', 'FastAPI', 'PyTorch', 'Ultralytics YOLO', 'Scikit-learn', 'OpenCV', 'GPS Telemetry'],
+      description:
+        'An advanced outdoor navigation and autonomous terrain hazard intelligence platform combining computer vision with geospatial telemetry. Deploys Ultralytics YOLO object detection models for real-time obstacle and trail hazard classification alongside a Random Forest model trained on USGS slope, elevation, and seismic data. Provides tactical off-grid routing, offline tile caching, and an AI Ranger Copilot for contextual environmental safety.',
+      summary:
+        'Multi-modal outdoor navigation and hazard assessment platform integrating Ultralytics YOLO computer vision with Random Forest terrain risk modeling. Evaluates real-time GPS coordinates, environmental sensors, and seismic telemetry to generate predictive trail safety indices and route recommendations.',
+      status: 'Prototype',
+      features: [
+        { name: 'AI Terrain Risk Prediction (Random Forest)', status: 'Prototype' },
+        { name: 'SureStep Vision (YOLO Object Detection)', status: 'Prototype' },
+        { name: 'Tactical GPS Navigation & Route Scoring', status: 'Prototype' },
+        { name: 'AI Ranger Contextual Safety Copilot', status: 'Prototype' },
+        { name: 'Geological Hazard & USGS Seismic Monitoring', status: 'Prototype' },
+        { name: 'Offline Map Layer Caching', status: 'Planned' },
+      ],
+      githubUrl: 'https://github.com/sainithinreddy06/SureStep',
+      liveUrl: 'https://terra-guard-ai-five.vercel.app',
+      caseStudySlug: 'surestep',
+      hasArchitecture: true,
+      architectureFlow: {
+        title: 'SureStep Pipeline Flow',
+        summary:
+          'Sensor processing and navigation pipeline from client to intelligent safety services.',
+        nodes: [
+          { id: '1', label: 'Client Application', sublabel: 'React & TypeScript UI', status: 'Prototype' },
+          { id: '2', label: 'Location & GPS', sublabel: 'Telemetry Engine', status: 'Prototype' },
+          { id: '3', label: 'FastAPI & Node Service', sublabel: 'Full-Stack ML Pipeline', status: 'Prototype' },
+          { id: '4', label: 'Random Forest Model', sublabel: 'Terrain Risk Scoring', status: 'Prototype' },
+          { id: '5', label: 'AI Ranger Copilot', sublabel: 'Contextual Safety Assistance', status: 'Prototype' },
+          { id: '6', label: 'Offline / Cloud Sync', sublabel: 'Trail Map Layers', status: 'Planned' },
+        ],
+      },
+    },
+    {
+      id: 'traffiq',
+      name: 'TRAFFIQ',
+      tagline: 'AI Traffic & Accident Risk Prediction System',
+      category: 'AI / ML',
+      stack: [
+        'React',
+        'FastAPI',
+        'Python',
+        'MongoDB',
+        'Scikit-learn',
+        'Tailwind CSS',
+        'Geospatial APIs',
+      ],
+      description:
+        'An intelligent urban traffic optimization and accident-risk prediction platform engineered to process spatial telemetry in real time. Combines historical road network sensor data with Scikit-learn regressors and spatial windowing algorithms to forecast severe congestion waves and highlight localized collision risk zones before incidents occur. Features interactive geospatial heatmaps, live weather indices, and asynchronous FastAPI REST endpoints backed by MongoDB.',
+      summary:
+        'Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.',
+      status: 'Prototype',
+      features: [
+        { name: 'Congestion Prediction Engine', status: 'Prototype' },
+        { name: 'Accident-Risk Spatial Classification', status: 'Prototype' },
+        { name: 'Dynamic Risk Heatmaps & Analytics', status: 'Prototype' },
+        { name: 'Interactive Map GIS Dashboard', status: 'Prototype' },
+        { name: 'FastAPI Async REST APIs & MongoDB Storage', status: 'Implemented' },
+        { name: 'Time-Series Trend Forecasting', status: 'Planned' },
+        { name: 'Meteorological Weather Data Ingestion', status: 'Planned' },
+      ],
+      githubUrl: 'https://github.com/sainithinreddy06/TRAFFIQ',
+      caseStudySlug: 'traffiq',
+      hasArchitecture: true,
+      architectureFlow: {
+        title: 'TRAFFIQ System Flow',
+        summary:
+          'High-level intended flow from geospatial telemetry to prediction models and reactive mapping.',
+        nodes: [
+          { id: '1', label: 'Frontend Client', sublabel: 'React & Mapping UI', status: 'Implemented' },
+          { id: '2', label: 'FastAPI Backend', sublabel: 'Async REST Service', status: 'Implemented' },
+          { id: '3', label: 'Data Processing', sublabel: 'Feature Extraction & Windows', status: 'Implemented' },
+          { id: '4', label: 'ML Models', sublabel: 'Scikit-learn Risk Classifier', status: 'Prototype' },
+          { id: '5', label: 'MongoDB', sublabel: 'Spatial Telemetry Collection', status: 'Implemented' },
+          { id: '6', label: 'Geospatial APIs', sublabel: 'External Tile & Routing', status: 'Planned' },
+        ],
+      },
+    },
+    {
+      id: 'vidyavistaar',
+      name: 'VidyaVistaar',
+      tagline: 'AI-Powered Educational Learning & Intelligence Platform',
+      category: 'FULL STACK',
+      stack: ['React 19', 'TypeScript', 'Google Gemini AI', 'Recharts', 'Vite', 'Tailwind CSS'],
+      description:
+        'A modern AI-powered educational intelligence platform designed to deliver personalized student tutoring and adaptive learning workflows. Connects a type-safe React 19 frontend with Google Gemini AI generative models for contextual multi-turn Q&A, backed by dynamic Recharts visual analytics tracking student concept mastery and engagement curves over time.',
+      summary:
+        'Modern educational platform combining component-based React 19 architecture with Google Gemini AI for contextual student guidance. Integrates reactive Recharts performance visualizers and modular services to track student concept mastery across personalized learning curricula.',
+      status: 'Implemented',
+      features: [
+        { name: 'Intelligent AI Question Answering', status: 'Implemented' },
+        { name: 'Google Gemini GenAI Integration', status: 'Implemented' },
+        { name: 'Interactive Performance Visualizations (Recharts)', status: 'Implemented' },
+        { name: 'Modular Type-Safe React 19 Architecture', status: 'Implemented' },
+        { name: 'Student Analytics & Activity Tracking', status: 'Prototype' },
+        { name: 'Personalized Learning Workflows', status: 'Planned' },
+      ],
+      githubUrl: 'https://github.com/sainithinreddy06/VidyaVistaar',
+      caseStudySlug: 'vidyavistaar',
+      hasArchitecture: true,
+      architectureFlow: {
+        title: 'VidyaVistaar Architecture Flow',
+        summary:
+          'Modular component-based frontend architecture routing student queries to Google Gemini AI and Recharts visual analytics.',
+        nodes: [
+          { id: '1', label: 'User Client', sublabel: 'React & Responsive UI', status: 'Implemented' },
+          { id: '2', label: 'Component Layer', sublabel: 'Interactive UI Elements', status: 'Implemented' },
+          { id: '3', label: 'Services Layer', sublabel: 'Google GenAI SDK Integration', status: 'Implemented' },
+          { id: '4', label: 'Gemini AI Engine', sublabel: 'Educational Intelligence & Q&A', status: 'Implemented' },
+          { id: '5', label: 'Recharts Visualizer', sublabel: 'Learning Progress & Analytics', status: 'Implemented' },
+        ],
+      },
+    },
+  ],
+  caseStudies: {
+    tapas: {
+      slug: 'tapas',
+      title: 'TAPAS',
+      subtitle: 'Thermal Analytics & Public-health Advisory System (SIH26083)',
+      overview:
+        'TAPAS is an India-ready public heat-safety frontend prototype developed for the Smart India Hackathon. It provides high-precision place discovery, public meteorological heat indices, interactive mapped emergency relief shelters, and official health advisory reference protocols.',
+      problem:
+        'Extreme thermal heatwaves present critical public health hazards across urban India. Citizens and relief responders lack unified, responsive map interfaces that accurately visualize localized thermal stress and locate nearby verified cooling shelters.',
+      whyBuilt:
+        'Engineered to tackle Smart India Hackathon problem statement SIH26083, delivering an accessible, resilient GIS dashboard that visualizes heat risks and directs citizens to relief centers.',
+      architectureSummary:
+        'Built with Next.js 15 and React 19. Incorporates MapLibre GL for client-side vector tile rendering, D3 contour for thermal boundary interpolation, and Recharts for diurnal temperature curve tracking.',
+      architectureFlow: [
+        { id: '1', label: 'Next.js Frontend', sublabel: 'React 19 & Tailwind CSS', status: 'Implemented' },
+        { id: '2', label: 'Location Telemetry', sublabel: 'Place Discovery & Geocoding', status: 'Implemented' },
+        { id: '3', label: 'D3 Contour Service', sublabel: 'Thermal Risk Meshes', status: 'Implemented' },
+        { id: '4', label: 'MapLibre Vector Layer', sublabel: 'Interactive Shelter GIS', status: 'Implemented' },
+        { id: '5', label: 'Advisory Engine', sublabel: 'Public Health Reference Data', status: 'Implemented' },
+      ],
+      dataPipeline:
+        'Weather observations and place coordinates are validated client-side with strict sanitization. Fallback snapshots record timestamped reference data without speculative extrapolation.',
+      frontendNotes:
+        'Designed with Next.js 15, React 19, MapLibre GL, and Tailwind CSS. Supports fast vector rendering and fluid responsive controls across mobile, tablet, and desktop.',
+      backendNotes:
+        'Type-safe services isolate external geocoding and weather API feeds with caching and error resilience.',
+      databaseNotes:
+        'GeoJSON point datasets for cooling shelters and emergency relief posts with spatial index queries.',
+      technicalDecisions: [
+        {
+          decision: 'MapLibre GL for GIS map rendering',
+          rationale: 'High-performance WebGL-based vector map engine without proprietary licensing overhead.',
+        },
+        {
+          decision: 'D3 contour for thermal visualization',
+          rationale: 'Generates smooth mathematical contour intervals over telemetry grids for clear heat stress boundaries.',
+        },
+      ],
+      challenges: [
+        'Rendering smooth vector thermal contours without blocking UI interactivity on mobile devices.',
+        'Handling offline or slow network conditions gracefully with timestamped fallback snapshots.',
+      ],
+      lessons: [
+        'Public health applications demand absolute transparency: clearly differentiating real-time sensor readings from historical reference snapshots builds critical trust.',
+      ],
+      futureWork: [
+        { item: 'Integration with national weather radar satellite feeds', status: 'Planned' },
+        { item: 'Automated SMS warning broadcasts for vulnerable zones', status: 'Planned' },
+      ],
+      repoUrl: 'https://github.com/sainithinreddy06/TAPAS',
+      stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
+    },
+    traffiq: {
+      slug: 'traffiq',
+      title: 'TRAFFIQ',
+      subtitle: 'AI Traffic & Accident Risk Prediction Platform',
+      overview:
+        'TRAFFIQ is an engineering initiative investigating whether real-time traffic sensor streams combined with historical road segment features can surface localized accident risks and predict sudden congestion spikes before they cascade through an urban corridor.',
+      problem:
+        'Urban traffic telemetry is frequently reactive: navigation systems route vehicles around accidents only after congestion has already formed. Drivers and municipality coordinators lack accessible predictive tools that evaluate spatial risk factors before incidents happen.',
+      whyBuilt:
+        'I built TRAFFIQ to experiment with combining geospatial web representations with machine learning backends in Python and FastAPI, moving past static visualizations into dynamic risk scoring and reactive dashboards.',
+      architectureSummary:
+        'The architecture decouples the reactive client view from the computational backend. The FastAPI server ingests segment speed and coordinate coordinates, extracts windowed features, runs them through risk estimation estimators, and serves geoJSON layers back to the client.',
+      architectureFlow: [
+        { id: '1', label: 'Frontend Client', sublabel: 'React & Interactive Maps', status: 'Implemented' },
+        { id: '2', label: 'FastAPI Backend', sublabel: 'Async REST Service', status: 'Implemented' },
+        { id: '3', label: 'Data Processing', sublabel: 'Feature Extraction & Windows', status: 'Implemented' },
+        { id: '4', label: 'ML Models', sublabel: 'Scikit-learn Regressors/Classifiers', status: 'Prototype' },
+        { id: '5', label: 'MongoDB', sublabel: 'Historical Spatial Collection', status: 'Implemented' },
+        { id: '6', label: 'Geospatial APIs', sublabel: 'External Tiles & Routing [Planned]', status: 'Planned' },
+      ],
+      dataPipeline:
+        'Segment data is standardized into uniform temporal buckets. Numerical features include historical speed variance, lane density, junction distance, and simulated weather indices. Missing values are filled via localized spatial nearest-neighbor interpolation.',
+      mlPipeline:
+        'Feature engineering isolates road curvature, average segment velocity degradation, and historical peak indices. Trained regression and classification models estimate congestion likelihood and high-risk flags per spatial node.',
+      frontendNotes:
+        'Constructed with React and Tailwind CSS. Employs clean vector-rendered maps with custom SVG overlays, rendering danger heatmaps without blocking user panning or zooming.',
+      backendNotes:
+        'FastAPI asynchronous handlers handle coordinate queries with sub-50ms serialized response times for cached segment bounding boxes.',
+      databaseNotes:
+        'MongoDB document schema stores temporal snapshots indexed by geospatial 2dsphere coordinates for fast bounding-box queries.',
+      technicalDecisions: [
+        {
+          decision: 'FastAPI instead of Flask or Express for the core service',
+          rationale:
+            'Async Python execution with native Pydantic validation allows high-throughput spatial coordinate parsing with zero glue serialization code.',
+        },
+        {
+          decision: 'Strict client-side separation of map rendering from ML inference',
+          rationale:
+            'Ensures heavy predictive algorithms never degrade 60fps canvas/vector panning.',
+        },
+      ],
+      challenges: [
+        'Handling high-frequency coordinate payload serialization without frame stutter on the client.',
+        'Normalizing uneven road segment lengths into standardized spatial grids for statistical consistency.',
+      ],
+      lessons: [
+        'Real-world sensor feeds suffer from sudden dropouts; input validators must handle incomplete feature arrays gracefully.',
+        'Visualizing risk gradients requires careful color palette contrast calibration to avoid ambiguous reading in daylight scenarios.',
+      ],
+      futureWork: [
+        { item: 'Integration with live municipality open-data feeds', status: 'Planned' },
+        { item: 'Temporal sequence forecasting with recurrent architectures', status: 'Research' },
+        { item: 'Automated weather radar precipitation overlays', status: 'Planned' },
+      ],
+      repoUrl: 'https://github.com/sainithinreddy06/TRAFFIQ',
+      stack: ['React', 'FastAPI', 'Python', 'Scikit-learn', 'MongoDB', 'Tailwind CSS'],
+    },
+    surestep: {
+      slug: 'surestep',
+      title: 'SureStep',
+      subtitle: 'AI-Powered Outdoor Safety & Navigation Platform',
+      overview:
+        'SureStep explores combining on-device computer vision inferences, GPS telemetry, and machine learning models to help hikers, field researchers, and outdoor adventurers navigate rough trails and off-grid environments safely.',
+      problem:
+        'Standard turn-by-turn navigation platforms fail when navigating remote wilderness or challenging terrain. They offer no insights into trail conditions, visual hazards, terrain stability, geological hazard monitoring, or offline availability.',
+      whyBuilt:
+        'To engineer a reliable system that aids physical situational awareness in off-grid environments using modular vision, GPS telemetry, and an AI Ranger Copilot for contextual assistance.',
+      architectureSummary:
+        'Designed as an edge-oriented full-stack ML architecture. Camera frames and terrain features are processed through lightweight models to evaluate surface hazards, while GPS coordinates query local geospatial caches.',
+      architectureFlow: [
+        { id: '1', label: 'Client Application', sublabel: 'React & TypeScript Interface', status: 'Prototype' },
+        { id: '2', label: 'Location & GPS', sublabel: 'Device Telemetry Engine', status: 'Prototype' },
+        { id: '3', label: 'Backend APIs', sublabel: 'Node.js & FastAPI Pipeline', status: 'Prototype' },
+        { id: '4', label: 'Random Forest Model', sublabel: 'Terrain & Environmental Scoring', status: 'Prototype' },
+        { id: '5', label: 'AI Ranger Copilot', sublabel: 'Contextual Safety Guidance', status: 'Prototype' },
+        { id: '6', label: 'Offline / Cloud Data', sublabel: 'Synced Map Layers', status: 'Planned' },
+      ],
+      dataPipeline:
+        'Processes GPS latitude, longitude, elevation, and heading telemetry in continuous sample buffers, paired with analyzed camera frames and terrain gradient indicators.',
+      frontendNotes:
+        'React and TypeScript interface with high-contrast outdoor visibility modes and minimal battery consumption footprint.',
+      backendNotes:
+        'Full-stack architecture combining Node.js/Express and FastAPI for machine learning evaluation and route scoring.',
+      databaseNotes:
+        'Local storage for offline trail paths with lightweight geo-indexing and planned cloud synchronization.',
+      technicalDecisions: [
+        {
+          decision: 'Machine Learning-based Random Forest model for terrain data',
+          rationale:
+            'Provides robust multi-factor risk scoring across slope, terrain roughness, weather conditions, and geological metrics with high interpretability.',
+        },
+      ],
+      challenges: [
+        'Battery conservation while simultaneously acquiring GPS locks and running evaluation cycles.',
+        'Calibrating orientation sensors under fluctuating magnetic anomalies in outdoor rocky terrains.',
+      ],
+      lessons: [
+        'Outdoor navigation requires clear, large typography and single-touch controls designed for one-handed operation.',
+      ],
+      futureWork: [
+        { item: 'Offline vector contour map caching', status: 'Planned' },
+        { item: 'Mesh-network SOS beaconing across nearby peer devices', status: 'Planned' },
+      ],
+      repoUrl: 'https://github.com/sainithinreddy06/SureStep',
+      stack: ['React', 'TypeScript', 'Node.js', 'FastAPI', 'Python', 'Scikit-learn'],
+    },
+    vidyavistaar: {
+      slug: 'vidyavistaar',
+      title: 'VidyaVistaar',
+      subtitle: 'AI-Powered Educational Learning & Intelligence Platform',
+      overview:
+        'VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience, combining Google Gemini AI with reactive data visualization.',
+      problem:
+        'Traditional learning management systems often deliver static content without immediate, adaptive explanations or visual progress feedback, leading to disengagement during self-guided study.',
+      whyBuilt:
+        'Built to explore practical integration of modern LLMs via the Google GenAI SDK with type-safe React frontend workflows, creating an interactive educational companion rather than a simple chatbot.',
+      architectureSummary:
+        'Follows a modular component-based frontend architecture connecting client UI components, Recharts telemetry visualizations, and secure Google Gemini API services.',
+      architectureFlow: [
+        { id: '1', label: 'User Interface', sublabel: 'Type-Safe React 19 & Tailwind', status: 'Implemented' },
+        { id: '2', label: 'Service Layer', sublabel: 'Google GenAI SDK Connector', status: 'Implemented' },
+        { id: '3', label: 'Gemini AI Engine', sublabel: 'Contextual Student Guidance', status: 'Implemented' },
+        { id: '4', label: 'Data Visualizer', sublabel: 'Interactive Recharts Dashboards', status: 'Implemented' },
+      ],
+      dataPipeline:
+        'User queries and study contexts are structured and dispatched to Gemini models with targeted instructional prompts. Student performance metrics are mapped to Recharts data streams.',
+      frontendNotes:
+        'Constructed with React 19, Vite, and Tailwind CSS. Features accessible responsive components and real-time visualization dashboards.',
+      backendNotes:
+        'Stateless API service interfaces connecting directly with Google GenAI endpoints with zero unnecessary backend latency.',
+      databaseNotes:
+        'Stateless client architecture with browser caching and environment-based configuration for API sessions.',
+      technicalDecisions: [
+        {
+          decision: 'Google GenAI SDK over generic REST endpoints',
+          rationale:
+            'Native TypeScript SDK provides typed responses, built-in retry handling, and direct prompt streaming capability.',
+        },
+        {
+          decision: 'Recharts for data visualization',
+          rationale:
+            'Declarative SVG charting designed for React, providing smooth animations and responsiveness across screen sizes.',
+        },
+      ],
+      challenges: [
+        'Formatting structured generative responses into digestible study cards without UI layout shifts.',
+        'Optimizing chart re-renders when student telemetry streams update.',
+      ],
+      lessons: [
+        'Combining generative text explanations with visual quantitative charts significantly increases comprehension speed.',
+      ],
+      futureWork: [
+        { item: 'Adaptive multi-subject learning pathways', status: 'Planned' },
+        { item: 'Collaborative peer study sessions', status: 'Planned' },
+      ],
+      repoUrl: 'https://github.com/sainithinreddy06/VidyaVistaar',
+      stack: ['React', 'TypeScript', 'Google Gemini AI', 'Recharts', 'Vite', 'Tailwind CSS'],
+    },
+  },
+  skillCategories: [
+    {
+      title: 'AI & Autonomous Systems',
+      skills: [
+        { name: 'Python' },
+        { name: 'LangGraph & AI Agents' },
+        { name: 'Gemini API & LLMs' },
+        { name: 'Scikit-learn' },
+        { name: 'PyTorch & YOLO' },
+        { name: 'Qdrant Vector DB' },
+        { name: 'Pandas & NumPy' },
+      ],
+    },
+    {
+      title: 'Software Engineering',
+      skills: [
+        { name: 'Python' },
+        { name: 'C / C++' },
+        { name: 'Java' },
+        { name: 'TypeScript & JavaScript' },
+        { name: 'Data Structures & Algorithms' },
+        { name: 'System Design & OOP' },
+        { name: 'SQL & Relational Modeling' },
+      ],
+    },
+    {
+      title: 'Full Stack & MERN',
+      skills: [
+        { name: 'React 19' },
+        { name: 'Next.js' },
+        { name: 'Node.js & Express' },
+        { name: 'Socket.io (WebSockets)' },
+        { name: 'FastAPI' },
+        { name: 'Tailwind CSS' },
+        { name: 'REST & GraphQL APIs' },
+      ],
+    },
+    {
+      title: 'Databases & Web3 / Tools',
+      skills: [
+        { name: 'MongoDB' },
+        { name: 'PostgreSQL & Prisma' },
+        { name: 'Redis (In-Memory)' },
+        { name: 'Solidity & Ethers.js (Web3)' },
+        { name: 'Docker' },
+        { name: 'Git & GitHub' },
+        { name: 'IPFS' },
+      ],
+    },
+  ],
+  timeline: [
+    {
+      id: 'cbit-education',
+      role: 'B.E./B.Tech. – Computer Science & Engineering',
+      organization: 'Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad',
+      period: '2024 – 2028',
+      type: 'Education',
+      achievementBadge: 'CGPA: 9.06',
+      description:
+        'Undergraduate studies in core Computer Science & Engineering covering Data Structures, Algorithms, Discrete Mathematics, Operating Systems, Database Management Systems, and Machine Learning.',
+    },
+    {
+      id: 'narayana-intermediate',
+      role: 'Board of Intermediate Education, Telangana',
+      organization: 'Narayana Institutions, Hyderabad',
+      period: '2022 – 2024',
+      type: 'Education',
+      achievementBadge: 'CGPA: 9.41',
+      description:
+        'Higher secondary education with intensive foundation in Mathematics, Physics, and Chemistry.',
+    },
+    {
+      id: 'asteroid-comp',
+      role: '3rd Place Awardee',
+      organization: 'Asteroid Hazard Classification Competition',
+      period: '2024',
+      type: 'Competition',
+      achievementBadge: '3rd Place',
+      description:
+        'Built machine learning classification models evaluating astronomical and orbital trajectory features to categorize hazardous near-Earth objects.',
+    },
+    {
+      id: 'eamcet-rank',
+      role: 'Rank 2337',
+      organization: 'TS EAMCET 2024 (Telangana State Engineering Entrance)',
+      period: '2024',
+      type: 'Competition',
+      achievementBadge: 'Rank 2337',
+      description:
+        'Secured Rank 2337 among over 200,000 engineering aspirants across Telangana state.',
+    },
+    {
+      id: 'rmc-involvement',
+      role: 'Public Relations Team Member',
+      organization: 'Ramanujan Mathematics Club (RMC), CBIT',
+      period: '2024 – Present',
+      type: 'Involvement',
+      description:
+        'Active member of the Public Relations team handling outreach, communications, and student engagement for technical events and symposiums.',
+    },
+    {
+      id: 'chaitanya-spandana',
+      role: 'Social Welfare Club Member',
+      organization: 'Chaitanya Spandana, CBIT',
+      period: '2024 – Present',
+      type: 'Involvement',
+      description:
+        'Participating in community social welfare initiatives, student mentorship drives, and campus outreach activities.',
+    },
+    {
+      id: 'certifications-verified',
+      role: 'Technical Certifications',
+      organization: 'Industry Credentials',
+      period: 'Verified',
+      type: 'Involvement',
+      description:
+        '• React Web Development Certification • Generative AI Certification • Java Programming Certification',
+    },
+    {
+      id: 'sih-participation',
+      role: 'Hackathon Participant',
+      organization: 'Smart India Hackathon (SIH)',
+      period: '2024',
+      type: 'Involvement',
+      description:
+        'Collaborated in a multidisciplinary team developing software solutions addressing national problem statements.',
+    },
+    {
+      id: 'cyberfest-ctf',
+      role: 'Participant',
+      organization: 'CyberFest / CTF',
+      period: '2024',
+      type: 'Involvement',
+      description:
+        'Engaged in Capture The Flag technical challenges focusing on systems analysis, web security, and cryptographic problem solving.',
+    },
+  ],
+};

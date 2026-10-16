@@ -1,0 +1,6 @@
+{
+  "name": "Sai Nithin Reddy Portfolio",
+  "description": "Production personal engineering portfolio for Sai Nithin Reddy with automated GitHub synchronization and live demo discovery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
