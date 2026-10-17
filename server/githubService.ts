@@ -1,3 +1,4 @@
+import { env } from './runtimeEnv';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -134,7 +135,7 @@ function getGitHubHeaders(): Record<string, string> {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'sainithinreddy-portfolio-discovery',
   };
-  const token = process.env.GITHUB_TOKEN;
+  const token = env('GITHUB_TOKEN');
   if (token && token.trim() !== '') {
     headers.Authorization = `Bearer ${token.trim()}`;
   }
@@ -606,7 +607,7 @@ export async function discoverLiveDeployment(
   }
 
   // Tier 5: Netlify API (if NETLIFY_AUTH_TOKEN is configured in server environment)
-  const netlifyToken = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_TOKEN;
+  const netlifyToken = env('NETLIFY_AUTH_TOKEN') || env('NETLIFY_TOKEN');
   if (netlifyToken) {
     try {
       const netlifyRes = await fetch('https://api.netlify.com/api/v1/sites', {
@@ -1049,7 +1050,7 @@ export async function syncAllPortfolioRepositories(
   forceRefresh = false,
   previousKnownUrls: Record<string, string> = {}
 ): Promise<ExtractedGitHubProject[]> {
-  const username = targetUsername || process.env.GITHUB_USERNAME || DEFAULT_GITHUB_USERNAME;
+  const username = targetUsername || env('GITHUB_USERNAME') || DEFAULT_GITHUB_USERNAME;
   const now = Date.now();
   lastSyncErrors = [];
 
@@ -1065,6 +1066,7 @@ export async function syncAllPortfolioRepositories(
 
   try {
     const allRepos = await fetchAllUserReposWithPagination(username, headers);
+    if (forceRefresh && lastSyncErrors.length) throw Object.assign(new Error('GitHub repository discovery failed.'), { code: 'GITHUB_DISCOVERY_FAILED' });
     const projects: ExtractedGitHubProject[] = [];
 
     // Filter and process eligible repositories
@@ -1085,7 +1087,7 @@ export async function syncAllPortfolioRepositories(
         username,
         projects,
       };
-      writeDiskCache(username, projects);
+
       console.log(`[GitHub Sync] Successfully discovered ${projects.length} eligible repositories for ${username}.`);
       return projects;
     }
@@ -1098,7 +1100,8 @@ export async function syncAllPortfolioRepositories(
     }
     return [];
   } catch (err: any) {
-    console.error('[GitHub Sync] Error syncing user repositories:', err);
+    if (forceRefresh) throw err;
+    console.error('[GitHub Sync] Repository discovery failed.');
     lastSyncErrors.push(err.message);
     const diskFallback = readDiskCache();
     if (diskFallback && diskFallback.length > 0) {
@@ -1116,13 +1119,13 @@ export function getGitHubDiagnostics(): GitHubSyncDiagnostics {
   const disk = readDiskCache();
   const currentProjects = inMemoryCache?.projects || disk || [];
   return {
-    username: process.env.GITHUB_USERNAME || DEFAULT_GITHUB_USERNAME,
+    username: env('GITHUB_USERNAME') || DEFAULT_GITHUB_USERNAME,
     lastSyncedAt: new Date(inMemoryCache?.timestamp || Date.now()).toISOString(),
     rateLimitRemaining: lastRateLimitRemaining,
     rateLimitReset: lastRateLimitReset,
-    hasTokenConfigured: Boolean(process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN.trim() !== ''),
-    hasWebhookSecretConfigured: Boolean(process.env.GITHUB_WEBHOOK_SECRET && process.env.GITHUB_WEBHOOK_SECRET.trim() !== ''),
-    hasNetlifyTokenConfigured: Boolean(process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_TOKEN),
+    hasTokenConfigured: Boolean(env('GITHUB_TOKEN')?.trim()),
+    hasWebhookSecretConfigured: Boolean(env('GITHUB_WEBHOOK_SECRET')?.trim()),
+    hasNetlifyTokenConfigured: Boolean(env('NETLIFY_AUTH_TOKEN') || env('NETLIFY_TOKEN')),
     totalReposDiscovered: currentProjects.length,
     eligibleReposCount: currentProjects.filter((p) => p.isEligible).length,
     projects: currentProjects,

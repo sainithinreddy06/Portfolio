@@ -1,5 +1,6 @@
+import { reportApiFailure } from '../../server/apiErrors';
 import type { Handler } from './types';
-import { getPortfolioStore } from '../../server/portfolioStore';
+import { getPortfolioStore } from '../../server/deployedPortfolioStore';
 
 export const handler: Handler = async () => {
   const headers = {
@@ -9,7 +10,7 @@ export const handler: Handler = async () => {
   };
 
   try {
-    const store = getPortfolioStore();
+    const store = await getPortfolioStore();
     return {
       statusCode: 200,
       headers,
@@ -21,10 +22,11 @@ export const handler: Handler = async () => {
       }),
     };
   } catch (err: any) {
+    reportApiFailure('portfolio', err);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ success: false, error: err.message }),
+      headers: { ...headers, 'Cache-Control': 'no-store' },
+      body: JSON.stringify({ success: false, error: 'Portfolio service failed. Check function logs and database configuration.' }),
     };
   }
 };

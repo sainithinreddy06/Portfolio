@@ -1,6 +1,7 @@
+import { reportApiFailure } from '../../server/apiErrors';
 import type { Handler } from './types';
-import { getPortfolioStore, savePortfolioStore } from '../../server/portfolioStore';
-import { verifyAdminToken } from '../../server/authService';
+import { getPortfolioStore, savePortfolioStore } from '../../server/deployedPortfolioStore';
+import { verifyAdminToken } from '../../server/deployedAuthService';
 
 export const handler: Handler = async (event) => {
   const headers = {
@@ -13,13 +14,14 @@ export const handler: Handler = async (event) => {
     return { statusCode: 204, headers, body: '' };
   }
 
+  try {
   if (event.httpMethod === 'POST') {
     const authHeader = event.headers['authorization'] || event.headers['Authorization'];
     const token = authHeader?.startsWith('Bearer ')
       ? authHeader.slice(7).trim()
       : (event.headers['x-admin-token'] || event.headers['X-Admin-Token']);
 
-    const authCheck = verifyAdminToken(token);
+    const authCheck = await verifyAdminToken(token);
     if (!authCheck.valid) {
       return {
         statusCode: 401,
@@ -29,7 +31,7 @@ export const handler: Handler = async (event) => {
     }
     try {
       const { fileUrl, fileName, fileSize, comingSoonMessage, isAvailable, reset } = JSON.parse(event.body || '{}');
-      const store = getPortfolioStore();
+      const store = await getPortfolioStore();
 
       if (reset) {
         store.content.profile.resume = {
@@ -40,7 +42,7 @@ export const handler: Handler = async (event) => {
           isAvailable: true,
           comingSoonMessage: 'Verified curriculum vitae available to view and download.',
         };
-        savePortfolioStore(store);
+        await savePortfolioStore(store);
         return {
           statusCode: 200,
           headers,
@@ -57,7 +59,7 @@ export const handler: Handler = async (event) => {
           isAvailable: isAvailable !== false,
           comingSoonMessage: comingSoonMessage || 'Verified curriculum vitae available.',
         };
-        savePortfolioStore(store);
+        await savePortfolioStore(store);
         return {
           statusCode: 200,
           headers,
@@ -71,18 +73,23 @@ export const handler: Handler = async (event) => {
         body: JSON.stringify({ success: false, error: 'Provide fileUrl or reset flag.' }),
       };
     } catch (err: any) {
+    reportApiFailure('resume', err);
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ success: false, error: err.message }),
+        body: JSON.stringify({ success: false, error: 'Portfolio service failed. Check function logs and database configuration.' }),
       };
     }
   }
 
-  const store = getPortfolioStore();
+  const store = await getPortfolioStore();
   return {
     statusCode: 200,
     headers,
     body: JSON.stringify({ success: true, resume: store.content.profile.resume }),
   };
+  } catch (error) {
+    reportApiFailure('resume', error);
+    return { statusCode: 503, headers, body: JSON.stringify({ success: false, error: 'Portfolio storage or authentication configuration is unavailable.' }) };
+  }
 };

@@ -1,3 +1,4 @@
+import { readApiJson } from '../services/apiResponse';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../content';
@@ -143,7 +144,7 @@ export const AdminPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (data.success) {
             setIsAuthenticated(true);
             sessionStorage.setItem('sai_nithin_admin_auth', 'true');
@@ -193,7 +194,7 @@ export const AdminPage: React.FC = () => {
     try {
       const res = await fetch('/api/github/status');
       if (res.ok) {
-        const data = await res.json();
+        const data = await readApiJson(res);
         if (data.success) {
           setDiagnostics(data.diagnostics);
         }
@@ -223,7 +224,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user, password }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
 
       if (res.ok && data.success && data.token) {
         setIsAuthenticated(true);
@@ -323,7 +324,7 @@ export const AdminPage: React.FC = () => {
             }),
           });
 
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Server error uploading resume file.');
           }
@@ -394,7 +395,7 @@ export const AdminPage: React.FC = () => {
             draft.profile.resume.comingSoonMessage || 'Verified curriculum vitae available.',
         }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error saving resume URL.');
       }
@@ -427,7 +428,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ versionId: version.id }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error rolling back resume version.');
       }
@@ -458,7 +459,7 @@ export const AdminPage: React.FC = () => {
       const res = await authFetch(`/api/portfolio/resume/version/${versionId}`, {
         method: 'DELETE',
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error deleting resume version.');
       }
@@ -494,7 +495,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reset: true }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       const updated = {
         ...draft,
         profile: {
@@ -560,7 +561,7 @@ export const AdminPage: React.FC = () => {
                 `Portrait of ${draft.profile.name}, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)`,
             }),
           });
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Server error saving portrait image.');
           }
@@ -625,7 +626,7 @@ export const AdminPage: React.FC = () => {
             `Portrait of ${draft.profile.name}, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)`,
         }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error saving photo URL.');
       }
@@ -658,7 +659,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ versionId: version.id }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error restoring photo version.');
       }
@@ -689,7 +690,7 @@ export const AdminPage: React.FC = () => {
       const res = await authFetch(`/api/portfolio/photo/version/${versionId}`, {
         method: 'DELETE',
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error deleting photo version.');
       }
@@ -724,7 +725,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reset: true }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       const updated = {
         ...draft,
         profile: {
@@ -1838,7 +1839,7 @@ export const AdminPage: React.FC = () => {
                   setIsSyncingGithub(true);
                   try {
                     const res = await authFetch('/api/github/sync', { method: 'POST' });
-                    const data = await res.json();
+                    const data = await readApiJson(res);
                     setGithubSyncMsg(data.message || 'Repositories synced successfully.');
                     await fetchDiagnostics();
                   } catch (err: any) {
