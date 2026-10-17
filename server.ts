@@ -85,7 +85,6 @@ import {
   checkLoginRateLimit,
   recordFailedLogin,
   recordSuccessfulLogin,
-  ADMIN_EMAIL,
   verifyAdminPassword,
   isAuthConfigured,
   ALLOWED_ADMIN_USERS,
@@ -408,7 +407,7 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
 
     const normEmail = email.trim().toLowerCase();
     const isUserAllowed =
-      normEmail === ADMIN_EMAIL.toLowerCase() || ALLOWED_ADMIN_USERS.includes(normEmail);
+      ALLOWED_ADMIN_USERS.includes(normEmail);
 
     if (!isUserAllowed) {
       recordFailedLogin(ip);

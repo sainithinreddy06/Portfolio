@@ -199,6 +199,19 @@ The `.env.example` file contains the project's environment-variable template. De
 
 Refer to `.env.example` and the implementation for the actual requirements. You do not need to configure every optional integration to work on the frontend.
 
+### Deployment secrets scanning
+
+Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the hosting environment, never in
+committed environment files or client-side build variables. Admin login requires
+both settings and accepts only the configured email address.
+
+The portfolio intentionally publishes its contact email. Because that public
+address may also be the admin login identifier, Netlify excludes only
+`ADMIN_EMAIL` from secrets scanning. Passwords and all other secrets remain
+covered. If a password was exposed in a previous deployment or commit, replace
+it in Netlify before deploying again; removing it from current files does not
+revoke the old credential.
+
 ## A Few Engineering Priorities
 
 While developing this project, I focus on:
