@@ -1,11 +1,14 @@
+import { reportApiFailure } from '../../server/apiErrors';
+import { env } from '../../server/runtimeEnv';
 import type { Handler } from './types';
-import { getPortfolioStore } from '../../server/portfolioStore';
+import { getPortfolioStore } from '../../server/deployedPortfolioStore';
 import { syncAllPortfolioRepositories } from '../../server/githubService';
-import { syncGitHubProjects } from '../../server/portfolioStore';
+import { syncGitHubProjects } from '../../server/deployedPortfolioStore';
 
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'sainithinreddy06';
 
 export const handler: Handler = async (event) => {
+  const GITHUB_USERNAME = env('GITHUB_USERNAME') || 'sainithinreddy06';
+
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -16,7 +19,7 @@ export const handler: Handler = async (event) => {
     const shouldRefresh = event.queryStringParameters?.refresh === 'true';
     if (shouldRefresh) {
       const discovered = await syncAllPortfolioRepositories(GITHUB_USERNAME, true);
-      const updatedContent = syncGitHubProjects(discovered);
+      const updatedContent = await syncGitHubProjects(discovered);
       return {
         statusCode: 200,
         headers,
@@ -30,7 +33,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const store = getPortfolioStore();
+    const store = await getPortfolioStore();
     return {
       statusCode: 200,
       headers,
@@ -43,18 +46,7 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (err: any) {
-    const store = getPortfolioStore();
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        source: 'fallback_store',
-        lastUpdated: store.lastUpdated,
-        total: store.content.projects.length,
-        projects: store.content.projects,
-        error: err.message,
-      }),
-    };
+    reportApiFailure('projects', err);
+    return { statusCode: 502, headers: { ...headers, 'Cache-Control': 'no-store' }, body: JSON.stringify({ success: false, error: 'Project refresh failed. Check GitHub and database configuration.' }) };
   }
 };

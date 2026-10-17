@@ -10,7 +10,7 @@ export function getResumeFileUrl(content?: PortfolioContent): string {
   const resume = content?.profile?.resume;
   if (resume?.fileUrl && resume.fileUrl !== '#resume-view' && resume.fileUrl.trim().length > 0) {
     if (resume.fileUrl.startsWith('http://') || resume.fileUrl.startsWith('https://')) {
-      return '/resume.pdf';
+      return resume.fileUrl;
     }
     return resume.fileUrl;
   }

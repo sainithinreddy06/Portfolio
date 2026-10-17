@@ -1,3 +1,5 @@
+import { reportApiFailure } from '../../server/apiErrors';
+import { env } from '../../server/runtimeEnv';
 import type { Handler } from './types';
 import {
   verifyGitHubSignature,
@@ -6,14 +8,15 @@ import {
 import {
   syncGitHubProjects,
   handleRepositoryUntagged,
-} from '../../server/portfolioStore';
+} from '../../server/deployedPortfolioStore';
 
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'sainithinreddy06';
 
 export const handler: Handler = async (event) => {
+  const GITHUB_USERNAME = env('GITHUB_USERNAME') || 'sainithinreddy06';
+
   const eventName = event.headers['x-github-event'] || event.headers['X-GitHub-Event'];
   const signature = event.headers['x-hub-signature-256'] || event.headers['X-Hub-Signature-256'];
-  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  const secret = env('GITHUB_WEBHOOK_SECRET');
 
   if (secret) {
     const rawBody = event.body || '';
@@ -56,7 +59,7 @@ export const handler: Handler = async (event) => {
     }
 
     if (payload.action === 'deleted') {
-      handleRepositoryUntagged(repo.id);
+      await handleRepositoryUntagged(repo.id);
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -73,7 +76,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    syncGitHubProjects([fullProject]);
+    await syncGitHubProjects([fullProject]);
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -85,10 +88,11 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (err: any) {
+    reportApiFailure('webhook', err);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: 'Portfolio service failed. Check function logs and database configuration.' }),
     };
   }
 };

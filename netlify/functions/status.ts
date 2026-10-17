@@ -1,6 +1,7 @@
+import { reportApiFailure } from '../../server/apiErrors';
 import type { Handler } from './types';
 import { getGitHubDiagnostics } from '../../server/githubService';
-import { getPortfolioStore } from '../../server/portfolioStore';
+import { getPortfolioStore } from '../../server/deployedPortfolioStore';
 
 export const handler: Handler = async () => {
   const headers = {
@@ -10,7 +11,7 @@ export const handler: Handler = async () => {
 
   try {
     const diagnostics = getGitHubDiagnostics();
-    const store = getPortfolioStore();
+    const store = await getPortfolioStore();
     return {
       statusCode: 200,
       headers,
@@ -22,10 +23,11 @@ export const handler: Handler = async () => {
       }),
     };
   } catch (err: any) {
+    reportApiFailure('status', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ success: false, error: err.message }),
+      body: JSON.stringify({ success: false, error: 'Portfolio service failed. Check function logs and database configuration.' }),
     };
   }
 };

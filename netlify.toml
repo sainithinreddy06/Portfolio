@@ -8,6 +8,12 @@
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "ADMIN_EMAIL,GITHUB_USERNAME"
 
+[[redirects]]
+  from = "/api/admin/*"
+  to = "/.netlify/functions/admin/:splat"
+  status = 200
+  force = true
+
 # Route API calls to Netlify functions if deployed to Netlify
 [[redirects]]
   from = "/api/projects"
@@ -17,11 +23,6 @@
 [[redirects]]
   from = "/api/portfolio"
   to = "/.netlify/functions/portfolio"
-  status = 200
-
-[[redirects]]
-  from = "/api/portfolio/resume"
-  to = "/.netlify/functions/resume"
   status = 200
 
 [[redirects]]
@@ -38,6 +39,13 @@
   from = "/api/github/status"
   to = "/.netlify/functions/status"
   status = 200
+
+# Keep unknown API routes out of the HTML SPA fallback.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api-not-found"
+  status = 200
+  force = true
 
 # SPA catch-all for client-side routing
 [[redirects]]

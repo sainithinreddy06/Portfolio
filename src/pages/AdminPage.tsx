@@ -1,3 +1,4 @@
+import { readApiJson } from '../services/apiResponse';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../content';
@@ -143,7 +144,7 @@ export const AdminPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (data.success) {
             setIsAuthenticated(true);
             sessionStorage.setItem('sai_nithin_admin_auth', 'true');
@@ -185,6 +186,10 @@ export const AdminPage: React.FC = () => {
       setAuthError('Your admin session has expired. Please sign in again.');
       throw new Error('Admin session expired. Please sign in again.');
     }
+    if (!res.ok) {
+      const data = await readApiJson(res);
+      throw new Error(data.error || `Request failed (HTTP ${res.status}).`);
+    }
     return res;
   };
 
@@ -193,7 +198,7 @@ export const AdminPage: React.FC = () => {
     try {
       const res = await fetch('/api/github/status');
       if (res.ok) {
-        const data = await res.json();
+        const data = await readApiJson(res);
         if (data.success) {
           setDiagnostics(data.diagnostics);
         }
@@ -223,7 +228,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user, password }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
 
       if (res.ok && data.success && data.token) {
         setIsAuthenticated(true);
@@ -268,8 +273,8 @@ export const AdminPage: React.FC = () => {
     if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
       return { valid: false, error: 'File must be a valid PDF document (.pdf extension).' };
     }
-    if (file.size > 15 * 1024 * 1024) {
-      return { valid: false, error: 'Resume PDF exceeds the 15 MB maximum size limit.' };
+    if (file.size > 4 * 1024 * 1024) {
+      return { valid: false, error: 'Resume PDF exceeds the 4 MB upload limit. Use a hosted URL for larger files.' };
     }
 
     try {
@@ -323,7 +328,7 @@ export const AdminPage: React.FC = () => {
             }),
           });
 
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Server error uploading resume file.');
           }
@@ -394,7 +399,7 @@ export const AdminPage: React.FC = () => {
             draft.profile.resume.comingSoonMessage || 'Verified curriculum vitae available.',
         }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error saving resume URL.');
       }
@@ -427,7 +432,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ versionId: version.id }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error rolling back resume version.');
       }
@@ -458,7 +463,7 @@ export const AdminPage: React.FC = () => {
       const res = await authFetch(`/api/portfolio/resume/version/${versionId}`, {
         method: 'DELETE',
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error deleting resume version.');
       }
@@ -494,7 +499,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reset: true }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       const updated = {
         ...draft,
         profile: {
@@ -527,8 +532,8 @@ export const AdminPage: React.FC = () => {
     if (!validMimes.includes(file.type) && !hasValidExt) {
       return { valid: false, error: 'Only JPG, PNG, and WEBP image formats are supported.' };
     }
-    if (file.size > 10 * 1024 * 1024) {
-      return { valid: false, error: 'Image exceeds the maximum 10 MB size limit.' };
+    if (file.size > 4 * 1024 * 1024) {
+      return { valid: false, error: 'Image exceeds the maximum 4 MB size limit.' };
     }
     return { valid: true };
   };
@@ -560,7 +565,7 @@ export const AdminPage: React.FC = () => {
                 `Portrait of ${draft.profile.name}, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)`,
             }),
           });
-          const data = await res.json();
+          const data = await readApiJson(res);
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Server error saving portrait image.');
           }
@@ -625,7 +630,7 @@ export const AdminPage: React.FC = () => {
             `Portrait of ${draft.profile.name}, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)`,
         }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error saving photo URL.');
       }
@@ -658,7 +663,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ versionId: version.id }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error restoring photo version.');
       }
@@ -689,7 +694,7 @@ export const AdminPage: React.FC = () => {
       const res = await authFetch(`/api/portfolio/photo/version/${versionId}`, {
         method: 'DELETE',
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Server error deleting photo version.');
       }
@@ -724,7 +729,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reset: true }),
       });
-      const data = await res.json();
+      const data = await readApiJson(res);
       const updated = {
         ...draft,
         profile: {
@@ -747,13 +752,13 @@ export const AdminPage: React.FC = () => {
 
   // General Save
   const handleSave = async () => {
-    updateContent(draft);
     try {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: draft }),
       });
+      updateContent(draft);
       setSuccessMessage('Settings persisted successfully.');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err: any) {
@@ -762,14 +767,14 @@ export const AdminPage: React.FC = () => {
   };
 
   const persistPortfolioChanges = async (newContent: typeof draft, message: string) => {
-    setDraft(newContent);
-    updateContent(newContent);
     try {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newContent }),
       });
+      setDraft(newContent);
+      updateContent(newContent);
       setSuccessMessage(message);
       setTimeout(() => setSuccessMessage(''), 4000);
     } catch (err: any) {
@@ -1227,7 +1232,7 @@ export const AdminPage: React.FC = () => {
                         {isSavingResume ? 'Uploading & Validating PDF...' : 'Click to Upload or Drag & Drop Resume PDF'}
                       </p>
                       <p className="text-[11px] text-[var(--text-secondary)] mt-1">
-                        Strict validation: Standard PDF files up to 15MB.
+                        Strict validation: Standard PDF files up to 4MB.
                       </p>
                     </div>
                     <button
@@ -1533,7 +1538,7 @@ export const AdminPage: React.FC = () => {
                         {isSavingPhoto ? 'Processing & Optimizing Image...' : 'Click to Upload or Drag & Drop Portrait'}
                       </p>
                       <p className="text-[11px] text-[var(--text-secondary)] mt-1">
-                        PNG, JPG, or WEBP (Max 10MB). Automatically framed and scaled.
+                        PNG, JPG, or WEBP (Max 4MB). Automatically framed and scaled.
                       </p>
                     </div>
                     <button
@@ -1838,7 +1843,7 @@ export const AdminPage: React.FC = () => {
                   setIsSyncingGithub(true);
                   try {
                     const res = await authFetch('/api/github/sync', { method: 'POST' });
-                    const data = await res.json();
+                    const data = await readApiJson(res);
                     setGithubSyncMsg(data.message || 'Repositories synced successfully.');
                     await fetchDiagnostics();
                   } catch (err: any) {

@@ -1,11 +1,14 @@
+import { reportApiFailure } from '../../server/apiErrors';
+import { env } from '../../server/runtimeEnv';
 import type { Handler } from './types';
 import { syncAllPortfolioRepositories } from '../../server/githubService';
-import { syncGitHubProjects } from '../../server/portfolioStore';
-import { verifyAdminToken } from '../../server/authService';
+import { syncGitHubProjects } from '../../server/deployedPortfolioStore';
+import { verifyAdminToken } from '../../server/deployedAuthService';
 
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'sainithinreddy06';
 
 export const handler: Handler = async (event) => {
+  const GITHUB_USERNAME = env('GITHUB_USERNAME') || 'sainithinreddy06';
+
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -16,12 +19,15 @@ export const handler: Handler = async (event) => {
     return { statusCode: 204, headers, body: '' };
   }
 
+  try {
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers: { ...headers, Allow: 'POST' }, body: JSON.stringify({ success: false, error: 'Method not allowed.' }) };
+
   const authHeader = event.headers['authorization'] || event.headers['Authorization'];
   const token = authHeader?.startsWith('Bearer ')
     ? authHeader.slice(7).trim()
     : (event.headers['x-admin-token'] || event.headers['X-Admin-Token']);
 
-  const authCheck = verifyAdminToken(token);
+  const authCheck = await verifyAdminToken(token);
   if (!authCheck.valid) {
     return {
       statusCode: 401,
@@ -31,11 +37,11 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    let targetUser = GITHUB_USERNAME;
+    const targetUser = GITHUB_USERNAME;
     if (event.body) {
       try {
         const parsed = JSON.parse(event.body);
-        if (parsed.username && parsed.username.toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
+        if (parsed.username && String(parsed.username).toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
           return {
             statusCode: 400,
             headers,
@@ -46,12 +52,12 @@ export const handler: Handler = async (event) => {
           };
         }
       } catch {
-        // ignore
+        return { statusCode: 400, headers, body: JSON.stringify({ success: false, error: 'Request body must be valid JSON.' }) };
       }
     }
 
     const projects = await syncAllPortfolioRepositories(targetUser, true);
-    const updatedContent = syncGitHubProjects(projects);
+    const updatedContent = await syncGitHubProjects(projects);
 
     return {
       statusCode: 200,
@@ -72,10 +78,15 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (err: any) {
+    reportApiFailure('sync', err);
     return {
-      statusCode: 500,
+      statusCode: err?.code === 'GITHUB_DISCOVERY_FAILED' ? 502 : 500,
       headers,
-      body: JSON.stringify({ success: false, error: err.message }),
+      body: JSON.stringify({ success: false, error: err?.code === 'GITHUB_DISCOVERY_FAILED' ? 'GitHub repository discovery failed. Check GITHUB_TOKEN permissions and API rate limits.' : 'Portfolio persistence failed. Check database configuration and function logs.' }),
     };
+  }
+  } catch (error) {
+    reportApiFailure('sync', error);
+    return { statusCode: 503, headers, body: JSON.stringify({ success: false, error: 'Portfolio storage or authentication configuration is unavailable.' }) };
   }
 };
