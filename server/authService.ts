@@ -8,19 +8,9 @@ const SECRET_FILE = path.join(DATA_DIR, '.session-secret');
 const SESSIONS_FILE = path.join(DATA_DIR, 'admin-sessions.json');
 const RATE_LIMITS_FILE = path.join(DATA_DIR, 'rate-limits.json');
 
-// Strict email allowlist (lowercased)
-export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'sainithinreddytadugam@gmail.com').toLowerCase().trim();
-export const ALLOWED_ADMIN_USERS = [
-  ADMIN_EMAIL,
-  'sainithinreddytadugam@gmail.com',
-  'tsainithinreddy@gmail.com',
-  'sainithinreddy06',
-  'sainithinreddy',
-  'sainithin',
-  'nithin',
-  'nithinreddy_06',
-  'admin',
-].map((u) => u.toLowerCase().trim());
+// Admin identity is configured only on the server; no hardcoded login defaults.
+export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+export const ALLOWED_ADMIN_USERS = ADMIN_EMAIL ? [ADMIN_EMAIL] : [];
 
 // Rate limiting parameters
 const MAX_ATTEMPTS = 5;
@@ -52,7 +42,7 @@ export function getAdminPassword(): string | null {
  * Checks whether admin authentication is configured on the server
  */
 export function isAuthConfigured(): boolean {
-  return getAdminPassword() !== null;
+  return ADMIN_EMAIL.length > 0 && getAdminPassword() !== null;
 }
 
 /**
@@ -63,7 +53,7 @@ export function verifyAdminPassword(provided: string): { valid: boolean; error?:
   if (!expected) {
     return {
       valid: false,
-      error: 'Admin authentication is currently disabled: ADMIN_PASSWORD environment variable is not configured.',
+      error: 'Admin authentication is currently disabled: server credentials are not configured.',
     };
   }
 
