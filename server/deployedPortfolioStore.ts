@@ -11,7 +11,7 @@ export async function getPortfolioStore(): Promise<PortfolioStoreState> {
   const [row] = await getDb().select().from(portfolio).where(eq(portfolio.id, 'main'));
   const state = structuredClone(row?.state ?? seed) as PortfolioStoreState;
   // Legacy uploaded files are absent from a static deploy; retain the public portrait.
-  if (state.content.profile.photo.url?.startsWith('/api/portfolio/photo')) state.content.profile.photo.url = '/images/profile-photo.png';
+  if (/^\/api\/portfolio\/photo(?:[?#]|$)/.test(state.content.profile.photo.url || '')) state.content.profile.photo.url = '/images/profile-photo.png';
   state.content.caseStudies = { ...initialPortfolioContent.caseStudies, ...state.content.caseStudies };
   state.content.skillCategories = initialPortfolioContent.skillCategories;
   return state;
