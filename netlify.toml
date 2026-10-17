@@ -3,10 +3,10 @@
   publish = "dist"
   functions = "netlify/functions"
 
-# The portfolio intentionally publishes its contact email, which may also be
-# used as the admin login identifier. Keep scanning passwords and other secrets.
+# The portfolio intentionally publishes its contact email and GitHub username.
+# Keep scanning passwords, tokens, and other secrets.
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "ADMIN_EMAIL"
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_EMAIL,GITHUB_USERNAME"
 
 # Route API calls to Netlify functions if deployed to Netlify
 [[redirects]]
