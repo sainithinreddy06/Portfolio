@@ -25,7 +25,7 @@ export const initialPortfolioContent: PortfolioContent = {
       'Deepening systems programming, distributed backend architectures, and production-grade ML inference optimization.',
     learningDirectionVerifyNote: undefined,
     photo: {
-      url: '/api/portfolio/photo',
+      url: '/images/profile-photo.png',
       altText: 'Portrait of Sai Nithin Reddy, Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT)',
       showInHero: true,
       showInAbout: false,
@@ -33,8 +33,11 @@ export const initialPortfolioContent: PortfolioContent = {
     },
     resume: {
       fileUrl: '#resume-view',
+      fileName: 'Sai_Nithin_Reddy_Resume.pdf',
+      fileSize: '137 KB',
+      uploadedAt: 'Oct 16, 2026',
       isAvailable: true,
-      comingSoonMessage: 'Verified curriculum vitae available to view and download.',
+      comingSoonMessage: 'Verified custom curriculum vitae active and available.',
     },
   },
   projects: [

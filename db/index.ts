@@ -1,9 +1,22 @@
 import { getDatabase } from '@netlify/database';
 import { drizzle } from 'drizzle-orm/netlify-db';
 import * as schema from './schema.js';
+import { env } from '../server/runtimeEnv.js';
 
-export function getDb() {
+let cachedDb: any = null;
+let cachedConnectionKey: string | null = null;
+
+export function getDb(): any {
+  const connectionString = env('NETLIFY_DB_URL') || env('DATABASE_URL');
+  const connectionKey = connectionString || '__default__';
+
+  if (cachedDb && cachedConnectionKey === connectionKey) {
+    return cachedDb;
+  }
+
   // Let the platform select its transport and read invocation-scoped credentials.
-  // Drizzle's implicit connection assumes Neon HTTP when the driver is unset.
-  return drizzle({ client: getDatabase(), schema });
+  const client = connectionString ? getDatabase({ connectionString }) : getDatabase();
+  cachedDb = (drizzle as any)({ client, schema });
+  cachedConnectionKey = connectionKey;
+  return cachedDb;
 }

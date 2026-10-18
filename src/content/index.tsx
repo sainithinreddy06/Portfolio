@@ -174,14 +174,26 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsLoadingProjects(true);
     setProjectsError(null);
     try {
-      const res = await fetch('/api/github/sync', { method: 'POST' });
-      if (!res.ok) {
-        throw new Error(`Sync API returned HTTP ${res.status}`);
+      const token =
+        sessionStorage.getItem('sai_nithin_admin_token') ||
+        localStorage.getItem('sai_nithin_admin_token');
+      if (token) {
+        const res = await fetch('/api/github/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          throw new Error(`Sync API returned HTTP ${res.status}`);
+        }
       }
       await refreshServerPortfolio();
     } catch (err: any) {
       console.error('[Manual Sync Error]', err);
       setProjectsError(err.message);
+      throw err;
     } finally {
       setIsLoadingProjects(false);
     }
