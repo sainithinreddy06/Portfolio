@@ -13,6 +13,7 @@ import {
   Check,
   AlertCircle,
   Eye,
+  EyeOff,
   Download,
   Terminal,
   Upload,
@@ -50,6 +51,7 @@ export const AdminPage: React.FC = () => {
   const [isVerifyingSession, setIsVerifyingSession] = useState<boolean>(true);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -237,7 +239,15 @@ export const AdminPage: React.FC = () => {
         localStorage.setItem('sai_nithin_admin_token', data.token);
         setAuthError('');
       } else {
-        setAuthError(data.error || 'Invalid credentials. Please verify your email and password.');
+        if (res.status === 503) {
+          setAuthError(data.error || 'Authentication storage is currently unavailable. Please verify database configuration.');
+        } else if (res.status === 429) {
+          setAuthError(data.error || 'Too many failed login attempts. Please wait before retrying.');
+        } else if (res.status === 401) {
+          setAuthError(data.error || 'Invalid credentials. Please verify your administrator email and password.');
+        } else {
+          setAuthError(data.error || 'Unable to authenticate. Please check your credentials and try again.');
+        }
       }
     } catch (err: any) {
       setAuthError(err.message || 'Unable to connect to authentication service.');
@@ -868,7 +878,11 @@ export const AdminPage: React.FC = () => {
           </p>
 
           {authError && (
-            <div className="mb-4 p-3 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/30 text-xs text-[var(--color-danger)] flex items-start gap-2">
+            <div
+              id="admin-auth-error"
+              role="alert"
+              className="mb-4 p-3 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/30 text-xs text-[var(--color-danger)] flex items-start gap-2"
+            >
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{authError}</span>
             </div>
@@ -876,38 +890,60 @@ export const AdminPage: React.FC = () => {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-mono text-[var(--text-secondary)] mb-1.5 uppercase font-medium">
+              <label
+                htmlFor="admin-email"
+                className="block text-xs font-mono text-[var(--text-secondary)] mb-1.5 uppercase font-medium"
+              >
                 Admin Email / Username
               </label>
               <input
+                id="admin-email"
                 type="text"
                 required
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder="admin@domain.com or username"
                 autoComplete="username"
-                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] font-mono focus:outline-hidden focus:border-[var(--accent-primary)]"
+                aria-invalid={Boolean(authError)}
+                aria-describedby={authError ? 'admin-auth-error' : undefined}
+                className="w-full px-3 py-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] font-mono focus:outline-hidden focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-mono text-[var(--text-secondary)] mb-1.5 uppercase font-medium">
+              <label
+                htmlFor="admin-password"
+                className="block text-xs font-mono text-[var(--text-secondary)] mb-1.5 uppercase font-medium"
+              >
                 Password
               </label>
-              <input
-                type="password"
-                required
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="••••••••••••"
-                autoComplete="current-password"
-                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] font-mono focus:outline-hidden focus:border-[var(--accent-primary)]"
-              />
+              <div className="relative">
+                <input
+                  id="admin-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  placeholder="••••••••••••"
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(authError)}
+                  aria-describedby={authError ? 'admin-auth-error' : undefined}
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] font-mono focus:outline-hidden focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={isLoggingIn}
-                className="w-full py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                disabled={isLoggingIn || !emailInput.trim() || !passwordInput}
+                className="w-full py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xs"
               >
                 {isLoggingIn ? (
                   <>
@@ -922,10 +958,11 @@ export const AdminPage: React.FC = () => {
           </form>
 
           <div className="mt-6 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] font-mono text-[var(--text-muted)]">
-            <span>SECURE REST STORAGE</span>
+            <span>ADMIN ACCESS GATEWAY</span>
             <button
+              type="button"
               onClick={() => navigate('/')}
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline cursor-pointer"
             >
               Back to Public Site
             </button>
