@@ -54,13 +54,38 @@ export async function handlePortfolioAsset(request: Request, kind: AssetKind): P
       const token = authorization?.startsWith('Bearer ') ? authorization.slice(7).trim() : request.headers.get('x-admin-token') || undefined;
       if (!(await verifyAdminToken(token)).valid) return json({ success: false, requiresLogin: true, error: 'Valid admin session required.' }, 401);
     }
-    const store = await getPortfolioStore();
+    let store;
+    try {
+      store = await getPortfolioStore();
+    } catch (storeError) {
+      if (request.method === 'GET') {
+        if (kind === 'photo') {
+          return Response.redirect(new URL('/images/profile-photo.png', request.url), 302);
+        }
+        if (kind === 'resume' && !suffix) {
+          return json({
+            success: true,
+            resume: {
+              fileUrl: '/resume.pdf',
+              fileName: 'Sai_Nithin_Reddy_Resume.pdf',
+              fileSize: '137 KB',
+              isAvailable: true,
+            },
+          });
+        }
+      }
+      throw storeError;
+    }
     const current = store.content.profile[kind];
     if (request.method === 'GET') {
       if (suffix === 'history') return json({ success: true, versions: current.versions || [] });
       if (kind === 'resume') return json({ success: true, resume: current });
       const photo = store.content.profile.photo;
-      return Response.redirect(new URL(photo.isPlaceholder ? '/images/default-profile.png' : photo.url, request.url), 302);
+      let targetUrl = photo.isPlaceholder ? '/images/default-profile.png' : photo.url;
+      if (!targetUrl || targetUrl.startsWith('/api/portfolio/photo')) {
+        targetUrl = '/images/profile-photo.png';
+      }
+      return Response.redirect(new URL(targetUrl, request.url), 302);
     }
     if (versionRequest) {
       const version = current.versions?.find(v => v.id === versionRequest[1]);

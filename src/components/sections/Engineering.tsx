@@ -49,32 +49,26 @@ export const Engineering: React.FC = () => {
           {skillCategories.map((cat, idx) => (
             <div
               key={cat.title}
-              className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] p-5 flex flex-col justify-between hover:border-[var(--text-primary)]/50 transition-colors shadow-xs"
+              className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] p-5 hover:border-[var(--text-primary)]/50 transition-colors shadow-xs"
             >
-              <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[var(--border-subtle)]">
-                  <div className="p-1.5 rounded-md bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
-                    {categoryIcons[idx % categoryIcons.length]}
-                  </div>
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">
-                    {cat.title}
-                  </h3>
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[var(--border-subtle)]">
+                <div className="p-1.5 rounded-md bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
+                  {categoryIcons[idx % categoryIcons.length]}
                 </div>
-                <ul className="space-y-2">
-                  {cat.skills.map((skill) => (
-                    <li
-                      key={skill.name}
-                      className="flex items-center justify-between text-xs text-[var(--text-primary)] font-mono"
-                    >
-                      <span className="text-[var(--text-primary)]">{skill.name}</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]/70" />
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">
+                  {cat.title}
+                </h3>
               </div>
-              <div className="mt-6 pt-3 border-t border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
-                {cat.skills.length} VERIFIED MODULES
-              </div>
+              <ul className="space-y-2.5">
+                {cat.skills.map((skill) => (
+                  <li
+                    key={skill.name}
+                    className="text-xs text-[var(--text-primary)] font-mono"
+                  >
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
