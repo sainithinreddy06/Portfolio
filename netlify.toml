@@ -1,0 +1,54 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# The portfolio intentionally publishes its contact email and GitHub username.
+# Keep scanning passwords, tokens, and other secrets.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_EMAIL,GITHUB_USERNAME"
+
+[[redirects]]
+  from = "/api/admin/*"
+  to = "/.netlify/functions/admin/:splat"
+  status = 200
+  force = true
+
+# Route API calls to Netlify functions if deployed to Netlify
+[[redirects]]
+  from = "/api/projects"
+  to = "/.netlify/functions/projects"
+  status = 200
+
+[[redirects]]
+  from = "/api/portfolio"
+  to = "/.netlify/functions/portfolio"
+  status = 200
+
+[[redirects]]
+  from = "/api/github/webhook"
+  to = "/.netlify/functions/webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/github/sync"
+  to = "/.netlify/functions/sync"
+  status = 200
+
+[[redirects]]
+  from = "/api/github/status"
+  to = "/.netlify/functions/status"
+  status = 200
+
+# Keep unknown API routes out of the HTML SPA fallback.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api-not-found"
+  status = 200
+  force = true
+
+# SPA catch-all for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

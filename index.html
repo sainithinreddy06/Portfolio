@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sai Nithin Reddy – AI Engineer & Full-Stack Developer</title>
+    <meta
+      name="description"
+      content="Production personal engineering portfolio for Sai Nithin Reddy with automated GitHub synchronization and live demo discovery."
+    />
+    <meta name="author" content="Sai Nithin Reddy" />
+    <meta name="theme-color" content="#07090D" />
+    <link rel="canonical" href="https://sainithinreddy.me/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sai Nithin Reddy – AI Engineer & Full-Stack Developer" />
+    <meta
+      property="og:description"
+      content="Production personal engineering portfolio for Sai Nithin Reddy with automated GitHub synchronization and live demo discovery."
+    />
+    <meta property="og:site_name" content="Sai Nithin Reddy Portfolio" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sai Nithin Reddy – AI Engineer & Full-Stack Developer" />
+    <meta
+      name="twitter:description"
+      content="Production personal engineering portfolio for Sai Nithin Reddy with automated GitHub synchronization and live demo discovery."
+    />
+
+    <!-- Theme initialization script (prevents flash of wrong theme) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('sai_nithin_theme_pref');
+          var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+          if (saved === 'day' || (!saved && prefersLight)) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          } else {
+            document.documentElement.classList.remove('light');
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Sai Nithin Reddy",
+        "jobTitle": "AI Engineer & Full-Stack Developer",
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Chaitanya Bharathi Institute of Technology (CBIT)"
+        },
+        "knowsAbout": [
+          "Artificial Intelligence",
+          "Machine Learning",
+          "Full-Stack Development",
+          "FastAPI",
+          "Python",
+          "React",
+          "TypeScript",
+          "MongoDB",
+          "Scikit-learn"
+        ],
+        "sameAs": [
+          "https://github.com/sainithinreddy06",
+          "https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372"
+        ]
+      }
+    </script>
+  </head>
+  <body class="bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased selection:bg-[var(--accent-primary)]/30 selection:text-[var(--text-primary)]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

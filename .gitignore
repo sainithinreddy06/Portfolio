@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+data/.session-secret
+data/admin-sessions.json
+data/rate-limits.json
+data/githubProjectsCache.json
+
+.env
+.env.*
