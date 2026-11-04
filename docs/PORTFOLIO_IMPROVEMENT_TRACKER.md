@@ -485,3 +485,11 @@ At the end of every session:
 - Added safe word wrapping to the hero name and improved minimum touch-target sizing for hero actions and resume-viewer tabs/close control. Normalized the remaining contact profile-link target sizing.
 - Commits: architecture `1bf6b2bcec6ef30952f2edf427bcd519a830c602`; hero `5b9166cc10e2fabf50cb7153e698c32d6f3815cb`; resume viewer `2c4318a991475531115bd49c433adad23e1bcf7d`; contact links `2567e7c53154754d53cd21d6712968533f694cfa`.
 - **Verification boundary:** CI and Render deployment are required for this revision. Actual 320px/375px/768px/1024px device viewport testing and screen-reader verification remain outstanding; P0-04 and P0-05 remain in progress.
+
+
+### 2026-11-04 — Project catalogue accessibility pass
+- Corrected the project category filter semantics: these controls filter a list and are now exposed as a labeled button group with `aria-pressed`, rather than incorrectly using tablist/tab roles without tab keyboard behavior.
+- Added live announcement semantics to sync feedback and alert semantics to the offline/error notice. Increased touch target sizing for category filters, retry/sync actions, repository links, case-study links, and the all-repositories action.
+- Commit: `092b7edede6901cd8402b8b58ac89608068a00a3`.
+- Responsive source review: project entries stack into one column until the large breakpoint, technology tags wrap, and action links use flex wrapping. No fixed-width project card was found in this section.
+- **Verification boundary:** source-level review only. Keyboard walkthrough, screen-reader announcement test, and 320px/375px/768px/1024px browser viewport checks are still outstanding. P0-04 and P0-05 remain in progress.
