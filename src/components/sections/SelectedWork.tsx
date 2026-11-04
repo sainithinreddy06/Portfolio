@@ -343,9 +343,9 @@ export const SelectedWork: React.FC = () => {
                         )}
 
                         {/* CASE STUDY Action */}
-                        {project.caseStudySlug && (
+                        {(
                           <Link
-                            to={`/work/${project.caseStudySlug}`}
+                            to={`/work/${project.caseStudySlug || project.id}`}
                             data-cursor="case-study"
                             className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--accent-primary)] hover:underline transition-colors ml-auto lg:ml-0 cursor-pointer"
                             aria-label={`Detailed case study for ${project.name}`}
