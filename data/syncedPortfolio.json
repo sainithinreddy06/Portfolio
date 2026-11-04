@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "lastUpdated": "2026-10-16T18:01:25.333Z",
+  "lastUpdated": "2026-11-04T00:00:00.000Z",
   "content": {
     "profile": {
       "name": "Sai Nithin Reddy",
       "wordmark": "SAI NITHIN REDDY",
       "positioning": "AI ENGINEER · FULL-STACK DEVELOPER · SYSTEMS BUILDER",
       "headline": "I BUILD INTELLIGENT SYSTEMS FOR REAL-WORLD PROBLEMS.",
-      "supportingCopy": "Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad building AI-powered products, full-stack applications and practical software systems.",
+      "supportingCopy": "Third-year Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad, building AI-powered products, full-stack applications and practical software systems.",
       "institution": "Chaitanya Bharathi Institute of Technology (CBIT)",
       "degree": "Computer Science & Engineering",
       "batchPeriod": "2024 – 2028",
@@ -17,7 +17,7 @@
       "leetcodeUrl": "https://leetcode.com/u/Nithinreddy_06/",
       "leetcodeUsername": "Nithinreddy_06",
       "aboutText": [
-        "I am an engineering undergraduate and software builder focused on applying machine learning, computer vision, and robust backend engineering to practical, physical-world problems.",
+        "I am a third-year Computer Science & Engineering student and software builder focused on applying machine learning, computer vision, and robust backend engineering to practical, real-world problems.",
         "Rather than assembling toy demos, I prioritize building end-to-end architectures from data ingestion pipelines and mathematical modeling to reactive client interfaces and geospatial visualizations.",
         "My work centers on intelligent navigation, environmental sensing, and predictive systems where latency, correctness, and reliable data flow matter."
       ],
@@ -89,12 +89,93 @@
     },
     "projects": [
       {
+        "id": "pravaah",
+        "name": "PRAVAAH",
+        "tagline": "AICTE Approval Workflow Automation, Compliance Monitoring & Alert Management",
+        "category": "AI / FULL STACK",
+        "stack": [
+          "React",
+          "TypeScript",
+          "Python",
+          "FastAPI",
+          "PostgreSQL",
+          "SQLAlchemy",
+          "Supabase"
+        ],
+        "description": "An enterprise workflow automation platform designed to streamline AICTE approval processes through policy-aware workflows, compliance monitoring, obligation tracking, and actionable alerts. Its architecture emphasizes policy version pinning, migration simulation, deterministic evidence, concurrent obligation management, transactional event delivery, and tamper-evident audit trails.",
+        "summary": "Enterprise approval workflow and compliance platform combining policy lifecycle management, deterministic proof generation, obligation tracking, alert orchestration, and hash-chain auditability.",
+        "status": "Prototype",
+        "features": [
+          {
+            "name": "Policy Version Pinning & Migration Simulation",
+            "status": "Prototype"
+          },
+          {
+            "name": "Deterministic Compliance Proof Engine",
+            "status": "Prototype"
+          },
+          {
+            "name": "Concurrent Obligation Ledger",
+            "status": "Prototype"
+          },
+          {
+            "name": "Transactional Outbox & Alert Processing",
+            "status": "Prototype"
+          },
+          {
+            "name": "Tamper-Evident Hash-Chain Audit Trail",
+            "status": "Prototype"
+          }
+        ],
+        "githubUrl": "https://github.com/sainithinreddy06/PRAVAAH-2",
+        "hasArchitecture": true,
+        "featured": true,
+        "order": 0,
+        "source": "curated",
+        "architectureFlow": {
+          "title": "PRAVAAH Workflow Architecture",
+          "summary": "Policy-aware approval workflow connecting institutional submissions, deterministic compliance evaluation, obligation tracking, alert delivery, and auditable records.",
+          "nodes": [
+            {
+              "id": "1",
+              "label": "Institution Portal",
+              "sublabel": "Submission & Workflow UI",
+              "status": "Prototype"
+            },
+            {
+              "id": "2",
+              "label": "Policy Registry",
+              "sublabel": "Version Pinning & Migration",
+              "status": "Prototype"
+            },
+            {
+              "id": "3",
+              "label": "Proof Engine",
+              "sublabel": "Deterministic Compliance Checks",
+              "status": "Prototype"
+            },
+            {
+              "id": "4",
+              "label": "Obligation Ledger",
+              "sublabel": "Concurrent Tracking",
+              "status": "Prototype"
+            },
+            {
+              "id": "5",
+              "label": "Outbox & Audit",
+              "sublabel": "Alerts and Hash-Chain Records",
+              "status": "Prototype"
+            }
+          ]
+        }
+      },
+      {
         "id": "tapas",
         "name": "TAPAS",
-        "tagline": "Thermal Analytics & Public-health Advisory System (SIH26083)",
+        "tagline": "Thermal Analytics & Public-health Advisory System",
         "category": "FULL STACK",
         "description": "TAPAS — Thermal Analytics & Public-health Advisory System (SIH26083)",
-        "summary": "Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows developed for SIH26083.",
+        "summary": "Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.",
         "stack": [
           "Next.js 15",
           "React 19",
@@ -123,7 +204,7 @@
             "status": "Implemented"
           },
           {
-            "name": "SIH26083 Public Health Protocol Alignment",
+            "name": "Public Health Guidance & Heat-Safety Protocol Alignment",
             "status": "Implemented"
           },
           {
@@ -232,7 +313,6 @@
           }
         ],
         "githubUrl": "https://github.com/sainithinreddy06/SureStep",
-        "liveUrl": "https://terra-guard-ai-five.vercel.app",
         "deploymentInfo": {
           "provider": "github_homepage",
           "url": "https://terra-guard-ai-five.vercel.app",
@@ -922,7 +1002,85 @@
         ]
       }
     ],
-    "timeline": [],
+    "timeline": [
+      {
+        "id": "cbit-education",
+        "role": "B.E./B.Tech. – Computer Science & Engineering",
+        "organization": "Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad",
+        "period": "2024 – 2028",
+        "type": "Education",
+        "achievementBadge": "CGPA: 9.06",
+        "description": "Undergraduate studies in core Computer Science & Engineering covering Data Structures, Algorithms, Discrete Mathematics, Operating Systems, Database Management Systems, and Machine Learning."
+      },
+      {
+        "id": "narayana-intermediate",
+        "role": "Board of Intermediate Education, Telangana",
+        "organization": "Narayana Institutions, Hyderabad",
+        "period": "2022 – 2024",
+        "type": "Education",
+        "achievementBadge": "CGPA: 9.41",
+        "description": "Higher secondary education with intensive foundation in Mathematics, Physics, and Chemistry."
+      },
+      {
+        "id": "asteroid-comp",
+        "role": "3rd Place Awardee",
+        "organization": "Asteroid Hazard Classification Competition",
+        "period": "2024",
+        "type": "Competition",
+        "achievementBadge": "3rd Place",
+        "description": "Built machine learning classification models evaluating astronomical and orbital trajectory features to categorize hazardous near-Earth objects."
+      },
+      {
+        "id": "eamcet-rank",
+        "role": "Rank 2337",
+        "organization": "TS EAMCET 2024 (Telangana State Engineering Entrance)",
+        "period": "2024",
+        "type": "Competition",
+        "achievementBadge": "Rank 2337",
+        "description": "Secured Rank 2337 among over 200,000 engineering aspirants across Telangana state."
+      },
+      {
+        "id": "rmc-involvement",
+        "role": "Public Relations Team Member",
+        "organization": "Ramanujan Mathematics Club (RMC), CBIT",
+        "period": "2024 – Present",
+        "type": "Involvement",
+        "description": "Active member of the Public Relations team handling outreach, communications, and student engagement for technical events and symposiums."
+      },
+      {
+        "id": "chaitanya-spandana",
+        "role": "Social Welfare Club Member",
+        "organization": "Chaitanya Spandana, CBIT",
+        "period": "2024 – Present",
+        "type": "Involvement",
+        "description": "Participating in community social welfare initiatives, student mentorship drives, and campus outreach activities."
+      },
+      {
+        "id": "certifications-verified",
+        "role": "Technical Certifications",
+        "organization": "Industry Credentials",
+        "period": "Verified",
+        "type": "Involvement",
+        "description": "React Web Development Certification • Generative AI Certification • Java Programming Certification"
+      },
+      {
+        "id": "sih-nominations",
+        "role": "College-Level Nominee — Smart India Hackathon",
+        "organization": "Smart India Hackathon (SIH), CBIT",
+        "period": "Two college-level nominations",
+        "type": "Competition",
+        "achievementBadge": "2× Nominated",
+        "description": "Nominated twice at the college level for Smart India Hackathon (SIH), recognizing proposed solutions during the institution-level selection process."
+      },
+      {
+        "id": "cyberfest-ctf",
+        "role": "Participant",
+        "organization": "CyberFest / CTF",
+        "period": "2024",
+        "type": "Involvement",
+        "description": "Engaged in Capture The Flag technical challenges focusing on systems analysis, web security, and cryptographic problem solving."
+      }
+    ],
     "lastSynced": "2026-10-16T18:01:25.333Z"
   },
   "syncedRepositories": {
