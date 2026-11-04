@@ -42,22 +42,55 @@ export const initialPortfolioContent: PortfolioContent = {
   },
   projects: [
     {
+      id: 'pravaah',
+      name: 'PRAVAAH',
+      tagline: 'AICTE Approval Workflow Automation, Compliance Monitoring & Alert Management',
+      category: 'AI / FULL STACK',
+      stack: ['React', 'TypeScript', 'Python', 'FastAPI', 'PostgreSQL', 'SQLAlchemy', 'Supabase'],
+      description: 'An enterprise workflow automation platform designed to streamline AICTE approval processes through policy-aware workflows, compliance monitoring, obligation tracking, and actionable alerts. Its architecture emphasizes policy version pinning, migration simulation, deterministic evidence, concurrent obligation management, transactional event delivery, and tamper-evident audit trails.',
+      summary: 'Enterprise approval workflow and compliance platform combining policy lifecycle management, deterministic proof generation, obligation tracking, alert orchestration, and hash-chain auditability.',
+      status: 'Prototype',
+      features: [
+        { name: 'Policy Version Pinning & Migration Simulation', status: 'Prototype' },
+        { name: 'Deterministic Compliance Proof Engine', status: 'Prototype' },
+        { name: 'Concurrent Obligation Ledger', status: 'Prototype' },
+        { name: 'Transactional Outbox & Alert Processing', status: 'Prototype' },
+        { name: 'Tamper-Evident Hash-Chain Audit Trail', status: 'Prototype' },
+      ],
+      githubUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
+      hasArchitecture: true,
+      featured: true,
+      order: 0,
+      source: 'curated',
+      architectureFlow: {
+        title: 'PRAVAAH Workflow Architecture',
+        summary: 'Policy-aware approval workflow connecting institutional submissions, deterministic compliance evaluation, obligation tracking, alert delivery, and auditable records.',
+        nodes: [
+          { id: '1', label: 'Institution Portal', sublabel: 'Submission & Workflow UI', status: 'Prototype' },
+          { id: '2', label: 'Policy Registry', sublabel: 'Version Pinning & Migration', status: 'Prototype' },
+          { id: '3', label: 'Proof Engine', sublabel: 'Deterministic Compliance Checks', status: 'Prototype' },
+          { id: '4', label: 'Obligation Ledger', sublabel: 'Concurrent Tracking', status: 'Prototype' },
+          { id: '5', label: 'Outbox & Audit', sublabel: 'Alerts and Hash-Chain Records', status: 'Prototype' },
+        ],
+      },
+    },
+    {
       id: 'tapas',
       name: 'TAPAS',
-      tagline: 'Thermal Analytics & Public-health Advisory System (SIH26083)',
+      tagline: 'Thermal Analytics & Public-health Advisory System',
       category: 'FULL STACK',
       stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
       description:
         'An India-ready public heat-safety prototype engineered for the Smart India Hackathon. Integrates geospatial place discovery, public weather feeds, interactive MapLibre mapped emergency shelters, and verified reference health guidance with D3 contour thermal risk modeling without invented boundary data.',
       summary:
-        'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows developed for SIH26083.',
+        'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.',
       status: 'Implemented',
       features: [
         { name: 'MapLibre Geospatial Mapping & Emergency Help GIS', status: 'Implemented' },
         { name: 'D3 Contour Thermal Risk Modeling', status: 'Implemented' },
         { name: 'Public Weather Telemetry & Heat Advisory Engine', status: 'Implemented' },
         { name: 'Next.js 15 & React 19 Client Architecture', status: 'Implemented' },
-        { name: 'SIH26083 Public Health Protocol Alignment', status: 'Implemented' },
+        { name: 'Public Health Guidance & Heat-Safety Protocol Alignment', status: 'Implemented' },
         { name: 'Dynamic Recharts Heat Trend Visualizer', status: 'Implemented' },
       ],
       githubUrl: 'https://github.com/sainithinreddy06/TAPAS',
@@ -97,7 +130,6 @@ export const initialPortfolioContent: PortfolioContent = {
         { name: 'Offline Map Layer Caching', status: 'Planned' },
       ],
       githubUrl: 'https://github.com/sainithinreddy06/SureStep',
-      liveUrl: 'https://terra-guard-ai-five.vercel.app',
       caseStudySlug: 'surestep',
       hasArchitecture: true,
       architectureFlow: {
@@ -199,13 +231,13 @@ export const initialPortfolioContent: PortfolioContent = {
     tapas: {
       slug: 'tapas',
       title: 'TAPAS',
-      subtitle: 'Thermal Analytics & Public-health Advisory System (SIH26083)',
+      subtitle: 'Thermal Analytics & Public-health Advisory System',
       overview:
         'TAPAS is an India-ready public heat-safety frontend prototype developed for the Smart India Hackathon. It provides high-precision place discovery, public meteorological heat indices, interactive mapped emergency relief shelters, and official health advisory reference protocols.',
       problem:
         'Extreme thermal heatwaves present critical public health hazards across urban India. Citizens and relief responders lack unified, responsive map interfaces that accurately visualize localized thermal stress and locate nearby verified cooling shelters.',
       whyBuilt:
-        'Engineered to tackle Smart India Hackathon problem statement SIH26083, delivering an accessible, resilient GIS dashboard that visualizes heat risks and directs citizens to relief centers.',
+        'Built as a public heat-safety project, delivering an accessible, resilient GIS dashboard that visualizes heat risks and directs citizens to relief centers.',
       architectureSummary:
         'Built with Next.js 15 and React 19. Incorporates MapLibre GL for client-side vector tile rendering, D3 contour for thermal boundary interpolation, and Recharts for diurnal temperature curve tracking.',
       architectureFlow: [
@@ -526,13 +558,14 @@ export const initialPortfolioContent: PortfolioContent = {
         '• React Web Development Certification • Generative AI Certification • Java Programming Certification',
     },
     {
-      id: 'sih-participation',
-      role: 'Hackathon Participant',
-      organization: 'Smart India Hackathon (SIH)',
-      period: '2024',
-      type: 'Involvement',
+      id: 'sih-nominations',
+      role: 'College-Level Nominee — Smart India Hackathon',
+      organization: 'Smart India Hackathon (SIH), CBIT',
+      period: 'Two college-level nominations',
+      type: 'Competition',
+      achievementBadge: '2× Nominated',
       description:
-        'Collaborated in a multidisciplinary team developing software solutions addressing national problem statements.',
+        'Nominated twice at the college level for Smart India Hackathon (SIH), recognizing proposed solutions during the institution-level selection process.',
     },
     {
       id: 'cyberfest-ctf',
