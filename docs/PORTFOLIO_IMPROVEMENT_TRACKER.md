@@ -190,7 +190,7 @@ Acceptance criteria:
 - Avoid heavy effects that reduce usability or performance.
 
 ### P0-06: SEO and social sharing
-**Status:** Not started  
+**Status:** In progress  
 **Goal:** Make the portfolio and project pages discoverable and share well.
 
 Audit/implementation:
@@ -415,3 +415,10 @@ At the end of every session:
 - **Footer status:** Replaced the always-green `LIVE SYNC` wording with `CONTENT READY`; clarified that the timestamp is the last content sync. Commit: `6029b67cf06ff2db5bbb47192eb82be713995460`.
 - **Verification boundary:** These changes are committed to `main`; the latest Render deploy was still queued/in progress when checked. No production behavior or runtime keyboard test is claimed. Package scripts expose `npm run lint` (TypeScript no-emit), `npm test`, and `npm run build`; none was run in this remote-source pass.
 - P0-01 remains in progress pending deployment completion, runtime checks, responsive review, and link verification.
+
+
+### 2026-11-04 — SEO crawl-path corrections
+- **Confirmed SEO issue:** `robots.txt` pointed crawlers to `https://sainithinreddy.me/sitemap.xml`, while the canonical production host is `https://sai-nithin-portfolio.onrender.com`. Updated the sitemap directive to the production host. Commit: `5ad44e8bbf8c04aa39d3a8ecae316407b0c82a5d`.
+- **Confirmed sitemap issue:** sitemap entries used the obsolete `/case-study/:slug` route, but the React router and project links use `/work/:slug`. Replaced those entries with the five actual public case-study routes, including PRAVAAH, and removed the standalone résumé PDF from the sitemap. Commit: `536522f530e19de7d7acf1c93cd3e6c481ea8636`.
+- **Verification boundary:** source files were updated on `main`; deployment and live HTTP responses for `/robots.txt` and `/sitemap.xml` are pending. Social preview image metadata/assets and per-case-study metadata remain to be audited. No Lighthouse or mobile viewport measurements have been run.
+- P0-06 remains in progress; P0-05 performance/mobile audit remains open.
