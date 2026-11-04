@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
-import { Github, Linkedin, Mail, Code2, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Github, Linkedin, Mail, Code2, ShieldCheck } from 'lucide-react';
 
 interface FooterProps {
   onOpenCommandPalette: () => void;
@@ -25,15 +25,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCommandPalette }) => {
         {/* Center: System status indicator */}
         <div className="flex items-center gap-2 font-mono text-[11px] text-[var(--text-muted)]">
           <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-success)]" />
-          <span>PORTFOLIO · LIVE SYNC</span>
+          <span>PORTFOLIO · CONTENT READY</span>
           {lastSyncedTimestamp && (
             <span className="text-[10px] text-[var(--text-muted)] opacity-80">
-              ({new Date(lastSyncedTimestamp).toLocaleDateString()})
+              (Last content sync: {new Date(lastSyncedTimestamp).toLocaleDateString()})
             </span>
           )}
         </div>
 
-        {/* Right: Verified links & admin shortcut */}
+        {/* Social links and admin shortcut */}
         <div className="flex items-center gap-4">
           <a
             href={content.profile.githubUrl}
