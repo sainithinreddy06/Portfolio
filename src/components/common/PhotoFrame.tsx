@@ -223,6 +223,9 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
           <img
             src={processedUrl || activeUrl}
             alt={photo.altText || 'Portrait of Sai Nithin Reddy'}
+            loading={size === 'hero' ? 'eager' : 'lazy'}
+            fetchPriority={size === 'hero' ? 'high' : 'auto'}
+            decoding="async"
             onError={handleImageError}
             className="max-h-[360px] sm:max-h-[430px] w-auto max-w-[280px] sm:max-w-[340px] object-contain object-bottom drop-shadow-sm transition-all duration-300 block select-none pointer-events-none"
             referrerPolicy="no-referrer"
