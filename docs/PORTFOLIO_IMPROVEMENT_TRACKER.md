@@ -529,3 +529,10 @@ At the end of every session:
 - Updated the PhotoFrame fallback path to reuse the primary public portrait and removed the redundant `public/images/default-profile.png` copy. The separate `data/profile-photo.png` was retained because its non-public/backend role was not conclusively ruled out.
 - Commits: `9a6bbeb` (fallback path), `c85feae` (remove duplicate public asset).
 - This removes one 1,630,340-byte duplicate from the deployed public asset tree; it does not reduce the size of the primary portrait request. CI and deployment verification pending.
+
+
+### 2026-11-04 — Share default portrait processing across component instances
+- Added a shared in-flight/completed promise for the fixed local default portrait in `PhotoFrame.tsx`.
+- Multiple PhotoFrame instances now reuse one canvas transparency-processing result instead of independently decoding and flood-filling the same 1.63 MB image. Other dynamic image URLs retain the existing independent processing path.
+- Commit: `3cf15ef`.
+- Source-level optimization only; runtime CPU and memory savings have not yet been measured. CI and Render deployment verification pending.
