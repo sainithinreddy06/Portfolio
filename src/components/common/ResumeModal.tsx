@@ -170,7 +170,7 @@ export const ResumeModal: React.FC = () => {
             <button
               onClick={() => setIsResumeModalOpen(false)}
               aria-label="Close resume viewer"
-              className="p-1.5 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shadow-xs cursor-pointer"
+              className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shadow-xs cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
