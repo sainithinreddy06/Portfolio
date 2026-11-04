@@ -10,7 +10,7 @@ import { ContactSection } from '../components/sections/ContactSection';
 
 export const HomePage: React.FC = () => {
   return (
-    <main id="main-content" className="min-h-screen">
+    <div className="min-h-screen">
       <Hero />
       <About />
       <SelectedWork />
@@ -19,6 +19,6 @@ export const HomePage: React.FC = () => {
       <ExperienceEducation />
       <ResumeSection />
       <ContactSection />
-    </main>
+    </div>
   );
 };
