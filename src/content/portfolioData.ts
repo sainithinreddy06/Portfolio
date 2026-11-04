@@ -305,28 +305,28 @@ export const initialPortfolioContent: PortfolioContent = {
       title: 'TAPAS',
       subtitle: 'Thermal Analytics & Public-health Advisory System',
       overview:
-        'TAPAS is an India-ready public heat-safety frontend prototype developed for the Smart India Hackathon. It provides high-precision place discovery, public meteorological heat indices, interactive mapped emergency relief shelters, and official health advisory reference protocols.',
+        'TAPAS is an India-focused public heat-safety frontend prototype. It combines place discovery, public weather information, nearby mapped points of interest, and links to official health-reference resources. Scientific risk layers and official relief inventories depend on separately configured, sourced provider data.',
       problem:
-        'Extreme thermal heatwaves present critical public health hazards across urban India. Citizens and relief responders lack unified, responsive map interfaces that accurately visualize localized thermal stress and locate nearby verified cooling shelters.',
+        'Extreme heat creates significant public-health risks. TAPAS explores how a location-aware interface can bring weather context, nearby points of interest, and public-health reference information together without presenting unavailable scientific measurements or unverified facilities as facts.',
       whyBuilt:
-        'Built as a public heat-safety project, delivering an accessible, resilient GIS dashboard that visualizes heat risks and directs citizens to relief centers.',
+        'Built to explore a transparent public heat-safety interface, with place search, weather context, map-based nearby information, and clearly scoped reference guidance.',
       architectureSummary:
-        'Built with Next.js 15 and React 19. Incorporates MapLibre GL for client-side vector tile rendering, D3 contour for thermal boundary interpolation, and Recharts for diurnal temperature curve tracking.',
+        'Built with Next.js 15 and React 19, using MapLibre GL for interactive maps, D3 contour for supported visualization workflows, and Recharts for data charts. Scientific overlays require valid, identity-matched source data from a configured API.',
       architectureFlow: [
         { id: '1', label: 'Next.js Frontend', sublabel: 'React 19 & Tailwind CSS', status: 'Implemented' },
         { id: '2', label: 'Location Telemetry', sublabel: 'Place Discovery & Geocoding', status: 'Implemented' },
-        { id: '3', label: 'D3 Contour Service', sublabel: 'Thermal Risk Meshes', status: 'Implemented' },
-        { id: '4', label: 'MapLibre Vector Layer', sublabel: 'Interactive Shelter GIS', status: 'Implemented' },
-        { id: '5', label: 'Advisory Engine', sublabel: 'Public Health Reference Data', status: 'Implemented' },
+        { id: '3', label: 'Visualization Layer', sublabel: 'D3 Contour & Recharts', status: 'Implemented' },
+        { id: '4', label: 'MapLibre Map', sublabel: 'Nearby Points & Map Layers', status: 'Implemented' },
+        { id: '5', label: 'Reference Resources', sublabel: 'Official Links & Scoped Notices', status: 'Implemented' },
       ],
       dataPipeline:
-        'Weather observations and place coordinates are validated client-side with strict sanitization. Fallback snapshots record timestamped reference data without speculative extrapolation.',
+        'Place coordinates and provider responses are validated before display. Weather values and fallback snapshots retain their source and timestamps; unavailable scientific fields remain unavailable rather than being estimated.',
       frontendNotes:
         'Designed with Next.js 15, React 19, MapLibre GL, and Tailwind CSS. Supports fast vector rendering and fluid responsive controls across mobile, tablet, and desktop.',
       backendNotes:
-        'Type-safe services isolate external geocoding and weather API feeds with caching and error resilience.',
+        'Client-side service adapters isolate external geocoding, weather, and optional scientific-data APIs, with request validation, caching, cancellation, and explicit unavailable states.',
       databaseNotes:
-        'GeoJSON point datasets for cooling shelters and emergency relief posts with spatial index queries.',
+        'Nearby points of interest are retrieved from external map data. Official cooling or relief resources appear only when a separately configured, validated authority feed supplies them; the frontend does not bundle a verified national shelter inventory.',
       technicalDecisions: [
         {
           decision: 'MapLibre GL for GIS map rendering',
@@ -342,7 +342,7 @@ export const initialPortfolioContent: PortfolioContent = {
         'Handling offline or slow network conditions gracefully with timestamped fallback snapshots.',
       ],
       lessons: [
-        'Public health applications demand absolute transparency: clearly differentiating real-time sensor readings from historical reference snapshots builds critical trust.',
+        'Public-health interfaces should distinguish live provider observations, timestamped snapshots, and unavailable scientific measurements so users can understand the limits of the displayed data.',
       ],
       futureWork: [
         { item: 'Integration with national weather radar satellite feeds', status: 'Planned' },
@@ -481,7 +481,7 @@ export const initialPortfolioContent: PortfolioContent = {
       frontendNotes:
         'Constructed with React 19, Vite, and Tailwind CSS. Features accessible responsive components and real-time visualization dashboards.',
       backendNotes:
-        'Stateless API service interfaces connecting directly with Google GenAI endpoints with zero unnecessary backend latency.',
+        'The frontend service layer calls Google Gemini through the configured Google GenAI integration; API availability, latency, quotas, and key protection depend on deployment configuration.',
       databaseNotes:
         'Stateless client architecture with browser caching and environment-based configuration for API sessions.',
       technicalDecisions: [
@@ -501,7 +501,7 @@ export const initialPortfolioContent: PortfolioContent = {
         'Optimizing chart re-renders when student telemetry streams update.',
       ],
       lessons: [
-        'Combining generative text explanations with visual quantitative charts significantly increases comprehension speed.',
+        'Pairing generated explanations with charts can make learning content easier to explore; the educational impact has not been formally measured.',
       ],
       futureWork: [
         { item: 'Adaptive multi-subject learning pathways', status: 'Planned' },
