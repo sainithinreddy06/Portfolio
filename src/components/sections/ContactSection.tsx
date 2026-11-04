@@ -68,14 +68,14 @@ export const ContactSection: React.FC = () => {
             <div className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex items-center gap-2">
               <a
                 href={`mailto:${profile.email}`}
-                className="flex-1 text-center py-1.5 px-2.5 rounded-sm bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-primary)] text-xs font-mono tracking-wider uppercase font-semibold transition-opacity"
+                className="flex-1 min-h-11 text-center py-2 px-2.5 rounded-sm bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-primary)] text-xs font-mono tracking-wider uppercase font-semibold transition-opacity"
               >
                 Send Email
               </a>
               <button
                 onClick={handleCopyEmail}
                 aria-label="Copy email address"
-                className="p-1.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                 title="Copy email to clipboard"
               >
                 {copied ? <Check className="w-4 h-4 text-[var(--color-success)]" /> : <Copy className="w-4 h-4" />}
@@ -99,7 +99,7 @@ export const ContactSection: React.FC = () => {
                 href={profile.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-center py-1.5 px-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="w-full min-h-11 text-center py-2 px-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>View Profile</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[var(--text-muted)]" />
@@ -145,7 +145,7 @@ export const ContactSection: React.FC = () => {
                 href={profile.leetcodeUrl || 'https://leetcode.com/u/Nithinreddy_06/'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-center py-1.5 px-2.5 rounded-sm border border-[#FFA116]/40 hover:bg-[#FFA116]/10 text-[#FFA116] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="w-full min-h-11 text-center py-2 px-2.5 rounded-sm border border-[#FFA116]/40 hover:bg-[#FFA116]/10 text-[#FFA116] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Solve</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[#FFA116]" />
