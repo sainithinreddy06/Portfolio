@@ -463,3 +463,11 @@ At the end of every session:
 - Confirmed the five project GitHub repositories are publicly discoverable through the GitHub API: PRAVAAH-2 (API redirects to its canonical repository record), TAPAS, SureStep, TRAFFIQ, and VidyaVistaar. This confirms repository existence/public visibility, not build health or project feature completeness.
 - Removed unsupported precision claims from portfolio copy: TRAFFIQ's sub-50ms response-time and 60fps statements are now qualified descriptions without benchmark promises; removed the unsupported "zero glue" phrasing; removed an unsourced EAMCET candidate-count comparison; changed TAPAS "verified" health guidance to neutral reference-guidance wording. Commit: `ac2f1ae2e7b346512c9a18629f7f159d7f8f3583`.
 - The TAPAS and PRAVAAH live demo hosts were not independently smoke-tested in this pass. SureStep has no live URL configured in the project card. Treat demo availability as unverified, not broken or live.
+
+
+### 2026-11-04 — Case-study evidence alignment
+- Compared portfolio case-study copy with the available project README/package documentation for TAPAS, SureStep, TRAFFIQ, and VidyaVistaar.
+- Updated TAPAS to distinguish its working location/weather/map interface from optional scientific-risk feeds and authority-sourced relief inventories. Removed unsupported claims that verified cooling shelters are provided by default.
+- Updated VidyaVistaar wording to avoid implying measured learning outcomes or guaranteed zero-latency API behavior.
+- Confirmed TAPAS package metadata documents Next.js 15, React 19, MapLibre GL, D3 Contour, and Recharts. SureStep, TRAFFIQ, and VidyaVistaar README claims were reviewed; no additional source-code-level feature verification was performed in this pass.
+- Portfolio content commit: `40f03da283efa31a9eed818af644149185e00868`.
