@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/admin/
 
-Sitemap: https://sainithinreddy.me/sitemap.xml
+Sitemap: https://sai-nithin-portfolio.onrender.com/sitemap.xml
