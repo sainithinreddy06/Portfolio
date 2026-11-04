@@ -174,7 +174,8 @@
           "url": "https://pravaah-frontend-bx3o.onrender.com",
           "verified": true,
           "notes": "Previously confirmed live PRAVAAH frontend deployment on Render."
-        }
+        },
+        "isManualOverride": true
       },
       {
         "id": "tapas",
@@ -264,7 +265,9 @@
         "isUnavailable": false,
         "lastUpdated": "2026-10-12T19:13:44Z",
         "starsCount": 0,
-        "topics": []
+        "topics": [],
+        "source": "curated",
+        "isManualOverride": true
       },
       {
         "id": "surestep",
@@ -363,7 +366,9 @@
         "isUnavailable": false,
         "lastUpdated": "2026-10-02T16:43:55Z",
         "starsCount": 0,
-        "topics": []
+        "topics": [],
+        "source": "curated",
+        "isManualOverride": true
       },
       {
         "id": "traffiq",

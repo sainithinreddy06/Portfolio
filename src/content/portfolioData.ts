@@ -43,6 +43,8 @@ export const initialPortfolioContent: PortfolioContent = {
   projects: [
     {
       id: 'pravaah',
+      source: 'curated',
+      isManualOverride: true,
       name: 'PRAVAAH',
       tagline: 'AICTE Approval Workflow Automation, Compliance Monitoring & Alert Management',
       category: 'AI / FULL STACK',
@@ -77,6 +79,8 @@ export const initialPortfolioContent: PortfolioContent = {
     },
     {
       id: 'tapas',
+      source: 'curated',
+      isManualOverride: true,
       name: 'TAPAS',
       tagline: 'Thermal Analytics & Public-health Advisory System',
       category: 'FULL STACK',
@@ -113,6 +117,8 @@ export const initialPortfolioContent: PortfolioContent = {
     },
     {
       id: 'surestep',
+      source: 'curated',
+      isManualOverride: true,
       name: 'SureStep',
       tagline: 'AI-Powered Outdoor Safety & Navigation Platform',
       category: 'COMPUTER VISION',

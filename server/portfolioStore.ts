@@ -226,17 +226,23 @@ export function mergeGitHubProject(
       new Set([...existing.stack, ...githubProj.stack.filter((t) => t.length > 1)])
     );
 
-    // Live URL update:
-    // If GitHub provides a new/changed demo URL, update it.
-    // If GitHub didn't provide one this time, keep existing known valid liveUrl (protection against temporary API glitch)
-    const liveUrl = githubProj.liveUrl || existing.liveUrl;
+    // Curated/manual project data owns the live URL decision. This intentionally
+    // preserves an absent liveUrl too, preventing stale README/homepage links from
+    // reappearing after sync. GitHub discovery is used only for non-curated projects.
+    const hasCuratedLiveUrlDecision =
+      existing.isManualOverride === true || existing.source === 'curated' || existing.source === 'manual';
+    const liveUrl = hasCuratedLiveUrlDecision
+      ? existing.liveUrl
+      : (githubProj.liveUrl || existing.liveUrl);
 
     const merged: ExtendedProjectItem = {
       ...existing,
       repositoryId: githubProj.repoId,
       githubUrl: githubProj.githubUrl || existing.githubUrl,
       liveUrl,
-      deploymentInfo: githubProj.deploymentInfo || existing.deploymentInfo,
+      deploymentInfo: hasCuratedLiveUrlDecision
+        ? existing.deploymentInfo
+        : (githubProj.deploymentInfo || existing.deploymentInfo),
       description,
       summary: existing.summary || description.slice(0, 150),
       stack: existing.stack.length > 0 ? existing.stack : combinedTech,
