@@ -59,7 +59,7 @@ export const initialPortfolioContent: PortfolioContent = {
         { name: 'Transactional Outbox & Alert Processing', status: 'Prototype' },
         { name: 'Tamper-Evident Hash-Chain Audit Trail', status: 'Prototype' },
       ],
-      githubUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
+      githubUrl: 'https://github.com/sainithinreddy06/PRAVAAH',
       liveUrl: 'https://pravaah-frontend-bx3o.onrender.com',
       caseStudySlug: 'pravaah',
       hasArchitecture: true,
@@ -299,7 +299,7 @@ export const initialPortfolioContent: PortfolioContent = {
         { item: 'Evaluate audit-chain anchoring and independent verification options', status: 'Research' },
         { item: 'Validate operational performance and accessibility with representative users', status: 'Planned' },
       ],
-      repoUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
+      repoUrl: 'https://github.com/sainithinreddy06/PRAVAAH',
       stack: ['React', 'TypeScript', 'Vite', 'Python', 'FastAPI', 'SQLAlchemy', 'Alembic', 'PostgreSQL', 'Supabase'],
     },
     tapas: {
