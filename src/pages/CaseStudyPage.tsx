@@ -63,7 +63,7 @@ export const CaseStudyPage: React.FC = () => {
 
         <EngineeringModeBadge
           componentName={`CaseStudy:${caseStudy.slug}`}
-          notes="Verified Technical Specification"
+          notes="Project Technical Overview"
           className="mb-4"
         />
 
