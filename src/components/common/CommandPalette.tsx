@@ -35,7 +35,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const previousBodyOverflowRef = useRef('');
   const navigate = useNavigate();
   const {
     content,
@@ -223,17 +225,45 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
   }, [query]);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    if (!isOpen) return;
+    document.getElementById(`command-option-${filteredCommands[selectedIndex]?.id}`)?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, filteredCommands, selectedIndex]);
+
+  useEffect(() => {
+    if (!isOpen) {
       setQuery('');
+      return;
     }
+
+    previouslyFocusedRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    previousBodyOverflowRef.current = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    inputRef.current?.focus();
+
+    const handleDialogKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'input:not([disabled]), button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleDialogKeyDown);
     return () => {
-      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleDialogKeyDown);
+      document.body.style.overflow = previousBodyOverflowRef.current;
+      previouslyFocusedRef.current?.focus();
     };
   }, [isOpen]);
 
@@ -275,6 +305,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         className="w-full max-w-xl rounded-xl border border-[var(--border-card)] bg-[var(--bg-primary)] shadow-2xl overflow-hidden text-[var(--text-primary)]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -286,7 +317,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type a command or jump to section..."
+            role="combobox"
             aria-label="Search commands"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            aria-controls="command-palette-options"
+            aria-activedescendant={filteredCommands[selectedIndex] ? `command-option-${filteredCommands[selectedIndex].id}` : undefined}
             className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-hidden"
           />
           {query && (
@@ -306,7 +342,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
           </button>
         </div>
 
-        <div ref={listRef} className="max-h-80 overflow-y-auto p-2 space-y-1">
+        <div id="command-palette-options" role="listbox" aria-label="Available commands" className="max-h-80 overflow-y-auto p-2 space-y-1">
           {filteredCommands.length === 0 ? (
             <div className="py-8 text-center text-xs font-mono text-[var(--text-muted)]">
               NO MATCHING COMMANDS FOUND
@@ -317,6 +353,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
               return (
                 <div
                   key={cmd.id}
+                  id={`command-option-${cmd.id}`}
                   role="option"
                   aria-selected={isSelected}
                   onClick={() => cmd.action()}
