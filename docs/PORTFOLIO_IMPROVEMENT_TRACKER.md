@@ -108,7 +108,9 @@ Acceptance criteria:
 - No unverified assumptions are described as defects.
 
 ### P0-02: Upgrade flagship project case studies
-**Status:** Not started  
+**Status:** In progress
+
+**2026-11-04 update:** Added the first PRAVAAH case study to `src/content/portfolioData.ts` and connected the PRAVAAH project card with `caseStudySlug: 'pravaah'`. Content is based on the PRAVAAH repository README and deliberately describes the system as an academic/hackathon prototype, distinguishes rule-based readiness support from official approval, and records audit-chain boundaries. Commit: `812f8e1bce956b08d2ed12a364043eebb82f6347`. Production route and visual rendering are not yet verified.  
 **Goal:** Turn project listings into credible engineering evidence.
 
 Initial order:
