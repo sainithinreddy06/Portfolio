@@ -30,7 +30,7 @@ export const ResumeSection: React.FC = () => {
         <div className="mb-10">
           <EngineeringModeBadge
             componentName="ResumeSection"
-            notes="Verified Document View · Factual Educational & Engineering Credentials"
+            notes="Resume Document · Education & Engineering Experience"
             className="mb-3"
           />
           <div className="flex items-center gap-2 mb-2">
@@ -43,7 +43,7 @@ export const ResumeSection: React.FC = () => {
           </h2>
           <div className="border-b border-dashed border-[var(--border-subtle)] my-2 w-full" />
           <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
-            Official curriculum vitae detailing undergraduate coursework at Chaitanya Bharathi Institute of Technology (CBIT), full-stack software systems, ML pipelines, and technical leadership.
+            Resume detailing undergraduate coursework at Chaitanya Bharathi Institute of Technology (CBIT), full-stack software systems, ML pipelines, and technical leadership.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ export const ResumeSection: React.FC = () => {
                     {content.profile.name}
                   </h3>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] border border-[var(--accent-primary)]/20">
-                    OFFICIAL PDF
+                    RESUME PDF
                   </span>
                 </div>
                 <p className="text-xs font-mono text-[var(--text-secondary)] mt-1">
@@ -131,7 +131,7 @@ export const ResumeSection: React.FC = () => {
                 <span>DOCUMENT INTEGRITY</span>
               </div>
               <p className="text-xs font-semibold text-[var(--text-primary)]">Direct PDF Delivery</p>
-              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">Original Authoritative Document</p>
+              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">PDF file hosted for direct access</p>
             </div>
           </div>
         </div>
