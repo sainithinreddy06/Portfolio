@@ -122,16 +122,15 @@ export const SelectedWork: React.FC = () => {
           {/* Dynamic Category Filter Bar */}
           {categories.length > 1 && (
             <div
-              role="tablist"
+              role="group"
               aria-label="Filter projects by category"
               className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] self-start sm:self-auto"
             >
               <button
                 type="button"
-                role="tab"
-                aria-selected={activeCategory === 'ALL'}
+                aria-pressed={activeCategory === 'ALL'}
                 onClick={() => setActiveCategory('ALL')}
-                className={`px-3 py-1.5 rounded-md font-mono text-xs tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-11 px-3 py-2 rounded-md font-mono text-xs tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                   activeCategory === 'ALL'
                     ? 'bg-[var(--surface-elevated)] text-[var(--text-primary)] font-semibold shadow-xs border border-[var(--border-subtle)]'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -147,8 +146,7 @@ export const SelectedWork: React.FC = () => {
                 <button
                   key={cat}
                   type="button"
-                  role="tab"
-                  aria-selected={activeCategory === cat}
+                  aria-pressed={activeCategory === cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-3 py-1.5 rounded-md font-mono text-xs tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === cat
@@ -168,7 +166,7 @@ export const SelectedWork: React.FC = () => {
 
         {/* Sync Feedback Toast */}
         {syncFeedback && (
-          <div className="mb-6 p-3 rounded-lg bg-[var(--surface-elevated)] border border-[var(--accent-primary)]/40 text-xs font-mono text-[var(--text-primary)] flex items-center gap-2 animate-fade-in">
+          <div role="status" aria-live="polite" className="mb-6 p-3 rounded-lg bg-[var(--surface-elevated)] border border-[var(--accent-primary)]/40 text-xs font-mono text-[var(--text-primary)] flex items-center gap-2 animate-fade-in">
             <CheckCircle2 className="w-4 h-4 text-[var(--color-success)] shrink-0" />
             <span>{syncFeedback}</span>
           </div>
@@ -176,14 +174,14 @@ export const SelectedWork: React.FC = () => {
 
         {/* Error State with Graceful Fallback */}
         {projectsError && (
-          <div className="mb-6 p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-xs font-mono text-[var(--color-warning)] flex items-center justify-between gap-3">
+          <div role="alert" className="mb-6 p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-xs font-mono text-[var(--color-warning)] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>Offline or network notice: displaying cached repository snapshot.</span>
             </div>
             <button
               onClick={refreshServerPortfolio}
-              className="underline hover:text-[var(--text-primary)] text-xs cursor-pointer"
+              className="min-h-11 px-2 inline-flex items-center underline hover:text-[var(--text-primary)] text-xs cursor-pointer"
             >
               Retry
             </button>
@@ -212,7 +210,7 @@ export const SelectedWork: React.FC = () => {
             </p>
             <button
               onClick={handleManualSync}
-              className="px-4 py-2 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] text-xs font-mono font-medium tracking-wider uppercase inline-flex items-center gap-2 cursor-pointer"
+              className="min-h-11 px-4 py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] text-xs font-mono font-medium tracking-wider uppercase inline-flex items-center gap-2 cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Sync GitHub Repositories</span>
@@ -311,7 +309,7 @@ export const SelectedWork: React.FC = () => {
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-mono tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group/link"
+                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group/link"
                             aria-label={`View source repository for ${project.name} on GitHub`}
                           >
                             <Github className="w-3.5 h-3.5 shrink-0 group-hover/link:text-[var(--accent-primary)] transition-colors" />
@@ -326,7 +324,7 @@ export const SelectedWork: React.FC = () => {
                             href={project.liveUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer"
+                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer"
                             aria-label={`Open live demo for ${project.name}`}
                           >
                             <ExternalLink className="w-3.5 h-3.5 shrink-0" />
@@ -340,7 +338,7 @@ export const SelectedWork: React.FC = () => {
                           <Link
                             to={`/work/${project.caseStudySlug}`}
                             data-cursor="case-study"
-                            className="inline-flex items-center gap-1.5 text-xs font-mono font-medium tracking-wider text-[var(--accent-primary)] hover:underline transition-colors ml-auto lg:ml-0 cursor-pointer"
+                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--accent-primary)] hover:underline transition-colors ml-auto lg:ml-0 cursor-pointer"
                             aria-label={`Detailed case study for ${project.name}`}
                           >
                             <span>CASE STUDY</span>
@@ -384,7 +382,7 @@ export const SelectedWork: React.FC = () => {
               onClick={handleManualSync}
               disabled={isSyncing}
               title="Revalidate repository data from GitHub"
-              className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)] transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1"
+              className="min-h-11 min-w-11 inline-flex items-center justify-center rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-elevated)] transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1"
               aria-label="Refresh GitHub repositories"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[var(--accent-primary)]' : ''}`} />
@@ -395,7 +393,7 @@ export const SelectedWork: React.FC = () => {
             href="https://github.com/sainithinreddy06"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] hover:border-[var(--accent-primary)]/60 text-xs font-mono font-semibold tracking-wider text-[var(--text-primary)] transition-all group cursor-pointer shadow-2xs"
+            className="inline-flex min-h-11 items-center gap-2.5 px-4 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] hover:border-[var(--accent-primary)]/60 text-xs font-mono font-semibold tracking-wider text-[var(--text-primary)] transition-all group cursor-pointer shadow-2xs"
           >
             <Github className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
             <span>VIEW ALL REPOSITORIES</span>
