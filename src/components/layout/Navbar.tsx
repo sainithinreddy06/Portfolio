@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'day' ? 'Night' : 'Day'} theme`}
               aria-pressed={theme === 'night'}
-              className="px-2.5 py-1.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-[var(--border-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-mono tracking-widest uppercase transition-colors flex items-center gap-1.5 focus-visible:outline-hidden cursor-pointer"
+              className="min-h-11 px-3 py-2 rounded-sm border border-[var(--border-subtle)] bg-[var(--surface-card)] hover:border-[var(--border-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-mono tracking-widest uppercase transition-colors flex items-center gap-1.5 focus-visible:outline-hidden cursor-pointer"
             >
               {theme === 'day' ? (
                 <>
@@ -202,7 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
               aria-controls="site-index-dialog"
               aria-haspopup="dialog"
               aria-label="Open index menu"
-              className="px-3 py-1.5 rounded-sm border border-[var(--text-primary)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] text-[11px] font-mono tracking-widest uppercase font-semibold transition-all duration-150 focus-visible:outline-hidden cursor-pointer"
+              className="min-h-11 px-3 py-2 rounded-sm border border-[var(--text-primary)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] text-[11px] font-mono tracking-widest uppercase font-semibold transition-all duration-150 focus-visible:outline-hidden cursor-pointer"
             >
               INDEX
             </button>
@@ -252,7 +252,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
                 <button
                   onClick={() => setIndexOpen(false)}
                   aria-label="Close index dialog"
-                  className="p-1.5 rounded-md border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] transition-colors cursor-pointer"
+                  className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
