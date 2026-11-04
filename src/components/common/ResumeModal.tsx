@@ -8,25 +8,63 @@ export const ResumeModal: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [viewMode, setViewMode] = useState<'pdf' | 'transcript'>('transcript');
   const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const previousBodyOverflowRef = useRef('');
   const resume = content.profile.resume;
   const isAvailable = resume?.isAvailable !== false;
   const resumeFileUrl = getResumeFileUrl(content);
 
   useEffect(() => {
+    if (!isResumeModalOpen) return;
+
+    previouslyFocusedRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    previousBodyOverflowRef.current = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const getFocusableElements = () => {
+      const dialog = modalRef.current;
+      if (!dialog) return [];
+      return Array.from(dialog.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter((element) => element.getAttribute('aria-hidden') !== 'true');
+    };
+
+    const initialFocus = getFocusableElements()[0];
+    (initialFocus || modalRef.current)?.focus();
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isResumeModalOpen) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         setIsResumeModalOpen(false);
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+      const focusable = getFocusableElements();
+      if (focusable.length === 0) {
+        e.preventDefault();
+        modalRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !modalRef.current?.contains(document.activeElement))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !modalRef.current?.contains(document.activeElement))) {
+        e.preventDefault();
+        first.focus();
       }
     };
-    if (isResumeModalOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
-    }
+
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousBodyOverflowRef.current;
+      previouslyFocusedRef.current?.focus();
     };
   }, [isResumeModalOpen, setIsResumeModalOpen]);
 
@@ -63,7 +101,7 @@ export const ResumeModal: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-primary)] print:hidden">
           <div className="flex items-center gap-3">
             <span className="font-mono text-xs font-semibold tracking-wider text-[var(--accent-primary)] uppercase">
-              {isAvailable ? 'VERIFIED DOCUMENT' : 'DOCUMENT STATUS'}
+              {isAvailable ? 'RESUME DOCUMENT' : 'DOCUMENT STATUS'}
             </span>
             <div className="flex items-center gap-1 bg-[var(--surface-elevated)] p-0.5 rounded border border-[var(--border-subtle)] text-[11px] font-mono">
               <button
