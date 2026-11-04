@@ -536,3 +536,10 @@ At the end of every session:
 - Multiple PhotoFrame instances now reuse one canvas transparency-processing result instead of independently decoding and flood-filling the same 1.63 MB image. Other dynamic image URLs retain the existing independent processing path.
 - Commit: `3cf15ef`.
 - Source-level optimization only; runtime CPU and memory savings have not yet been measured. CI and Render deployment verification pending.
+
+
+### 2026-11-04 — Restore known live demo actions in project catalogue
+- The project catalogue only renders a LIVE DEMO action when the current portfolio snapshot contains `project.liveUrl`. The curated source already contained verified Render demo URLs for PRAVAAH and TAPAS, but an older persisted snapshot can omit those fields and hide the actions.
+- Added a narrow fallback map in `SelectedWork.tsx` for the two known demo deployments: PRAVAAH (`https://pravaah-frontend-bx3o.onrender.com`) and TAPAS (`https://tapas-g0ly.onrender.com`). Existing project-specific `liveUrl` values still take precedence. No demo links were invented for SureStep, TRAFFIQ, or VidyaVistaar because no confirmed public frontend deployment URL was available in the inspected Git data.
+- Confirmed all five flagship projects already have case-study slugs and corresponding case-study content in `portfolioData.ts`; TAPAS already has a detailed case study matching the existing case-study page structure, so no duplicate case study was created.
+- Code commit: `28d18f8763dc690ad5184dc7b20ab3ad03766d50`. CI and production deployment verification pending.
