@@ -10,7 +10,7 @@ interface PhotoFrameProps {
 }
 
 // Stable permanent default profile photo asset (user's uploaded portrait)
-export const DEFAULT_PROFILE_PHOTO = '/images/default-profile.png';
+export const DEFAULT_PROFILE_PHOTO = '/images/profile-photo.png';
 
 export function processImageTransparency(sourceUrl: string, onProcessed: (url: string) => void) {
   if (!sourceUrl) {
