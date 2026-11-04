@@ -104,12 +104,70 @@ export function getPortfolioStore(): PortfolioStoreState {
 /**
  * Persists the portfolio store state to disk.
  */
+const getSupabaseConfig = () => ({
+  url: (process.env.SUPABASE_URL || '').replace(/\/$/, ''),
+  key: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+});
+
+let supabaseWriteQueue: Promise<void> = Promise.resolve();
+
+function queueSupabaseSave(state: PortfolioStoreState): void {
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) return;
+  const snapshot = JSON.parse(JSON.stringify(state));
+  supabaseWriteQueue = supabaseWriteQueue.catch(() => undefined).then(async () => {
+    const response = await fetch(`${url}/rest/v1/portfolio_state?on_conflict=id`, {
+      method: 'POST',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify({ id: 'main', state: snapshot, updated_at: new Date().toISOString() }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) throw new Error(`Supabase portfolio save failed (${response.status}): ${await response.text()}`);
+  }).catch((error) => console.error('[PortfolioStore] Supabase persistence failed:', error));
+}
+
+export async function initializePortfolioStore(): Promise<void> {
+  ensureDataDir();
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) {
+    console.warn('[PortfolioStore] Supabase persistence is not configured; using the local JSON snapshot.');
+    getPortfolioStore();
+    return;
+  }
+  try {
+    const response = await fetch(`${url}/rest/v1/portfolio_state?id=eq.main&select=state&limit=1`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) throw new Error(`Supabase portfolio load failed (${response.status}): ${await response.text()}`);
+    const rows = await response.json() as Array<{ state?: PortfolioStoreState }>;
+    if (rows[0]?.state) {
+      cachedState = rows[0].state;
+      console.log('[PortfolioStore] Loaded durable portfolio state from Supabase.');
+      return;
+    }
+    const initial = getPortfolioStore();
+    queueSupabaseSave(initial);
+    await supabaseWriteQueue;
+    console.log('[PortfolioStore] Seeded Supabase with the curated portfolio snapshot.');
+  } catch (error) {
+    console.error('[PortfolioStore] Supabase unavailable; using local JSON fallback:', error);
+    getPortfolioStore();
+  }
+}
+
 export function savePortfolioStore(state: PortfolioStoreState): void {
   ensureDataDir();
   state.lastUpdated = new Date().toISOString();
   try {
     fs.writeFileSync(STORE_FILE, JSON.stringify(state, null, 2), 'utf8');
     cachedState = state;
+    queueSupabaseSave(state);
   } catch (err) {
     console.error('[PortfolioStore] Error saving store file:', err);
   }

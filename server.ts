@@ -19,6 +19,7 @@ import {
   handleRepositoryUntagged,
   applyApprovedResumeChanges,
   resetPortfolioStore,
+  initializePortfolioStore,
 } from './server/portfolioStore';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -143,7 +144,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  // Dynamic CORS Handling (supports localhost, Netlify, custom domain, Render)
+  // Dynamic CORS Handling (supports localhost, custom domains, and Render)
   const isLocalhost = origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   const isAllowedCustom =
     origin && (ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*'));
@@ -1088,7 +1089,9 @@ async function startServer() {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-startServer().catch((err) => {
-  console.error('[Portfolio Server] Fatal start error:', err);
-  process.exit(1);
-});
+initializePortfolioStore()
+  .catch((err) => console.error('[PortfolioStore] Initialization warning:', err))
+  .finally(() => startServer().catch((err) => {
+    console.error('[Portfolio Server] Fatal start error:', err);
+    process.exit(1);
+  }));

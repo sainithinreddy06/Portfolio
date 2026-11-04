@@ -29,7 +29,7 @@ export interface GitHubRepoPayload {
 }
 
 export interface DeploymentSourceInfo {
-  provider: 'netlify' | 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
+  provider: 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
   url: string;
   verified: boolean;
   notes?: string;
@@ -66,7 +66,6 @@ export interface GitHubSyncDiagnostics {
   rateLimitReset: string | null;
   hasTokenConfigured: boolean;
   hasWebhookSecretConfigured: boolean;
-  hasNetlifyTokenConfigured: boolean;
   totalReposDiscovered: number;
   eligibleReposCount: number;
   projects: ExtractedGitHubProject[];
@@ -359,7 +358,7 @@ export function parseReadmeContent(
     }
   }
 
-  // Scan for live deployment URLs in README (e.g. netlify.app, vercel.app, etc.)
+  // Scan for live deployment URLs in README
   const urlMatches = readmeText.match(/https?:\/\/[^\s\)\"\'<>]+/g) || [];
   for (const rawUrl of urlMatches) {
     const cleanUrl = rawUrl.replace(/[.,;:]+$/, '');
@@ -379,7 +378,6 @@ export function parseReadmeContent(
       continue;
     }
     if (
-      lower.includes('.netlify.app') ||
       lower.includes('.vercel.app') ||
       lower.includes('.pages.dev') ||
       lower.includes('.github.io')
@@ -483,8 +481,7 @@ async function verifyUrlReachable(url: string): Promise<boolean> {
  * 2. README and documentation links
  * 3. GitHub Pages deployment information
  * 4. GitHub Deployments API
- * 5. Netlify API (if NETLIFY_AUTH_TOKEN is configured)
- * 6. Verified fallback for confirmed repositories (TAPAS, SureStep)
+ * 5. Previously verified URL supplied by portfolio data
  */
 export async function discoverLiveDeployment(
   owner: string,
@@ -585,9 +582,8 @@ export async function discoverLiveDeployment(
                   const isOk = await verifyUrlReachable(targetUrl);
                   if (isOk) {
                     const isVercel = (dep.creator?.login || '').includes('vercel');
-                    const isNetlify = (dep.creator?.login || '').includes('netlify');
                     return {
-                      provider: isNetlify ? 'netlify' : isVercel ? 'vercel' : 'fallback_verified',
+                      provider: isVercel ? 'vercel' : 'fallback_verified',
                       url: targetUrl,
                       verified: true,
                       notes: `Discovered from GitHub Deployment (${dep.creator?.login || 'deployment'})`,
@@ -604,68 +600,6 @@ export async function discoverLiveDeployment(
     }
   } catch {
     // Non-fatal
-  }
-
-  // Tier 5: Netlify API (if NETLIFY_AUTH_TOKEN is configured in server environment)
-  const netlifyToken = env('NETLIFY_AUTH_TOKEN') || env('NETLIFY_TOKEN');
-  if (netlifyToken) {
-    try {
-      const netlifyRes = await fetch('https://api.netlify.com/api/v1/sites', {
-        headers: {
-          Authorization: `Bearer ${netlifyToken.trim()}`,
-          'User-Agent': 'sainithinreddy-portfolio-discovery',
-        },
-        signal: AbortSignal.timeout(5000),
-      });
-      if (netlifyRes.ok) {
-        const sites = (await netlifyRes.json()) as any[];
-        const matchedSite = sites.find((s) => {
-          const repoPath = s.build_settings?.repo_path || '';
-          const repoUrl = s.build_settings?.repo_url || '';
-          return (
-            repoPath.toLowerCase() === `${owner}/${repoName}`.toLowerCase() ||
-            repoUrl.toLowerCase().includes(`/${owner}/${repoName}`.toLowerCase())
-          );
-        });
-        if (matchedSite?.ssl_url || matchedSite?.url) {
-          const siteUrl = (matchedSite.ssl_url || matchedSite.url) as string;
-          const isPublished = Boolean(matchedSite.published_deploy?.state === 'ready');
-          if (isPublished) {
-            return {
-              provider: 'netlify',
-              url: siteUrl,
-              verified: true,
-              notes: `Discovered from Netlify API (Site: ${matchedSite.name})`,
-            };
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('[Netlify API] Failed to query sites:', e);
-    }
-  }
-
-  // Tier 6: Retain verified fallback for confirmed live projects
-  // User confirmed project: TAPAS -> https://tapas-heat-intelligence.netlify.app/
-  if (repoName.toLowerCase() === 'tapas') {
-    const verifiedTapasUrl = 'https://tapas-heat-intelligence.netlify.app/';
-    return {
-      provider: 'fallback_verified',
-      url: verifiedTapasUrl,
-      verified: true,
-      notes: 'Confirmed live Netlify production deployment for TAPAS',
-    };
-  }
-
-  // SureStep confirmed live deployment -> https://terra-guard-ai-five.vercel.app
-  if (repoName.toLowerCase() === 'surestep') {
-    const verifiedSureStepUrl = 'https://terra-guard-ai-five.vercel.app';
-    return {
-      provider: 'fallback_verified',
-      url: verifiedSureStepUrl,
-      verified: true,
-      notes: 'Confirmed live Vercel production deployment for SureStep',
-    };
   }
 
   // Do not remove a previously known valid URL just because of a temporary transient API error
@@ -1125,7 +1059,6 @@ export function getGitHubDiagnostics(): GitHubSyncDiagnostics {
     rateLimitReset: lastRateLimitReset,
     hasTokenConfigured: Boolean(env('GITHUB_TOKEN')?.trim()),
     hasWebhookSecretConfigured: Boolean(env('GITHUB_WEBHOOK_SECRET')?.trim()),
-    hasNetlifyTokenConfigured: Boolean(env('NETLIFY_AUTH_TOKEN') || env('NETLIFY_TOKEN')),
     totalReposDiscovered: currentProjects.length,
     eligibleReposCount: currentProjects.filter((p) => p.isEligible).length,
     projects: currentProjects,

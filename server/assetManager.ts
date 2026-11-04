@@ -102,8 +102,8 @@ export async function saveUploadedResume(
 
   // Attempt durable cloud storage upload (Supabase Free Tier)
   const cloudResult = await uploadAssetToStorage(buffer, originalFileName, 'resume');
-  // Stable public HTTPS path served locally by the application
-  const activeFileUrl = '/resume.pdf';
+  // Prefer durable Supabase Storage URLs when configured.
+  const activeFileUrl = cloudResult.provider === 'supabase' && cloudResult.url ? cloudResult.url : '/resume.pdf';
 
   const sizeStr = customFileSize || formatFileSize(buffer.length);
   const store = getPortfolioStore();
