@@ -442,3 +442,9 @@ At the end of every session:
 - Removed unsupported verification language from the resume section: changed the badge to `RESUME PDF`, the engineering note to neutral resume wording, and the document description to a direct hosted PDF description. Commit: `e0dda8cda51f6094a1d8a16c0f8d589a903fa16b`.
 - Changed the certification timeline from an asserted `Verified` period and `Industry Credentials` organization to `Listed in resume` and `Certificate details`, pending issuer names or verification URLs. Updated the unavailable-resume fallback copy to remove an unsupported verification claim. Commit: `9bcd2c47bf994c41de4c7b06ae7931069c7447a5`.
 - **Verification boundary:** source changes are pushed to `main`; Render deployment is queued. No certificate issuer links or certificate files were supplied, so no independent verification is claimed. No GitHub Actions workflow is configured in `.github/workflows`; the repository's package scripts expose `npm test` and `npm run lint`, but these were not run in this pass. Continue to use Render's production build logs as build evidence only.
+
+
+### 2026-11-04 — Case-study page metadata
+- Added route-aware document titles, meta descriptions, Open Graph title/description/URL, Twitter title/description, and canonical URLs for `/work/:slug` pages. Metadata returns to the portfolio homepage defaults when navigating away from a case study. Commit: `51025fed1fffab3ae5860a365ba1a7e39f74d693`.
+- Description text is derived from each case study's existing overview and shortened for metadata; no new project claims were introduced.
+- **Verification pending:** this is a client-side React metadata update, not server-side rendering. Search crawlers and social scrapers that do not execute JavaScript may still receive the static homepage metadata. Render build and route-level browser checks are pending; do not treat this as fully verified SEO for crawlers.
