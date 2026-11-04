@@ -522,3 +522,10 @@ At the end of every session:
 - Added a module-scoped in-flight request promise so simultaneous consumers share one request; the promise is cleared after completion so later manual retries still fetch fresh server data. Existing local-storage fallback and state merge behavior are unchanged.
 - Commit: `bfec8cf` — `perf(data): deduplicate portfolio snapshot requests`.
 - This removes duplicate concurrent requests, not the single initial API request. No browser network trace has been captured yet. CI and Render deployment verification pending.
+
+
+### 2026-11-04 — Remove duplicate deployed portrait asset
+- Repository tree inspection showed that `data/profile-photo.png`, `public/images/profile-photo.png`, and `public/images/default-profile.png` were byte-identical Git blobs (1,630,340 bytes each).
+- Updated the PhotoFrame fallback path to reuse the primary public portrait and removed the redundant `public/images/default-profile.png` copy. The separate `data/profile-photo.png` was retained because its non-public/backend role was not conclusively ruled out.
+- Commits: `9a6bbeb` (fallback path), `c85feae` (remove duplicate public asset).
+- This removes one 1,630,340-byte duplicate from the deployed public asset tree; it does not reduce the size of the primary portrait request. CI and deployment verification pending.
