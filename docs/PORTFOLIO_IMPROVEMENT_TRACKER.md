@@ -429,3 +429,10 @@ At the end of every session:
 - Changed `src/App.tsx` to lazy-load the home, case-study, admin, and not-found route components behind an accessible Suspense loading state. Commit: `e95e0a98d270360b1fc94ae4e4a8e12ad131119c`.
 - **Verification pending:** wait for the new Render build and compare emitted chunk sizes. No Lighthouse score, Core Web Vitals, mobile viewport, or image transfer-size measurements have been collected. Do not mark P0-05 complete until measured and production-tested.
 - Static review notes: the hero photo is processed through a canvas pixel scan before display; its actual cost depends on the delivered image dimensions and device. Review whether this processing is necessary after measuring rather than removing it speculatively.
+
+
+### 2026-11-04 — Mobile layout, image loading, and social metadata pass
+- Updated the system architecture flow to stack its stages vertically on narrow screens and retain the horizontal pipeline layout from the `sm` breakpoint upward. This avoids forcing a 700px-wide diagram inside a phone viewport. Commit: `4881af7fd6266b24117e4d53d0da9d134673b91a`.
+- Profile photos now use eager/high-priority loading only for the hero image, lazy loading for non-hero instances, and asynchronous image decoding. Commit: `e5a35bf4ec09d4e66d0499bff17136e2e0b151c6`.
+- Added the canonical production URL to Open Graph metadata and changed the Twitter card to `summary` because the repository currently has no confirmed social preview image asset. Commit: `0b90b1abb74872ebde3e3e81db055edd469baee7`.
+- **Verification pending:** production build and deployment checks are queued after these changes. No real-device/mobile-browser walkthrough, Lighthouse audit, or social preview validator has been run. P0-05 and P0-06 remain in progress.
