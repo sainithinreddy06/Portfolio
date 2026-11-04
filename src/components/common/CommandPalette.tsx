@@ -124,7 +124,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     {
       id: 'nav-resume',
       label: 'View Curriculum Vitae',
-      description: '07 / RESUME – Verified document viewer & download',
+      description: '07 / RESUME – Resume viewer & download',
       icon: <FileText className="w-4 h-4 text-[var(--color-warning)]" />,
       category: 'Navigation',
       action: () => {
