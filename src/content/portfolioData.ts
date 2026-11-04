@@ -98,7 +98,7 @@ export const initialPortfolioContent: PortfolioContent = {
         { name: 'Dynamic Recharts Heat Trend Visualizer', status: 'Implemented' },
       ],
       githubUrl: 'https://github.com/sainithinreddy06/TAPAS',
-      liveUrl: undefined,
+      liveUrl: 'https://tapas-g0ly.onrender.com',
       caseStudySlug: 'tapas',
       hasArchitecture: true,
       architectureFlow: {
