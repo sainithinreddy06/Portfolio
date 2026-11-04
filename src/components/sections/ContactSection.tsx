@@ -7,11 +7,24 @@ export const ContactSection: React.FC = () => {
   const { content } = usePortfolio();
   const { profile } = content;
   const [copied, setCopied] = useState(false);
+  const [copyMessage, setCopyMessage] = useState('');
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(profile.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyEmail = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is unavailable in this browser.');
+      }
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+      setCopyMessage('Email address copied.');
+    } catch {
+      setCopied(false);
+      setCopyMessage('Copy was unavailable. Please select the email address above.');
+    }
+    window.setTimeout(() => {
+      setCopied(false);
+      setCopyMessage('');
+    }, 3000);
   };
 
   return (
@@ -68,6 +81,7 @@ export const ContactSection: React.FC = () => {
                 {copied ? <Check className="w-4 h-4 text-[var(--color-success)]" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
+            <p role="status" aria-live="polite" className="sr-only">{copyMessage}</p>
           </div>
 
           <div className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] flex flex-col justify-between hover:border-[var(--text-primary)]/50 transition-colors shadow-xs">
