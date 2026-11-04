@@ -501,3 +501,10 @@ At the end of every session:
 - This reduces avoidable React state updates during pointer movement; it is a source-level optimization, not a measured Core Web Vitals result.
 - Commit: `526387782f32c87e4a0135edea2253ed87beb454`.
 - Lighthouse, browser performance profiling, and Core Web Vitals measurements remain outstanding. P0-05 remains in progress.
+
+
+### 2026-11-04 — Profile image transparency processing allocations
+- Optimized the background-removal flood-fill in `PhotoFrame.tsx` while preserving the existing pixel thresholds and traversal order: replaced the dynamically growing JavaScript number array with a preallocated `Uint32Array` queue, and removed per-pixel neighbor-array allocations.
+- The neighbor visitor is created once per image-processing run, not once per pixel.
+- Commits: `5c996a2` (typed queue and inline neighbors), `75562c2` (reuse visitor helper outside traversal loop).
+- This is a source-level allocation reduction; image appearance equivalence and actual CPU/memory improvements still need browser testing against representative photos. Lighthouse and Core Web Vitals remain outstanding. P0-05 remains in progress.
