@@ -10,9 +10,9 @@ interface PhotoFrameProps {
 }
 
 // Stable permanent default profile photo asset (user's uploaded portrait)
-export const DEFAULT_PROFILE_PHOTO = '/images/profile-photo.png';
+const DEFAULT_PROFILE_PHOTO_URL = '/images/profile-photo.png';
 
-export function processImageTransparency(sourceUrl: string, onProcessed: (url: string) => void) {
+function processImageTransparencyUncached(sourceUrl: string, onProcessed: (url: string) => void) {
   if (!sourceUrl) {
     onProcessed('');
     return;
@@ -149,6 +149,27 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
     onProcessed(sourceUrl);
   };
   img.src = sourceUrl;
+}
+
+let defaultProcessedPhoto: Promise<string> | null = null;
+
+export const DEFAULT_PROFILE_PHOTO = DEFAULT_PROFILE_PHOTO_URL;
+
+// The same local portrait is used by multiple PhotoFrame instances. Share its
+// one-time canvas processing result instead of repeating the flood fill.
+export function processImageTransparency(sourceUrl: string, onProcessed: (url: string) => void) {
+  if (sourceUrl !== DEFAULT_PROFILE_PHOTO_URL) {
+    processImageTransparencyUncached(sourceUrl, onProcessed);
+    return;
+  }
+
+  if (!defaultProcessedPhoto) {
+    defaultProcessedPhoto = new Promise((resolve) => {
+      processImageTransparencyUncached(sourceUrl, resolve);
+    });
+  }
+
+  defaultProcessedPhoto.then(onProcessed);
 }
 
 export const PhotoFrame: React.FC<PhotoFrameProps> = ({
