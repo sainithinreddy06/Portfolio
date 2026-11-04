@@ -6,7 +6,8 @@ export const CustomCursor: React.FC = () => {
   const [isPressed, setIsPressed] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
-  const mousePos = useRef({ x: -100, y: -100 });
+  const visibilityRef = useRef(false);
+  const hoveredRef = useRef(false);
 
   useEffect(() => {
     const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
@@ -19,17 +20,20 @@ export const CustomCursor: React.FC = () => {
     document.documentElement.classList.add('has-custom-cursor');
 
     const handleMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
       }
-      if (!isVisible) {
+      if (!visibilityRef.current) {
+        visibilityRef.current = true;
         setIsVisible(true);
       }
 
       const target = e.target as HTMLElement | null;
       if (!target) {
-        setIsHovered(false);
+        if (hoveredRef.current) {
+          hoveredRef.current = false;
+          setIsHovered(false);
+        }
         return;
       }
 
@@ -44,22 +48,29 @@ export const CustomCursor: React.FC = () => {
         target.closest('.cursor-pointer') ||
         target.getAttribute('tabindex') === '0';
 
-      if (interactive) {
-        setIsHovered(true);
-      } else {
+      let nextHovered = Boolean(interactive);
+      if (!interactive) {
         try {
-          const computedCursor = window.getComputedStyle(target).cursor;
-          setIsHovered(computedCursor === 'pointer');
+          nextHovered = window.getComputedStyle(target).cursor === 'pointer';
         } catch {
-          setIsHovered(false);
+          nextHovered = false;
         }
+      }
+      if (nextHovered !== hoveredRef.current) {
+        hoveredRef.current = nextHovered;
+        setIsHovered(nextHovered);
       }
     };
 
     const handleMouseDown = () => setIsPressed(true);
     const handleMouseUp = () => setIsPressed(false);
-    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseEnter = () => {
+      visibilityRef.current = true;
+      setIsVisible(true);
+    };
     const handleMouseLeave = () => {
+      visibilityRef.current = false;
+      hoveredRef.current = false;
       setIsVisible(false);
       setIsHovered(false);
     };
@@ -78,7 +89,7 @@ export const CustomCursor: React.FC = () => {
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [isVisible]);
+  }, []);
 
   if (!isEnabled) {
     return null;
