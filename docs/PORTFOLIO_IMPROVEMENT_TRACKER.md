@@ -77,6 +77,7 @@ A task is **Verified** only when the implementation is reviewed, relevant tests/
 | 2026-11-04 | Supabase table access/RLS inspection | Verified as previously inspected | RLS enabled; anon/authenticated have no table grants; service_role has required table privileges |
 | 2026-11-04 | Resume/profile-photo persistence | Owner-confirmed | Owner reported assets persist after upload and restart/redeploy; not independently re-tested in this audit |
 | 2026-11-04 | Login rate-limiting decision | Keep enabled | Recommended to retain and improve; configuration still needs source/config verification |
+| 2026-11-04 | TAPAS and SureStep demo-link audit | TAPAS Render frontend URL added to portfolio data; SureStep has backend/ML services but no frontend deployment listed in the connected Render workspace | TAPAS service `srv-dah3n5h42hec73eld8g0` reports a `live` deploy at `https://tapas-g0ly.onrender.com`; SureStep should not be given a fabricated frontend URL. Live HTTP/browser smoke test remains outstanding |
 
 ### Security verification boundaries
 - The unauthenticated `/api/portfolio/save` request was rejected with 401 in production.
