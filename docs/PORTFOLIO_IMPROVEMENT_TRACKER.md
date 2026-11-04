@@ -400,3 +400,10 @@ At the end of every session:
 5. Keep unfinished tasks open. Do not silently drop work.
 
 **Next recommended task:** P0-01 — verify the latest Render deployment, then complete case-study route coverage, keyboard/focus behavior for dialogs and navigation, contact/resume actions, and mobile layouts. Record only checks actually performed.
+
+### 2026-11-04 — PRAVAAH case study deployed; resume modal accessibility pass
+- **Production deployment:** Render reports the PRAVAAH case-study commit `812f8e1bce956b08d2ed12a364043eebb82f6347` as `live`. The intended route is `/work/pravaah`. This is deployment-state evidence; a full visual browser walkthrough is still outstanding.
+- **Case-study route coverage:** Source data contains project slugs for `pravaah`, `tapas`, `surestep`, `traffiq`, and `vidyavistaar`, and corresponding case-study definitions are present. This is a static source check, not a live route test.
+- **Resume modal:** Replaced the unsupported `VERIFIED DOCUMENT` label with `RESUME DOCUMENT`; added initial focus, Tab/Shift+Tab focus containment, Escape handling, focus restoration, and restoration of the previous body overflow style. Commit: `0dd7d7f60884c1f6fb7101c53375e127b7505991`. Runtime keyboard testing remains outstanding.
+- **Case-study fallback copy:** Removed wording that implied an unavailable route was “not verified”; the message now explains that the case study is unavailable and suggests checking the link. Commit: `9e61e694111169468a35b6bf2ce1214e934a1942`.
+- P0-01 and P0-02 remain in progress. No full accessibility, mobile, or end-to-end route audit is claimed.
