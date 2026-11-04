@@ -238,34 +238,36 @@ export const initialPortfolioContent: PortfolioContent = {
     pravaah: {
       slug: 'pravaah',
       title: 'PRAVAAH',
-      subtitle: 'Enterprise Approval Workflow Automation & Compliance Monitoring',
+      subtitle: 'Enterprise Autonomous Transformation — Policy-Aware Approval & Compliance Platform',
       overview:
-        'PRAVAAH is an academic and hackathon prototype for organising institutional approval workflows, evidence-based reviews, compliance obligations, and operational audit history in one role-oriented workspace. It is designed to support consistent review and follow-up; it is not an official AICTE service and does not issue approvals.',
+        'PRAVAAH is an academic prototype for AICTE-oriented approval workflow automation and compliance operations. It brings role-based institutional workspaces, policy version pinning, policy migration simulation, deterministic compliance proofs, evidence reviews, a concurrent obligation ledger, transactional alert processing, and a tamper-evident audit trail into one platform. It supports structured human review; it is not an official AICTE service and does not issue regulatory approvals.',
       problem:
         'Approval and compliance work can span multiple stakeholders, policy requirements, supporting documents, review stages, deadlines, and follow-up actions. When these activities are distributed across separate records and communication channels, teams can struggle to identify missing evidence, understand application status, and maintain a traceable history.',
       whyBuilt:
-        'The project explores how a structured digital workspace can make application review and compliance operations easier to coordinate. The focus is on connecting workflow records, evidence, obligations, readiness information, notifications, and audit events while keeping human review and decision-making explicit.',
+        'The project explores how policy-aware workflow software can make institutional reviews more consistent and auditable. Its design connects versioned policy context to deterministic checks, evidence-backed application records, obligation tracking, reliable alert processing, and verifiable audit events while keeping final decisions with authorised human reviewers.',
       architectureSummary:
-        'The React and TypeScript frontend communicates with a Python FastAPI backend over HTTP APIs. The backend coordinates workflow services and persistence through SQLAlchemy and PostgreSQL, with Alembic managing schema migrations. Evidence storage and operational audit events are handled as distinct parts of the application architecture.',
+        'The React, TypeScript, and Vite frontend communicates with a Python FastAPI backend over HTTP APIs. The backend separates policy lifecycle, application workflow, deterministic compliance evaluation, evidence handling, obligation management, notification delivery, and audit services. SQLAlchemy provides data access to PostgreSQL, while Alembic manages schema migrations. A transactional outbox pattern is used to coordinate durable event recording with asynchronous alert processing; hash-chain verification provides an application-level audit-integrity check.',
       architectureFlow: [
         { id: '1', label: 'Role-based Workspace', sublabel: 'React, TypeScript & Vite', status: 'Implemented' },
         { id: '2', label: 'API & Access Layer', sublabel: 'FastAPI Authentication & Scoped Authorisation', status: 'Implemented' },
-        { id: '3', label: 'Workflow Services', sublabel: 'Applications, Reviews & Policy Metadata', status: 'Implemented' },
-        { id: '4', label: 'Evidence & Obligations', sublabel: 'Uploads, Reviews, Undertakings & Deadlines', status: 'Implemented' },
-        { id: '5', label: 'Persistence & Audit', sublabel: 'SQLAlchemy, PostgreSQL & Audit Events', status: 'Implemented' },
+        { id: '3', label: 'Policy Registry', sublabel: 'Version Pinning & Migration Simulation', status: 'Prototype' },
+        { id: '4', label: 'Deterministic Proof Engine', sublabel: 'Policy-Driven Evidence & Compliance Checks', status: 'Prototype' },
+        { id: '5', label: 'Obligation Ledger', sublabel: 'Concurrent Tracking & Undertakings', status: 'Prototype' },
+        { id: '6', label: 'Transactional Outbox', sublabel: 'Reliable Alert & Event Processing', status: 'Prototype' },
+        { id: '7', label: 'Audit & Persistence', sublabel: 'PostgreSQL, SQLAlchemy & Hash-Chain Verification', status: 'Implemented' },
       ],
       dataPipeline:
-        'An application record moves through supported workflow transitions. Evidence metadata and file digests are associated with the record, reviewers can record findings, and policy metadata provides context for the review. Obligation and undertaking workflows track follow-up work; readiness snapshots summarise evidence, open obligations, and unaccepted undertakings for human assessment.',
+        'An application record moves through authenticated workflow transitions and is evaluated against its pinned policy version. Evidence metadata and file digests are associated with the record; the deterministic proof layer evaluates configured requirements and produces explainable results for review. Policy migration simulation compares the impact of a proposed policy version before adoption. Obligations and undertakings are tracked in a shared ledger, while transactional outbox events are processed for dependable in-app alerts. Readiness snapshots bring evidence state, open obligations, and unaccepted undertakings together for human assessment.',
       frontendNotes:
         'The React, TypeScript, and Vite client presents role-oriented workspaces for submitting, reviewing, administering, and monitoring workflow records. The interface consumes backend APIs rather than treating client-side state as the source of truth for workflow decisions.',
       backendNotes:
-        'FastAPI exposes the application and compliance workflows. Authentication and role/region-scoped authorisation protect supported operations. Workflow services cover application transitions, evidence review, obligations, undertakings, readiness snapshots, rule-based recommendations, notifications, operational metrics, and audit-event queries.',
+        'FastAPI exposes application, policy, evidence, compliance, and administrative workflows. Authentication and role/region-scoped authorisation protect supported operations. Services cover application transitions, policy version pinning and migration simulation, deterministic proof evaluation, evidence review, concurrent obligation tracking, undertakings, readiness snapshots, rule-based recommendations, transactional outbox processing, in-app notifications, operational metrics, and audit verification.',
       databaseNotes:
-        'SQLAlchemy provides the data-access layer and Alembic manages schema migrations. PostgreSQL is the intended deployment database, while selected tests may use SQLite. Evidence files are stored through configured storage paths; the exact storage safeguards depend on deployment configuration.',
+        'SQLAlchemy provides the data-access layer and Alembic manages schema migrations. PostgreSQL is the intended deployment database, while selected tests may use SQLite. Relational records hold workflow, policy, obligation, event, and audit metadata; evidence files use configured storage paths. The outbox and audit chain are application-level reliability and integrity mechanisms, not a claim of independently immutable infrastructure.',
       technicalDecisions: [
         {
           decision: 'Separate the client interface from workflow enforcement',
-          rationale: 'Keeping workflow operations behind FastAPI endpoints allows authentication, authorisation, validation, and business rules to be applied at the service boundary.',
+          rationale: 'Keeping workflow operations behind FastAPI endpoints allows authentication, authorisation, validation, policy-version checks, and business rules to be applied at the service boundary.',
         },
         {
           decision: 'Use role- and region-scoped authorisation',
@@ -273,15 +275,15 @@ export const initialPortfolioContent: PortfolioContent = {
         },
         {
           decision: 'Represent readiness as a point-in-time snapshot',
-          rationale: 'A snapshot can bring evidence state, open obligations, and unaccepted undertakings together for human review without presenting an automated recommendation as an official approval decision.',
+          rationale: 'Pinning the applicable policy version makes later reviews reproducible, while migration simulation helps assess policy changes before they affect active workflows.',
         },
         {
-          decision: 'Keep audit integrity checks explicit',
-          rationale: 'The administrator verification workflow checks event hashes and links and compares the calculated chain head with the stored chain head; this provides an integrity signal within the application, not a claim of independently immutable storage.',
+          decision: 'Use a transactional outbox and explicit audit-integrity checks',
+          rationale: 'The outbox separates committed workflow changes from asynchronous notification processing, reducing the risk of losing an alert between a database update and event delivery. The administrator verification workflow checks event hashes and links and compares the calculated chain head with the stored chain head; this provides an application-level integrity signal, not independently immutable storage.',
         },
       ],
       challenges: [
-        'Coordinating application state, evidence review, policy metadata, obligations, and undertakings without losing the relationship between the records.',
+        'Keeping policy versions, evidence decisions, obligation state, asynchronous alert events, and audit history consistent across related workflow operations.',
         'Applying role- and region-scoped access consistently across workflow operations.',
         'Communicating the boundary between rule-based readiness guidance and decisions that must remain with authorised human reviewers.',
         'Making audit-chain verification understandable while accurately describing its application-level trust boundary.',
@@ -289,7 +291,7 @@ export const initialPortfolioContent: PortfolioContent = {
       lessons: [
         'Compliance software needs explainable workflow state and traceable evidence, not only a collection of forms and dashboards.',
         'Readiness summaries should support human review rather than imply that an automated system grants regulatory approval.',
-        'Security and audit claims must be bounded by the actual deployment configuration and verification performed.',
+        'Reliable event delivery, deterministic evaluation, and audit-chain verification each have explicit trust boundaries and should be tested independently.',
       ],
       futureWork: [
         { item: 'Expand automated end-to-end coverage across role-specific workflows', status: 'Planned' },
@@ -297,8 +299,8 @@ export const initialPortfolioContent: PortfolioContent = {
         { item: 'Evaluate audit-chain anchoring and independent verification options', status: 'Research' },
         { item: 'Validate operational performance and accessibility with representative users', status: 'Planned' },
       ],
-      repoUrl: 'https://github.com/sainithinreddy06/PRAVAAH',
-      stack: ['React', 'TypeScript', 'Vite', 'Python', 'FastAPI', 'SQLAlchemy', 'Alembic', 'PostgreSQL'],
+      repoUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
+      stack: ['React', 'TypeScript', 'Vite', 'Python', 'FastAPI', 'SQLAlchemy', 'Alembic', 'PostgreSQL', 'Supabase'],
     },
     tapas: {
       slug: 'tapas',
