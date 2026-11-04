@@ -42,7 +42,7 @@ export interface CaseStudyData {
 }
 
 export interface DeploymentSourceInfo {
-  provider: 'netlify' | 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
+  provider: 'render' | 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
   url: string;
   verified: boolean;
   notes?: string;
