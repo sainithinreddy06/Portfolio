@@ -37,7 +37,7 @@ export const initialPortfolioContent: PortfolioContent = {
       fileSize: '137 KB',
       uploadedAt: 'Oct 16, 2026',
       isAvailable: true,
-      comingSoonMessage: 'Verified custom curriculum vitae active and available.',
+      comingSoonMessage: 'Resume document is currently unavailable.',
     },
   },
   projects: [
@@ -615,10 +615,10 @@ export const initialPortfolioContent: PortfolioContent = {
         'Participating in community social welfare initiatives, student mentorship drives, and campus outreach activities.',
     },
     {
-      id: 'certifications-verified',
+      id: 'technical-certifications',
       role: 'Technical Certifications',
-      organization: 'Industry Credentials',
-      period: 'Verified',
+      organization: 'Certificate details',
+      period: 'Listed in resume',
       type: 'Involvement',
       description:
         '• React Web Development Certification • Generative AI Certification • Java Programming Certification',
