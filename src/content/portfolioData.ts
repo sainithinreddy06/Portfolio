@@ -86,7 +86,7 @@ export const initialPortfolioContent: PortfolioContent = {
       category: 'FULL STACK',
       stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
       description:
-        'An India-ready public heat-safety prototype engineered for the Smart India Hackathon. Integrates geospatial place discovery, public weather feeds, interactive MapLibre mapped emergency shelters, and verified reference health guidance with D3 contour thermal risk modeling without invented boundary data.',
+        'An India-ready public heat-safety prototype engineered for the Smart India Hackathon. Integrates geospatial place discovery, public weather feeds, interactive MapLibre mapped emergency shelters, and public-health reference guidance with D3 contour thermal risk modeling without invented boundary data.',
       summary:
         'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.',
       status: 'Implemented',
@@ -378,19 +378,19 @@ export const initialPortfolioContent: PortfolioContent = {
       frontendNotes:
         'Constructed with React and Tailwind CSS. Employs clean vector-rendered maps with custom SVG overlays, rendering danger heatmaps without blocking user panning or zooming.',
       backendNotes:
-        'FastAPI asynchronous handlers handle coordinate queries with sub-50ms serialized response times for cached segment bounding boxes.',
+        'FastAPI asynchronous handlers expose coordinate-query endpoints, with response performance dependent on cache state, payload size, and deployment conditions.',
       databaseNotes:
         'MongoDB document schema stores temporal snapshots indexed by geospatial 2dsphere coordinates for fast bounding-box queries.',
       technicalDecisions: [
         {
           decision: 'FastAPI instead of Flask or Express for the core service',
           rationale:
-            'Async Python execution with native Pydantic validation allows high-throughput spatial coordinate parsing with zero glue serialization code.',
+            'Async Python execution and Pydantic validation provide structured request parsing for spatial coordinate data.',
         },
         {
           decision: 'Strict client-side separation of map rendering from ML inference',
           rationale:
-            'Ensures heavy predictive algorithms never degrade 60fps canvas/vector panning.',
+            'Keeps predictive computation separate from map rendering to help preserve a responsive pan-and-zoom experience.',
         },
       ],
       challenges: [
@@ -594,7 +594,7 @@ export const initialPortfolioContent: PortfolioContent = {
       type: 'Competition',
       achievementBadge: 'Rank 2337',
       description:
-        'Secured Rank 2337 among over 200,000 engineering aspirants across Telangana state.',
+        'Secured Rank 2337 in the Telangana State Engineering Entrance Test (TS EAMCET) 2024.',
     },
     {
       id: 'rmc-involvement',
