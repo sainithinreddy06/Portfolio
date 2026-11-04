@@ -32,7 +32,7 @@ export const initialPortfolioContent: PortfolioContent = {
       isPlaceholder: false,
     },
     resume: {
-      fileUrl: '#resume-view',
+      fileUrl: '/resume.pdf',
       fileName: 'Sai_Nithin_Reddy_Resume.pdf',
       fileSize: '137 KB',
       uploadedAt: 'Oct 16, 2026',
@@ -95,7 +95,7 @@ export const initialPortfolioContent: PortfolioContent = {
         { name: 'Dynamic Recharts Heat Trend Visualizer', status: 'Implemented' },
       ],
       githubUrl: 'https://github.com/sainithinreddy06/TAPAS',
-      liveUrl: 'https://tapas-heat-intelligence.netlify.app/',
+      liveUrl: undefined,
       caseStudySlug: 'tapas',
       hasArchitecture: true,
       architectureFlow: {
