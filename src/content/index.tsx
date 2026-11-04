@@ -25,7 +25,30 @@ export interface PortfolioContextType {
 
 const STORAGE_KEY = 'sai_nithin_portfolio_content_v3';
 const ENG_MODE_KEY = 'sai_nithin_engineering_mode_v2';
+
 const THEME_KEY = 'sai_nithin_theme_pref';
+
+// Share an in-flight snapshot request across provider remounts (including
+// React Strict Mode's development remount) and overlapping refresh triggers.
+let portfolioSnapshotRequest: Promise<any> | null = null;
+
+function fetchPortfolioSnapshot(): Promise<any> {
+  if (!portfolioSnapshotRequest) {
+    portfolioSnapshotRequest = fetch('/api/portfolio', {
+      headers: { Accept: 'application/json' },
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Server returned HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .finally(() => {
+        portfolioSnapshotRequest = null;
+      });
+  }
+  return portfolioSnapshotRequest;
+}
 
 /**
  * Deduplicates and sorts dynamic projects by priority/order.
@@ -122,11 +145,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsLoadingProjects(true);
     setProjectsError(null);
     try {
-      const res = await fetch('/api/portfolio');
-      if (!res.ok) {
-        throw new Error(`Server returned HTTP ${res.status}`);
-      }
-      const data = await res.json();
+      const data = await fetchPortfolioSnapshot();
       if (data.success && data.content) {
         const serverProjects = normalizeProjectList(data.content.projects || []);
         setContent((prev) => {
