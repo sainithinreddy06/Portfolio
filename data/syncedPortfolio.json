@@ -174,7 +174,7 @@
         "name": "TAPAS",
         "tagline": "Thermal Analytics & Public-health Advisory System",
         "category": "FULL STACK",
-        "description": "TAPAS — Thermal Analytics & Public-health Advisory System (SIH26083)",
+        "description": "TAPAS — Thermal Analytics & Public-health Advisory System",
         "summary": "Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.",
         "stack": [
           "Next.js 15",
@@ -313,12 +313,6 @@
           }
         ],
         "githubUrl": "https://github.com/sainithinreddy06/SureStep",
-        "deploymentInfo": {
-          "provider": "github_homepage",
-          "url": "https://terra-guard-ai-five.vercel.app",
-          "verified": true,
-          "notes": "Discovered from GitHub repository homepage metadata"
-        },
         "repositoryId": 1396317703,
         "caseStudySlug": "surestep",
         "hasArchitecture": true,
@@ -565,10 +559,10 @@
       "tapas": {
         "slug": "tapas",
         "title": "TAPAS",
-        "subtitle": "Thermal Analytics & Public-health Advisory System (SIH26083)",
-        "overview": "TAPAS is an India-ready public heat-safety frontend prototype developed for the Smart India Hackathon. It provides high-precision place discovery, public meteorological heat indices, interactive mapped emergency relief shelters, and official health advisory reference protocols.",
+        "subtitle": "Thermal Analytics & Public-health Advisory System",
+        "overview": "TAPAS is an India-ready public heat-safety frontend prototype. It provides high-precision place discovery, public meteorological heat indices, interactive mapped emergency relief shelters, and official health advisory reference protocols.",
         "problem": "Extreme thermal heatwaves present critical public health hazards across urban India. Citizens and relief responders lack unified, responsive map interfaces that accurately visualize localized thermal stress and locate nearby verified cooling shelters.",
-        "whyBuilt": "Engineered to tackle Smart India Hackathon problem statement SIH26083, delivering an accessible, resilient GIS dashboard that visualizes heat risks and directs citizens to relief centers.",
+        "whyBuilt": "Built to explore an accessible, resilient geospatial dashboard that visualizes heat risks and helps citizens locate nearby cooling shelters.",
         "architectureSummary": "Built with Next.js 15 and React 19. Incorporates MapLibre GL for client-side vector tile rendering, D3 contour for thermal boundary interpolation, and Recharts for diurnal temperature curve tracking.",
         "architectureFlow": [
           {
@@ -1102,7 +1096,6 @@
       "repoId": 1396317703,
       "name": "SureStep",
       "fullName": "SureStep",
-      "liveUrl": "https://terra-guard-ai-five.vercel.app",
       "syncedAt": "2026-10-16T18:01:25.333Z",
       "topics": []
     },
