@@ -1,6 +1,8 @@
 {
   "name": "Sai Nithin Reddy Portfolio",
-  "description": "Production personal engineering portfolio for Sai Nithin Reddy with automated GitHub synchronization and live demo discovery.",
+  "description": "Portfolio of Sai Nithin Reddy, a third-year Computer Science & Engineering student at CBIT Hyderabad, featuring AI, full-stack, and software engineering projects.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
