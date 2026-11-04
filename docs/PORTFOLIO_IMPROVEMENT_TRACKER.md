@@ -515,3 +515,10 @@ At the end of every session:
 - Replaced the sequential loop with a bounded worker pool (maximum three concurrent repository-enrichment jobs). This avoids an unbounded request burst, preserves result ordering, and isolates individual repository enrichment failures so one unexpected error does not abort the remaining workers.
 - Commit: `5956c2f` — `perf(sync): enrich repositories with bounded concurrency`.
 - This is a source-level latency improvement; no measured refresh-duration or GitHub request-count benchmark has been run. CI and production deployment verification are pending. P0-05 remains in progress.
+
+
+### 2026-11-04 — Deduplicate initial portfolio snapshot requests
+- The portfolio provider fetched `/api/portfolio` directly whenever its mount effect ran. Overlapping refreshes or development Strict Mode remounts could issue duplicate requests for the same snapshot.
+- Added a module-scoped in-flight request promise so simultaneous consumers share one request; the promise is cleared after completion so later manual retries still fetch fresh server data. Existing local-storage fallback and state merge behavior are unchanged.
+- Commit: `bfec8cf` — `perf(data): deduplicate portfolio snapshot requests`.
+- This removes duplicate concurrent requests, not the single initial API request. No browser network trace has been captured yet. CI and Render deployment verification pending.
