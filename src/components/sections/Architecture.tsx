@@ -129,7 +129,7 @@ export const Architecture: React.FC = () => {
                         </div>
                         <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)]">
                           <span>STAGE</span>
-                          <span className="text-[var(--accent-secondary)]">VERIFIED</span>
+                          <span className="text-[var(--accent-secondary)]">{node.status.toUpperCase()}</span>
                         </div>
                       </div>
 
