@@ -30,6 +30,53 @@ export const CaseStudyPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  useEffect(() => {
+    const baseTitle = 'Sai Nithin Reddy – AI Engineer & Full-Stack Developer';
+    const baseDescription = 'Third-year Computer Science & Engineering student at CBIT Hyderabad. Explore Sai Nithin Reddy’s AI, full-stack, and software engineering projects.';
+    const baseUrl = window.location.origin + '/';
+    const description = caseStudy?.overview
+      ? caseStudy.overview.replace(/\\s+/g, ' ').slice(0, 157).trimEnd() + (caseStudy.overview.length > 157 ? '…' : '')
+      : baseDescription;
+    const title = caseStudy ? `${caseStudy.title} | Sai Nithin Reddy` : baseTitle;
+    const canonicalUrl = caseStudy ? window.location.origin + window.location.pathname : baseUrl;
+
+    document.title = title;
+    const setMeta = (selector: string, attribute: 'name' | 'property', key: string, value: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+      element.content = value;
+    };
+    setMeta('meta[name="description"]', 'name', 'description', description);
+    setMeta('meta[property="og:title"]', 'property', 'og:title', title);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', description);
+    setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
+
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
+
+    return () => {
+      document.title = baseTitle;
+      setMeta('meta[name="description"]', 'name', 'description', baseDescription);
+      setMeta('meta[property="og:title"]', 'property', 'og:title', baseTitle);
+      setMeta('meta[property="og:description"]', 'property', 'og:description', baseDescription);
+      setMeta('meta[property="og:url"]', 'property', 'og:url', baseUrl);
+      setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', baseTitle);
+      setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', baseDescription);
+      if (canonical) canonical.href = baseUrl;
+    };
+  }, [caseStudy]);
+
   if (!caseStudy) {
     return (
       <div className="min-h-screen pt-32 pb-20 px-4 max-w-4xl mx-auto text-center text-[var(--text-primary)]">
