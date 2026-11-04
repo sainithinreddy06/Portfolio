@@ -147,7 +147,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   // Dynamic CORS Handling (supports localhost, custom domains, and Render)
   const isLocalhost = origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   const isAllowedCustom =
-    origin && (ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*'));
+    origin && (ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*'));
 
   if (origin && (isLocalhost || isAllowedCustom || !IS_PROD)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -787,16 +787,15 @@ app.post('/api/github/webhook', async (req: Request, res: Response) => {
 
   console.log(`[GitHub Webhook] Received event: ${event}`);
 
-  // 1. Signature Verification
-  if (secret) {
-    const isValid = verifyGitHubSignature((req as any).rawBody, signature, secret);
-    if (!isValid) {
-      console.warn('[GitHub Webhook] Invalid signature rejected.');
-      res.status(401).json({ error: 'Invalid webhook signature.' });
-      return;
-    }
-  } else {
-    console.warn('[GitHub Webhook] GITHUB_WEBHOOK_SECRET is not set in environment. Allowing request for testing.');
+  // Fail closed: never process webhooks without a configured shared secret.
+  if (!secret) {
+    console.error('[GitHub Webhook] GITHUB_WEBHOOK_SECRET is not configured; rejecting webhook.');
+    return res.status(503).json({ success: false, error: 'Webhook integration is not configured.' });
+  }
+  const isValid = verifyGitHubSignature((req as any).rawBody, signature, secret);
+  if (!isValid) {
+    console.warn('[GitHub Webhook] Invalid signature rejected.');
+    return res.status(401).json({ success: false, error: 'Invalid webhook signature.' });
   }
 
   // 2. Handle Ping event

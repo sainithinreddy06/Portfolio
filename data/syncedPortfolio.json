@@ -220,13 +220,6 @@
           }
         ],
         "githubUrl": "https://github.com/sainithinreddy06/TAPAS",
-        "liveUrl": "https://tapas-heat-intelligence.netlify.app/",
-        "deploymentInfo": {
-          "provider": "github_homepage",
-          "url": "https://tapas-heat-intelligence.netlify.app/",
-          "verified": true,
-          "notes": "Discovered from GitHub repository homepage metadata"
-        },
         "repositoryId": 1415788245,
         "caseStudySlug": "tapas",
         "hasArchitecture": true,
@@ -1092,7 +1085,6 @@
       "repoId": 1415788245,
       "name": "TAPAS",
       "fullName": "TAPAS",
-      "liveUrl": "https://tapas-heat-intelligence.netlify.app/",
       "syncedAt": "2026-10-16T18:01:25.333Z",
       "topics": []
     }

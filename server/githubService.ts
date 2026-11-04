@@ -29,7 +29,7 @@ export interface GitHubRepoPayload {
 }
 
 export interface DeploymentSourceInfo {
-  provider: 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
+  provider: 'render' | 'vercel' | 'github_pages' | 'github_homepage' | 'readme_docs' | 'fallback_verified';
   url: string;
   verified: boolean;
   notes?: string;
@@ -379,6 +379,7 @@ export function parseReadmeContent(
     }
     if (
       lower.includes('.vercel.app') ||
+      lower.includes('.onrender.com') ||
       lower.includes('.pages.dev') ||
       lower.includes('.github.io')
     ) {
@@ -522,7 +523,7 @@ export async function discoverLiveDeployment(
     const isOk = await verifyUrlReachable(readmeLiveUrl);
     if (isOk) {
       return {
-        provider: 'readme_docs',
+        provider: readmeLiveUrl.toLowerCase().includes('.onrender.com') ? 'render' : 'readme_docs',
         url: readmeLiveUrl,
         verified: true,
         notes: 'Discovered from repository README documentation',
