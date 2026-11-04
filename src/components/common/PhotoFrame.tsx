@@ -103,6 +103,21 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
       }
 
       let head = 0;
+      const visitNeighbor = (n: number) => {
+        if (n === -1 || visited[n]) return;
+        visited[n] = 1;
+        const nIdx = n * 4;
+        const r = data[nIdx];
+        const g = data[nIdx + 1];
+        const b = data[nIdx + 2];
+        if (r > 220 && g > 220 && b > 220) {
+          queue[tail++] = n;
+        } else if (r > 195 && g > 195 && b > 195) {
+          const avg = (r + g + b) / 3;
+          const alphaFactor = Math.max(0, Math.min(1, (230 - avg) / 35));
+          data[nIdx + 3] = Math.round(data[nIdx + 3] * alphaFactor);
+        }
+      };
       while (head < tail) {
         const curr = queue[head++];
         const cx = curr % w;
@@ -116,22 +131,6 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
         const right = cx < w - 1 ? curr + 1 : -1;
         const up = cy > 0 ? curr - w : -1;
         const down = cy < h - 1 ? curr + w : -1;
-
-        const visitNeighbor = (n: number) => {
-          if (n === -1 || visited[n]) return;
-          visited[n] = 1;
-          const nIdx = n * 4;
-          const r = data[nIdx];
-          const g = data[nIdx + 1];
-          const b = data[nIdx + 2];
-          if (r > 220 && g > 220 && b > 220) {
-            queue[tail++] = n;
-          } else if (r > 195 && g > 195 && b > 195) {
-            const avg = (r + g + b) / 3;
-            const alphaFactor = Math.max(0, Math.min(1, (230 - avg) / 35));
-            data[nIdx + 3] = Math.round(data[nIdx + 3] * alphaFactor);
-          }
-        };
 
         visitNeighbor(left);
         visitNeighbor(right);
