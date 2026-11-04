@@ -448,3 +448,9 @@ At the end of every session:
 - Added route-aware document titles, meta descriptions, Open Graph title/description/URL, Twitter title/description, and canonical URLs for `/work/:slug` pages. Metadata returns to the portfolio homepage defaults when navigating away from a case study. Commit: `51025fed1fffab3ae5860a365ba1a7e39f74d693`.
 - Description text is derived from each case study's existing overview and shortened for metadata; no new project claims were introduced.
 - **Verification pending:** this is a client-side React metadata update, not server-side rendering. Search crawlers and social scrapers that do not execute JavaScript may still receive the static homepage metadata. Render build and route-level browser checks are pending; do not treat this as fully verified SEO for crawlers.
+
+
+### 2026-11-04 — Route metadata and CI
+- Added client-side case-study page titles, descriptions, canonical URLs, Open Graph and Twitter metadata. Metadata resets to homepage defaults on route exit. Commit: `51025fed1fffab3ae5860a365ba1a7e39f74d693`.
+- Added GitHub Actions checks for Node.js 24, `npm run lint`, `npm test`, and `npm run build` on pushes and pull requests to `main`. npm cache is disabled because the repository has no lockfile. Workflow commits: `ba861a33d3f206a69f44d064b2445b5712b777f9` and `4f33c4c3360a0b6361bca85a835345aa73e44233`.
+- Verification is pending until the workflow runs and the Render queue deploys the current commit. Metadata is client-side; server-rendered crawler previews remain a separate limitation.
