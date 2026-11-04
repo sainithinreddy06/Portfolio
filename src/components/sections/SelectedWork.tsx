@@ -115,7 +115,7 @@ export const SelectedWork: React.FC = () => {
               Selected Work
             </h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-xl leading-relaxed">
-              Engineering project archive automatically synchronized with GitHub (@sainithinreddy06). Reflects real-time repository descriptions, live demo links, and verified architectures.
+              A curated project archive with repository links, implementation notes, and project status labels.
             </p>
           </div>
 
@@ -327,7 +327,7 @@ export const SelectedWork: React.FC = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer"
-                            aria-label={`View verified live demo for ${project.name}`}
+                            aria-label={`Open live demo for ${project.name}`}
                           >
                             <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                             <span>LIVE DEMO</span>
