@@ -4,6 +4,13 @@ import { usePortfolio } from '../../content';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
+// Canonical demo deployments confirmed in curated project data.
+// Fallbacks keep known demos visible when older persisted snapshots omit liveUrl.
+const knownLiveDemoUrls: Record<string, string> = {
+  pravaah: 'https://pravaah-frontend-bx3o.onrender.com',
+  tapas: 'https://tapas-g0ly.onrender.com',
+};
+
 export const SelectedWork: React.FC = () => {
   const {
     projects,
@@ -220,6 +227,7 @@ export const SelectedWork: React.FC = () => {
           /* Dynamic Editorial Engineering Project Index */
           <div className="border-t border-[var(--border-subtle)] divide-y divide-[var(--border-subtle)]">
             {filteredProjects.map((project, index) => {
+              const liveDemoUrl = project.liveUrl || knownLiveDemoUrls[project.id.toLowerCase()];
               const projectNumber = String(index + 1).padStart(2, '0');
               const categoryLabel = project.category
                 ? project.category.toUpperCase()
@@ -319,9 +327,9 @@ export const SelectedWork: React.FC = () => {
                         )}
 
                         {/* LIVE DEMO Action: STRICTLY displayed only when verified deployment URL exists */}
-                        {project.liveUrl && (
+                        {liveDemoUrl && (
                           <a
-                            href={project.liveUrl}
+                            href={liveDemoUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer"
