@@ -38,7 +38,7 @@ export const Hero: React.FC = () => {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-medium tracking-tight text-[var(--text-primary)] leading-[1.05]">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-medium tracking-tight text-[var(--text-primary)] leading-[1.05] break-words">
               {profile.name}.
             </h1>
 
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
             <div className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
               <button
                 onClick={() => scrollTo('work')}
-                className="px-5 py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm focus-visible:outline-hidden cursor-pointer"
+                className="min-h-11 px-5 py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm focus-visible:outline-hidden cursor-pointer"
               >
                 <span>VIEW WORK</span>
                 <ArrowDown className="w-3.5 h-3.5" />
@@ -79,7 +79,7 @@ export const Hero: React.FC = () => {
                 href={profile.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-2 focus-visible:outline-hidden shadow-xs cursor-pointer"
+                className="min-h-11 px-4 py-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-2 focus-visible:outline-hidden shadow-xs cursor-pointer"
                 aria-label="GitHub Profile"
               >
                 <Github className="w-3.5 h-3.5" />
