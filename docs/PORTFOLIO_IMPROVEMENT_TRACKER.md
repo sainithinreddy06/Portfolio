@@ -408,3 +408,10 @@ At the end of every session:
 - **Case-study fallback copy:** Removed wording that implied an unavailable route was “not verified”; the message now explains that the case study is unavailable and suggests checking the link. Commit: `9e61e694111169468a35b6bf2ce1214e934a1942`.
 - P0-01 and P0-02 remain in progress. No full accessibility, mobile, or end-to-end route audit is claimed.
 - **Command palette:** Added an accessible combobox/listbox relationship with active-option announcement, selected-option scrolling, Tab/Shift+Tab focus containment, initial focus, focus restoration, and preservation of the previous body overflow style. Commit: `97b9a03d3ad8090a59f9ab4c77fccf89df1ead01`. Keyboard behavior has been improved in source but still needs runtime testing with keyboard and screen reader.
+
+### 2026-11-04 — Navbar, contact, and footer audit
+- **Site index dialog:** Added initial focus, Tab/Shift+Tab focus containment, Escape handling, focus restoration, and restoration of the prior body scroll-lock value. Added `aria-controls` linkage. Commit: `4cdde45275ba48b04d0f7f665c5576f8efe019f9`.
+- **Contact email copy:** Handles unavailable/rejected Clipboard API access and announces success/failure through a polite live region instead of silently failing. Commit: `0fcd5454b523a3655de2fae596f7abe1db4a0144`.
+- **Footer status:** Replaced the always-green `LIVE SYNC` wording with `CONTENT READY`; clarified that the timestamp is the last content sync. Commit: `6029b67cf06ff2db5bbb47192eb82be713995460`.
+- **Verification boundary:** These changes are committed to `main`; the latest Render deploy was still queued/in progress when checked. No production behavior or runtime keyboard test is claimed. Package scripts expose `npm run lint` (TypeScript no-emit), `npm test`, and `npm run build`; none was run in this remote-source pass.
+- P0-01 remains in progress pending deployment completion, runtime checks, responsive review, and link verification.
