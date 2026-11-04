@@ -31,21 +31,56 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && indexOpen) {
+    if (!indexOpen) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    document.body.style.overflow = 'hidden';
+
+    const getFocusableElements = () => Array.from(
+      dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      ) || []
+    );
+
+    getFocusableElements()[0]?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
         setIndexOpen(false);
-        indexButtonRef.current?.focus();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = getFocusableElements();
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialogRef.current?.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
       }
     };
-    if (indexOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
-    }
+
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      if (indexButtonRef.current?.isConnected) {
+        indexButtonRef.current.focus();
+      } else {
+        previouslyFocused?.focus();
+      }
     };
   }, [indexOpen]);
 
@@ -164,6 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
               ref={indexButtonRef}
               onClick={() => setIndexOpen(true)}
               aria-expanded={indexOpen}
+              aria-controls="site-index-dialog"
               aria-haspopup="dialog"
               aria-label="Open index menu"
               className="px-3 py-1.5 rounded-sm border border-[var(--text-primary)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] text-[11px] font-mono tracking-widest uppercase font-semibold transition-all duration-150 focus-visible:outline-hidden cursor-pointer"
@@ -176,6 +212,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
 
       {indexOpen && (
         <div
+          id="site-index-dialog"
           role="dialog"
           aria-modal="true"
           aria-label="Site Index Navigation"
@@ -184,6 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
         >
           <div
             ref={dialogRef}
+            tabIndex={-1}
             className="w-full max-w-2xl rounded-xl border border-[var(--border-card)] bg-[var(--bg-primary)] p-6 sm:p-8 shadow-2xl text-[var(--text-primary)] overflow-hidden flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
