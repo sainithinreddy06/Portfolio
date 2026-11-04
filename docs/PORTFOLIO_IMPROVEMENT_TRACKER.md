@@ -508,3 +508,10 @@ At the end of every session:
 - The neighbor visitor is created once per image-processing run, not once per pixel.
 - Commits: `5c996a2` (typed queue and inline neighbors), `75562c2` (reuse visitor helper outside traversal loop).
 - This is a source-level allocation reduction; image appearance equivalence and actual CPU/memory improvements still need browser testing against representative photos. Lighthouse and Core Web Vitals remain outstanding. P0-05 remains in progress.
+
+
+### 2026-11-04 — Bounded GitHub repository enrichment
+- The backend previously enriched eligible repositories in a sequential loop, making refresh duration grow with the number of repositories and the multiple metadata/README/dependency/deployment requests per repository.
+- Replaced the sequential loop with a bounded worker pool (maximum three concurrent repository-enrichment jobs). This avoids an unbounded request burst, preserves result ordering, and isolates individual repository enrichment failures so one unexpected error does not abort the remaining workers.
+- Commit: `5956c2f` — `perf(sync): enrich repositories with bounded concurrency`.
+- This is a source-level latency improvement; no measured refresh-duration or GitHub request-count benchmark has been run. CI and production deployment verification are pending. P0-05 remains in progress.
