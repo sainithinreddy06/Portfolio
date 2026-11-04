@@ -350,7 +350,7 @@ Acceptance criteria:
 
 Append a new entry for every meaningful portfolio work session.
 
-### 2026-11-04 — P0-01 live-site and source audit continued
+### 2026-11-04 — P0-01 case-study and content-accuracy audit continued
 - Read the tracker before work; continued with P0-01 as the highest-priority task.
 - Inspected the production homepage and admin login page through the connected browser.
 - Reviewed source for `App.tsx`, `HomePage.tsx`, `CaseStudyPage.tsx`, `ResumeModal.tsx`, `ResumeSection.tsx`, `Architecture.tsx`, `ExperienceEducation.tsx`, `Navbar.tsx`, and `Footer.tsx`.
@@ -360,6 +360,10 @@ Append a new entry for every meaningful portfolio work session.
 - The architecture flow has a `min-w-[700px]` horizontal diagram with an overflow-x scroll container. This is an intentional responsive fallback but should be checked on narrow mobile viewports.
 - Admin login page content was inspected; no credentials were entered and no admin data was changed.
 - Desktop/mobile visual interaction, case-study route coverage, accessibility, performance, SEO, and all links remain to be audited.
+- **Case-study accuracy fix:** Removed the engineering-mode label `Verified Technical Specification`; it now reads `Project Technical Overview`. The case-study content describes a technical overview and does not itself establish independent verification. Commit: `8629fd45cf6eafe0c3746db669702eeabd34ea3b`.
+- **Project archive accuracy fix:** Replaced the claim that the archive reflects real-time repository descriptions and verified architectures with a more accurate description of curated project information and repository links. Changed the live-demo link's accessible label from `verified live demo` to `open live demo`; URL presence alone is not proof of current availability. Commit: `58e398411e384716eb14cd7c2f52ae82f4dfd929`.
+- **Source cleanup:** Removed a duplicate `source: 'curated'` property from the PRAVAAH object in `initialPortfolioContent`. Commit: `fb107a5bda4ffedbd9537c971ed861378f442128`.
+- **Deployment evidence:** Render reports homepage landmark fix commit `dcabccf872573cfa41424c1d83604a8b1d71f263` as `live`. New content/copy commits were queued after that and have not yet been confirmed live; no build/test result is claimed here.
 - **Confirmed accessibility/HTML issue:** `App.tsx` already provides the page-level `<main id="main-content">`, while `HomePage.tsx` rendered another nested `<main>` with the same ID. Changed the homepage wrapper to a `<div>` so the document has one page-level main landmark and no duplicate `main-content` ID. Commit: `dcabccf872573cfa41424c1d83604a8b1d71f263`. This is implemented in source; build and browser verification are still pending.
 - Reviewed the case-study page renderer and structured project data. The page includes overview, problem, architecture, pipeline, subsystem notes, decisions, challenges, lessons and future work; actual completeness/accuracy of each project narrative still needs a separate content audit. PRAVAAH, SureStep and TRAFFIQ project cards are marked Prototype in source; TAPAS is marked Implemented. No project status was changed.
 - P0-01 remains in progress; no claim of full audit completion.
@@ -391,4 +395,4 @@ At the end of every session:
 4. List blockers and the next exact action.
 5. Keep unfinished tasks open. Do not silently drop work.
 
-**Next recommended task:** P0-01 — continue desktop/mobile review of the case-study routes, navigation, dialogs, contact and resume actions; then record verified accessibility and responsive findings before starting P0-02.
+**Next recommended task:** P0-01 — verify the latest Render deployment, then complete case-study route coverage, keyboard/focus behavior for dialogs and navigation, contact/resume actions, and mobile layouts. Record only checks actually performed.
