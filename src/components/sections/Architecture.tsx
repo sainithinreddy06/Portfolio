@@ -102,10 +102,10 @@ export const Architecture: React.FC = () => {
               </div>
 
               <div className="pb-4">
-                <div className="grid grid-cols-1 sm:flex sm:items-stretch sm:min-w-[700px] gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-stretch gap-2">
                   {currentProject.architectureFlow.nodes.map((node, idx, arr) => (
                     <React.Fragment key={node.id}>
-                      <div className="min-w-0 sm:flex-1 flex flex-col justify-between p-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)]/50 transition-colors">
+                      <div className="min-w-0 lg:flex-1 flex flex-col justify-between p-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)]/50 transition-colors">
                         <div className="flex items-center justify-between gap-2 mb-3">
                           <span className="text-[10px] font-mono text-[var(--text-muted)]">
                             0{idx + 1}
@@ -134,8 +134,8 @@ export const Architecture: React.FC = () => {
                       </div>
 
                       {idx < arr.length - 1 && (
-                        <div className="flex items-center justify-center py-0.5 sm:px-1 text-[var(--text-muted)]">
-                          <ArrowRight className="w-4 h-4 rotate-90 sm:rotate-0" />
+                        <div className="flex items-center justify-center py-0.5 lg:px-1 text-[var(--text-muted)]">
+                          <ArrowRight className="w-4 h-4 rotate-90 lg:rotate-0" />
                         </div>
                       )}
                     </React.Fragment>
