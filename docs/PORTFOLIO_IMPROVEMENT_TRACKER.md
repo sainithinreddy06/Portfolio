@@ -493,3 +493,11 @@ At the end of every session:
 - Commit: `092b7edede6901cd8402b8b58ac89608068a00a3`.
 - Responsive source review: project entries stack into one column until the large breakpoint, technology tags wrap, and action links use flex wrapping. No fixed-width project card was found in this section.
 - **Verification boundary:** source-level review only. Keyboard walkthrough, screen-reader announcement test, and 320px/375px/768px/1024px browser viewport checks are still outstanding. P0-04 and P0-05 remain in progress.
+
+
+### 2026-11-04 — Pointer interaction performance
+- Updated the custom cursor so its global pointer-move listener is installed once rather than being torn down and reinstalled after the first pointer movement.
+- Removed an unused mouse-position ref and now only update React hover state when the interactive/non-interactive state actually changes. Pointer position remains a direct transform update on the cursor element.
+- This reduces avoidable React state updates during pointer movement; it is a source-level optimization, not a measured Core Web Vitals result.
+- Commit: `526387782f32c87e4a0135edea2253ed87beb454`.
+- Lighthouse, browser performance profiling, and Core Web Vitals measurements remain outstanding. P0-05 remains in progress.
