@@ -92,7 +92,7 @@ A task is **Verified** only when the implementation is reviewed, relevant tests/
 ## P0 — Essential
 
 ### P0-01: Complete page-by-page portfolio audit
-**Status:** Not started  
+**Status:** In progress  
 **Goal:** Establish an accurate baseline before changing design or functionality.
 
 Scope:
@@ -349,6 +349,18 @@ Acceptance criteria:
 ## 7. Change log
 
 Append a new entry for every meaningful portfolio work session.
+
+### 2026-11-04 — P0-01 live-site and source audit started
+- Read the tracker before work; continued with P0-01 as the highest-priority task.
+- Inspected the production homepage and admin login page through the connected browser.
+- Reviewed source for `App.tsx`, `HomePage.tsx`, `CaseStudyPage.tsx`, `ResumeModal.tsx`, `ResumeSection.tsx`, `Architecture.tsx`, `ExperienceEducation.tsx`, `Navbar.tsx`, and `Footer.tsx`.
+- Confirmed the homepage currently exposes eight main sections, five project cards, project filters, architecture selector, résumé actions, contact links, theme toggle, index dialog, command-palette entry point, and admin shortcut.
+- **Confirmed issue:** `Architecture.tsx` displayed the literal label `VERIFIED` for every stage regardless of its actual `node.status`. Changed the footer label to display `node.status.toUpperCase()` instead. Commit: `961e49770ebea39df734e67ca6d56a94bbeb6b7f`.
+- **Needs reconciliation:** the live browser text extraction showed an Education summary of `2022–2026` in the résumé section, while the current `ResumeSection.tsx` source says `2024–2028` and the structured CV source also says `2024–2028`. Treat as possible stale deployment/content until a fresh production check confirms it; do not change the correct source based only on this discrepancy.
+- The architecture flow has a `min-w-[700px]` horizontal diagram with an overflow-x scroll container. This is an intentional responsive fallback but should be checked on narrow mobile viewports.
+- Admin login page content was inspected; no credentials were entered and no admin data was changed.
+- Desktop/mobile visual interaction, case-study route coverage, accessibility, performance, SEO, and all links remain to be audited.
+- P0-01 remains in progress; no claim of full audit completion.
 
 ### 2026-11-04 — Initial benchmark and tracker creation
 - Read `README.md` and `src/App.tsx` from `main`.
