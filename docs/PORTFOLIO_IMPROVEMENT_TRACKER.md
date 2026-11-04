@@ -457,3 +457,9 @@ At the end of every session:
 
 - **CI evidence:** GitHub Actions run `41814068361` completed successfully on commit `4f33c4c3360a0b6361bca85a835345aa73e44233`; dependency installation, TypeScript typecheck, test suite, and production Vite build all passed. This commit includes the case-study metadata implementation. The tracker-only follow-up commit does not change application code.
 - **Render status:** latest deployment remains queued while the earlier Render deployment is still reported as `update_in_progress`; do not claim the current main revision is live until Render reports `live`.
+
+
+### 2026-11-04 — Project-link and technical-claim audit
+- Confirmed the five project GitHub repositories are publicly discoverable through the GitHub API: PRAVAAH-2 (API redirects to its canonical repository record), TAPAS, SureStep, TRAFFIQ, and VidyaVistaar. This confirms repository existence/public visibility, not build health or project feature completeness.
+- Removed unsupported precision claims from portfolio copy: TRAFFIQ's sub-50ms response-time and 60fps statements are now qualified descriptions without benchmark promises; removed the unsupported "zero glue" phrasing; removed an unsourced EAMCET candidate-count comparison; changed TAPAS "verified" health guidance to neutral reference-guidance wording. Commit: `ac2f1ae2e7b346512c9a18629f7f159d7f8f3583`.
+- The TAPAS and PRAVAAH live demo hosts were not independently smoke-tested in this pass. SureStep has no live URL configured in the project card. Treat demo availability as unverified, not broken or live.
