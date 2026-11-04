@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-11-04T00:00:00.000Z",
+  "lastUpdated": "2026-11-04T08:17:08.868Z",
   "content": {
     "profile": {
       "name": "Sai Nithin Reddy",
@@ -167,6 +167,13 @@
               "status": "Prototype"
             }
           ]
+        },
+        "liveUrl": "https://pravaah-frontend-bx3o.onrender.com",
+        "deploymentInfo": {
+          "provider": "render",
+          "url": "https://pravaah-frontend-bx3o.onrender.com",
+          "verified": true,
+          "notes": "Previously confirmed live PRAVAAH frontend deployment on Render."
         }
       },
       {

@@ -58,6 +58,7 @@ export const initialPortfolioContent: PortfolioContent = {
         { name: 'Tamper-Evident Hash-Chain Audit Trail', status: 'Prototype' },
       ],
       githubUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
+      liveUrl: 'https://pravaah-frontend-bx3o.onrender.com',
       hasArchitecture: true,
       featured: true,
       order: 0,
