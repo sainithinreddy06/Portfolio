@@ -1002,19 +1002,37 @@ export async function syncAllPortfolioRepositories(
   try {
     const allRepos = await fetchAllUserReposWithPagination(username, headers);
     if (forceRefresh && lastSyncErrors.length) throw Object.assign(new Error('GitHub repository discovery failed.'), { code: 'GITHUB_DISCOVERY_FAILED' });
-    const projects: ExtractedGitHubProject[] = [];
+    // Process a small, bounded batch concurrently. Repository enrichment makes
+    // several network requests per repo; an unbounded Promise.all would risk
+    // GitHub rate limits, while a sequential loop makes refreshes unnecessarily slow.
+    const eligibleRepos = allRepos.filter(
+      (repo) => !repo.fork && !/^portfolio(-.*)?$/i.test(repo.name)
+    );
+    const projectsByIndex: Array<ExtractedGitHubProject | null> = new Array(eligibleRepos.length);
+    let nextRepoIndex = 0;
+    const workerCount = Math.min(3, eligibleRepos.length);
 
-    // Filter and process eligible repositories
-    for (const repo of allRepos) {
-      if (repo.fork) continue;
-      if (/^portfolio(-.*)?$/i.test(repo.name)) continue;
-
-      const previousUrl = previousKnownUrls[repo.name.toLowerCase()];
-      const project = await fetchRepositoryData(username, repo.name, previousUrl);
-      if (project && project.isEligible) {
-        projects.push(project);
+    const workers = Array.from({ length: workerCount }, async () => {
+      while (true) {
+        const index = nextRepoIndex++;
+        if (index >= eligibleRepos.length) return;
+        const repo = eligibleRepos[index];
+        const previousUrl = previousKnownUrls[repo.name.toLowerCase()];
+        try {
+          projectsByIndex[index] = await fetchRepositoryData(username, repo.name, previousUrl);
+        } catch (error: any) {
+          const message = `Failed to enrich ${repo.name}: ${error?.message || 'unknown error'}`;
+          console.warn(`[GitHub Sync] ${message}`);
+          lastSyncErrors.push(message);
+          projectsByIndex[index] = null;
+        }
       }
-    }
+    });
+
+    await Promise.all(workers);
+    const projects = projectsByIndex.filter(
+      (project): project is ExtractedGitHubProject => Boolean(project && project.isEligible)
+    );
 
     if (projects.length > 0) {
       inMemoryCache = {
