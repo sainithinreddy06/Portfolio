@@ -61,6 +61,7 @@ export const initialPortfolioContent: PortfolioContent = {
       ],
       githubUrl: 'https://github.com/sainithinreddy06/PRAVAAH-2',
       liveUrl: 'https://pravaah-frontend-bx3o.onrender.com',
+      caseStudySlug: 'pravaah',
       hasArchitecture: true,
       featured: true,
       order: 0,
@@ -234,6 +235,71 @@ export const initialPortfolioContent: PortfolioContent = {
     },
   ],
   caseStudies: {
+    pravaah: {
+      slug: 'pravaah',
+      title: 'PRAVAAH',
+      subtitle: 'Enterprise Approval Workflow Automation & Compliance Monitoring',
+      overview:
+        'PRAVAAH is an academic and hackathon prototype for organising institutional approval workflows, evidence-based reviews, compliance obligations, and operational audit history in one role-oriented workspace. It is designed to support consistent review and follow-up; it is not an official AICTE service and does not issue approvals.',
+      problem:
+        'Approval and compliance work can span multiple stakeholders, policy requirements, supporting documents, review stages, deadlines, and follow-up actions. When these activities are distributed across separate records and communication channels, teams can struggle to identify missing evidence, understand application status, and maintain a traceable history.',
+      whyBuilt:
+        'The project explores how a structured digital workspace can make application review and compliance operations easier to coordinate. The focus is on connecting workflow records, evidence, obligations, readiness information, notifications, and audit events while keeping human review and decision-making explicit.',
+      architectureSummary:
+        'The React and TypeScript frontend communicates with a Python FastAPI backend over HTTP APIs. The backend coordinates workflow services and persistence through SQLAlchemy and PostgreSQL, with Alembic managing schema migrations. Evidence storage and operational audit events are handled as distinct parts of the application architecture.',
+      architectureFlow: [
+        { id: '1', label: 'Role-based Workspace', sublabel: 'React, TypeScript & Vite', status: 'Implemented' },
+        { id: '2', label: 'API & Access Layer', sublabel: 'FastAPI Authentication & Scoped Authorisation', status: 'Implemented' },
+        { id: '3', label: 'Workflow Services', sublabel: 'Applications, Reviews & Policy Metadata', status: 'Implemented' },
+        { id: '4', label: 'Evidence & Obligations', sublabel: 'Uploads, Reviews, Undertakings & Deadlines', status: 'Implemented' },
+        { id: '5', label: 'Persistence & Audit', sublabel: 'SQLAlchemy, PostgreSQL & Audit Events', status: 'Implemented' },
+      ],
+      dataPipeline:
+        'An application record moves through supported workflow transitions. Evidence metadata and file digests are associated with the record, reviewers can record findings, and policy metadata provides context for the review. Obligation and undertaking workflows track follow-up work; readiness snapshots summarise evidence, open obligations, and unaccepted undertakings for human assessment.',
+      frontendNotes:
+        'The React, TypeScript, and Vite client presents role-oriented workspaces for submitting, reviewing, administering, and monitoring workflow records. The interface consumes backend APIs rather than treating client-side state as the source of truth for workflow decisions.',
+      backendNotes:
+        'FastAPI exposes the application and compliance workflows. Authentication and role/region-scoped authorisation protect supported operations. Workflow services cover application transitions, evidence review, obligations, undertakings, readiness snapshots, rule-based recommendations, notifications, operational metrics, and audit-event queries.',
+      databaseNotes:
+        'SQLAlchemy provides the data-access layer and Alembic manages schema migrations. PostgreSQL is the intended deployment database, while selected tests may use SQLite. Evidence files are stored through configured storage paths; the exact storage safeguards depend on deployment configuration.',
+      technicalDecisions: [
+        {
+          decision: 'Separate the client interface from workflow enforcement',
+          rationale: 'Keeping workflow operations behind FastAPI endpoints allows authentication, authorisation, validation, and business rules to be applied at the service boundary.',
+        },
+        {
+          decision: 'Use role- and region-scoped authorisation',
+          rationale: 'Different participants need different operational views, and access should be constrained by role and applicable regional scope rather than relying on UI visibility alone.',
+        },
+        {
+          decision: 'Represent readiness as a point-in-time snapshot',
+          rationale: 'A snapshot can bring evidence state, open obligations, and unaccepted undertakings together for human review without presenting an automated recommendation as an official approval decision.',
+        },
+        {
+          decision: 'Keep audit integrity checks explicit',
+          rationale: 'The administrator verification workflow checks event hashes and links and compares the calculated chain head with the stored chain head; this provides an integrity signal within the application, not a claim of independently immutable storage.',
+        },
+      ],
+      challenges: [
+        'Coordinating application state, evidence review, policy metadata, obligations, and undertakings without losing the relationship between the records.',
+        'Applying role- and region-scoped access consistently across workflow operations.',
+        'Communicating the boundary between rule-based readiness guidance and decisions that must remain with authorised human reviewers.',
+        'Making audit-chain verification understandable while accurately describing its application-level trust boundary.',
+      ],
+      lessons: [
+        'Compliance software needs explainable workflow state and traceable evidence, not only a collection of forms and dashboards.',
+        'Readiness summaries should support human review rather than imply that an automated system grants regulatory approval.',
+        'Security and audit claims must be bounded by the actual deployment configuration and verification performed.',
+      ],
+      futureWork: [
+        { item: 'Expand automated end-to-end coverage across role-specific workflows', status: 'Planned' },
+        { item: 'Harden evidence storage, retention, backup, and deployment safeguards', status: 'Planned' },
+        { item: 'Evaluate audit-chain anchoring and independent verification options', status: 'Research' },
+        { item: 'Validate operational performance and accessibility with representative users', status: 'Planned' },
+      ],
+      repoUrl: 'https://github.com/sainithinreddy06/PRAVAAH',
+      stack: ['React', 'TypeScript', 'Vite', 'Python', 'FastAPI', 'SQLAlchemy', 'Alembic', 'PostgreSQL'],
+    },
     tapas: {
       slug: 'tapas',
       title: 'TAPAS',
