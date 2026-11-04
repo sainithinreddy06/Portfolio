@@ -67,10 +67,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCommandPalette }) => {
     { num: '01', label: 'INTRO', target: 'hero', desc: 'Identity, Degree & Core Focus' },
     { num: '02', label: 'ABOUT', target: 'about', desc: 'Engineering Mindset & Personal Profile' },
     { num: '03', label: 'SELECTED WORK', target: 'work', desc: 'Engineering Project Index & Selected Work' },
-    { num: '04', label: 'ENGINEERING', target: 'engineering', desc: 'Technical Stack & Verified Disciplines' },
+    { num: '04', label: 'ENGINEERING', target: 'engineering', desc: 'Technical Stack & Focus Areas' },
     { num: '05', label: 'ARCHITECTURE', target: 'architecture', desc: 'System Pipeline Diagrams & Ingestion Flows' },
     { num: '06', label: 'EXPERIENCE & EDUCATION', target: 'experience', desc: 'CBIT Education, Club Leadership & Competitions' },
-    { num: '07', label: 'RESUME', target: 'resume', desc: 'Verified Curriculum Vitae & Download' },
+    { num: '07', label: 'RESUME', target: 'resume', desc: 'Resume Viewer & Download' },
     { num: '08', label: 'CONTACT', target: 'contact', desc: 'Direct Channels (Email, GitHub, LinkedIn)' },
   ];
 
