@@ -64,7 +64,6 @@ export const initialPortfolioContent: PortfolioContent = {
       hasArchitecture: true,
       featured: true,
       order: 0,
-      source: 'curated',
       architectureFlow: {
         title: 'PRAVAAH Workflow Architecture',
         summary: 'Policy-aware approval workflow connecting institutional submissions, deterministic compliance evaluation, obligation tracking, alert delivery, and auditable records.',
