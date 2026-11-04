@@ -9,6 +9,7 @@ import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckC
 const knownLiveDemoUrls: Record<string, string> = {
   pravaah: 'https://pravaah-frontend-bx3o.onrender.com',
   tapas: 'https://tapas-g0ly.onrender.com',
+  surestep: 'https://terra-guard-ai-five.vercel.app',
 };
 
 export const SelectedWork: React.FC = () => {
