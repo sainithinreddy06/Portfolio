@@ -15,7 +15,7 @@ export interface StorageUploadResult {
 export function isSupabaseConfigured(): boolean {
   return Boolean(
     process.env.SUPABASE_URL &&
-    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY)
+    process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 }
 
@@ -29,7 +29,8 @@ export function getStorageProviderStatus(): 'supabase' | 'repository_static' {
 
 /**
  * Uploads a buffer to Supabase Storage via native REST API (0 SDK dependencies).
- * Uses public buckets: 'photos' for profile pictures and 'resumes' for CV PDFs.
+ * Uses a server-side service-role key and a public bucket for read access.
+ * The service-role key must never be exposed to the browser.
  */
 async function uploadToSupabase(
   buffer: Buffer,
@@ -37,7 +38,10 @@ async function uploadToSupabase(
   bucket: string = 'portfolio-assets'
 ): Promise<StorageUploadResult> {
   const supabaseUrl = process.env.SUPABASE_URL!.replace(/\/$/, '');
-  const apiKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!;
+  // Storage uploads are server-side privileged operations. Never use the
+  // public anon key as a fallback for writes; it must not be granted broad
+  // upload permissions through permissive Storage RLS policies.
+  const apiKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const cleanBase = path.basename(fileName).replace(/[^a-zA-Z0-9._-]/g, '_');
   const storageKey = `${Date.now()}_${cleanBase}`;
 
@@ -82,8 +86,9 @@ async function uploadToSupabase(
 /**
  * Unified free-tier storage uploader.
  * 1. If Supabase free tier is configured, uploads directly to Supabase storage bucket.
- * 2. If Supabase is not configured or unavailable, falls back cleanly to the
- *    version-controlled static assets in the repository (/images/profile-photo.png, /resume.pdf).
+ * 2. If Supabase is not configured, uses the repository static asset fallback.
+ * 3. If Supabase is configured but upload fails, report the failure rather than
+ *    pretending a non-durable local file is safely stored.
  * 3. Never relies on Cloudinary or any paid service.
  */
 export async function uploadAssetToStorage(
@@ -99,7 +104,7 @@ export async function uploadAssetToStorage(
 
     const result = await uploadToSupabase(buffer, fileName, bucket);
     if (result.success) return result;
-    console.warn('[Storage] Supabase failed or quota reached. Preserving repository static asset fallback:', result.error);
+    return result;
   }
 
   // Version-controlled repository static asset fallback (100% free, permanent, zero external dependency)
