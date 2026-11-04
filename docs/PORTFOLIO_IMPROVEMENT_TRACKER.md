@@ -173,7 +173,7 @@ Acceptance criteria:
 - Automated accessibility scan results and remaining known issues are recorded.
 
 ### P0-05: Performance and responsive audit
-**Status:** Not started  
+**Status:** In progress  
 **Goal:** Ensure fast, stable experience across common devices and networks.
 
 Audit:
@@ -422,3 +422,10 @@ At the end of every session:
 - **Confirmed sitemap issue:** sitemap entries used the obsolete `/case-study/:slug` route, but the React router and project links use `/work/:slug`. Replaced those entries with the five actual public case-study routes, including PRAVAAH, and removed the standalone résumé PDF from the sitemap. Commit: `536522f530e19de7d7acf1c93cd3e6c481ea8636`.
 - **Verification boundary:** source files were updated on `main`; deployment and live HTTP responses for `/robots.txt` and `/sitemap.xml` are pending. Social preview image metadata/assets and per-case-study metadata remain to be audited. No Lighthouse or mobile viewport measurements have been run.
 - P0-06 remains in progress; P0-05 performance/mobile audit remains open.
+
+
+### 2026-11-04 — Initial bundle-size review and route splitting
+- Render's production build reported a single client JavaScript bundle of **494.85 kB raw / 132.23 kB gzip** before this change. This is close to Vite's default 500 kB chunk warning threshold and means the admin and case-study page code was included in the initial route bundle.
+- Changed `src/App.tsx` to lazy-load the home, case-study, admin, and not-found route components behind an accessible Suspense loading state. Commit: `e95e0a98d270360b1fc94ae4e4a8e12ad131119c`.
+- **Verification pending:** wait for the new Render build and compare emitted chunk sizes. No Lighthouse score, Core Web Vitals, mobile viewport, or image transfer-size measurements have been collected. Do not mark P0-05 complete until measured and production-tested.
+- Static review notes: the hero photo is processed through a canvas pixel scan before display; its actual cost depends on the delivered image dimensions and device. Review whether this processing is necessary after measuring rather than removing it speculatively.
