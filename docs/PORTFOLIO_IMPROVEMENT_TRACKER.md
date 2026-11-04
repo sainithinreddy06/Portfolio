@@ -471,3 +471,10 @@ At the end of every session:
 - Updated VidyaVistaar wording to avoid implying measured learning outcomes or guaranteed zero-latency API behavior.
 - Confirmed TAPAS package metadata documents Next.js 15, React 19, MapLibre GL, D3 Contour, and Recharts. SureStep, TRAFFIQ, and VidyaVistaar README claims were reviewed; no additional source-code-level feature verification was performed in this pass.
 - Portfolio content commit: `40f03da283efa31a9eed818af644149185e00868`.
+
+
+### 2026-11-04 — Accessibility and touch-target pass
+- Audited the command palette, resume modal, site index dialog, navbar, contact actions, case-study page, and global styles. Existing dialogs already implement Escape handling, focus restoration, body-scroll locking, and keyboard focus containment; the command palette also supports arrow-key selection.
+- Increased the minimum height of the navbar theme/index controls, the site-index close control, contact action links and email-copy control, and the case-study return control to improve touch usability on narrow screens.
+- Commits: contact targets `7f262ad1fe9597103de6d3c39765c3d8b88fe1b6`; navbar targets `577a9617e18e5f763994b2663b9e74418375838d`; case-study return target `68d9562fd5d95b13fd1307adb924ce44bc8afa30`.
+- **Verification boundary:** source review only at this stage. Automated CI and Render deployment for the latest commit must pass; keyboard/screen-reader testing and real-device viewport checks have not yet been performed. P0-04 and P0-05 remain in progress.
