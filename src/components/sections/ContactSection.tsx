@@ -122,7 +122,7 @@ export const ContactSection: React.FC = () => {
                 href={profile.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-center py-1.5 px-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="w-full min-h-11 text-center py-2 px-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-primary)] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Connect</span>
                 <ExternalLink className="w-3.5 h-3.5 text-[var(--text-muted)]" />
