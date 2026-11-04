@@ -478,3 +478,10 @@ At the end of every session:
 - Increased the minimum height of the navbar theme/index controls, the site-index close control, contact action links and email-copy control, and the case-study return control to improve touch usability on narrow screens.
 - Commits: contact targets `7f262ad1fe9597103de6d3c39765c3d8b88fe1b6`; navbar targets `577a9617e18e5f763994b2663b9e74418375838d`; case-study return target `68d9562fd5d95b13fd1307adb924ce44bc8afa30`.
 - **Verification boundary:** source review only at this stage. Automated CI and Render deployment for the latest commit must pass; keyboard/screen-reader testing and real-device viewport checks have not yet been performed. P0-04 and P0-05 remain in progress.
+
+
+### 2026-11-04 — Responsive architecture and control sizing
+- Fixed a tablet-width overflow risk in architecture diagrams: stages now use a one-column mobile layout, two-column tablet layout, and horizontal desktop layout; removed the forced 700px minimum width below desktop. Flow arrows rotate only while the desktop row is active.
+- Added safe word wrapping to the hero name and improved minimum touch-target sizing for hero actions and resume-viewer tabs/close control. Normalized the remaining contact profile-link target sizing.
+- Commits: architecture `1bf6b2bcec6ef30952f2edf427bcd519a830c602`; hero `5b9166cc10e2fabf50cb7153e698c32d6f3815cb`; resume viewer `2c4318a991475531115bd49c433adad23e1bcf7d`; contact links `2567e7c53154754d53cd21d6712968533f694cfa`.
+- **Verification boundary:** CI and Render deployment are required for this revision. Actual 320px/375px/768px/1024px device viewport testing and screen-reader verification remain outstanding; P0-04 and P0-05 remain in progress.
