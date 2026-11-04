@@ -454,3 +454,6 @@ At the end of every session:
 - Added client-side case-study page titles, descriptions, canonical URLs, Open Graph and Twitter metadata. Metadata resets to homepage defaults on route exit. Commit: `51025fed1fffab3ae5860a365ba1a7e39f74d693`.
 - Added GitHub Actions checks for Node.js 24, `npm run lint`, `npm test`, and `npm run build` on pushes and pull requests to `main`. npm cache is disabled because the repository has no lockfile. Workflow commits: `ba861a33d3f206a69f44d064b2445b5712b777f9` and `4f33c4c3360a0b6361bca85a835345aa73e44233`.
 - Verification is pending until the workflow runs and the Render queue deploys the current commit. Metadata is client-side; server-rendered crawler previews remain a separate limitation.
+
+- **CI evidence:** GitHub Actions run `41814068361` completed successfully on commit `4f33c4c3360a0b6361bca85a835345aa73e44233`; dependency installation, TypeScript typecheck, test suite, and production Vite build all passed. This commit includes the case-study metadata implementation. The tracker-only follow-up commit does not change application code.
+- **Render status:** latest deployment remains queued while the earlier Render deployment is still reported as `update_in_progress`; do not claim the current main revision is live until Render reports `live`.
