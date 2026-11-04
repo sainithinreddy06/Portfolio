@@ -146,8 +146,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   // Dynamic CORS Handling (supports localhost, custom domains, and Render)
   const isLocalhost = origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  // Never allow a wildcard origin in production. Reflecting arbitrary origins
+  // while enabling credentials would effectively defeat the origin allowlist.
   const isAllowedCustom =
-    origin && (ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*'));
+    origin && ALLOWED_ORIGINS.includes(origin) && !ALLOWED_ORIGINS.includes('*');
 
   if (origin && (isLocalhost || isAllowedCustom || !IS_PROD)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -284,23 +286,18 @@ app.get('/api/portfolio/resume/meta', (_req: Request, res: Response) => {
  * Single dynamic project data source consumed by the Projects page (SelectedWork).
  * Returns the latest synchronized repository data without requiring frontend builds or edits.
  */
-app.get('/api/projects', async (req: Request, res: Response) => {
+app.get('/api/projects', async (req: Request, res: Response, next: NextFunction) => {
+  // A GET request must remain read-only. Repository reconciliation writes to
+  // the portfolio store and consumes GitHub API quota, so require an admin
+  // session before honoring the explicit refresh query.
+  const shouldRefresh = req.query.refresh === 'true';
+  if (shouldRefresh) {
+    return requireAdminAuth(req, res, () => {
+      void refreshProjects(req, res);
+    });
+  }
   try {
     const store = getPortfolioStore();
-    const shouldRefresh = req.query.refresh === 'true';
-
-    if (shouldRefresh) {
-      const discovered = await syncAllPortfolioRepositories(GITHUB_USERNAME, true);
-      const updatedContent = syncGitHubProjects(discovered);
-      return res.json({
-        success: true,
-        source: 'github_live',
-        lastUpdated: updatedContent.lastSynced || new Date().toISOString(),
-        total: updatedContent.projects.length,
-        projects: updatedContent.projects,
-      });
-    }
-
     res.json({
       success: true,
       source: 'synchronized_store',
@@ -321,6 +318,23 @@ app.get('/api/projects', async (req: Request, res: Response) => {
     });
   }
 });
+
+async function refreshProjects(_req: Request, res: Response): Promise<void> {
+  try {
+    const discovered = await syncAllPortfolioRepositories(GITHUB_USERNAME, true);
+    const updatedContent = syncGitHubProjects(discovered);
+    res.json({
+      success: true,
+      source: 'github_live',
+      lastUpdated: updatedContent.lastSynced || new Date().toISOString(),
+      total: updatedContent.projects.length,
+      projects: updatedContent.projects,
+    });
+  } catch (err: any) {
+    console.error('[API /api/projects?refresh=true] Error:', err);
+    res.status(500).json({ success: false, error: 'Repository refresh failed.' });
+  }
+}
 
 /**
  * GET /api/portfolio
