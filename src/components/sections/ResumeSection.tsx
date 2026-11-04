@@ -113,7 +113,7 @@ export const ResumeSection: React.FC = () => {
                 <span>EDUCATION</span>
               </div>
               <p className="text-xs font-semibold text-[var(--text-primary)]">B.E. Computer Science</p>
-              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">CBIT · CGPA: 9.06 (2022–2026)</p>
+              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">CBIT · CGPA: 9.06 (2024–2028)</p>
             </div>
 
             <div className="p-4 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)]">
