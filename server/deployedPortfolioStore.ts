@@ -8,8 +8,17 @@ import type { PortfolioStoreState, ExtendedProjectItem } from './types';
 import type { ExtractedGitHubProject } from './githubService';
 
 export async function getPortfolioStore(): Promise<PortfolioStoreState> {
-  const [row] = await getDb().select().from(portfolio).where(eq(portfolio.id, 'main'));
-  const state = structuredClone(row?.state ?? seed) as PortfolioStoreState;
+  let state: PortfolioStoreState;
+  try {
+    const [row] = await getDb().select().from(portfolio).where(eq(portfolio.id, 'main'));
+    state = structuredClone(row?.state ?? seed) as PortfolioStoreState;
+  } catch (error) {
+    // The public portfolio must remain available even when an optional database
+    // connection is not provisioned or temporarily unavailable on the host.
+    console.warn('[Portfolio Store] Database unavailable; serving the committed portfolio snapshot.', error);
+    state = structuredClone(seed) as PortfolioStoreState;
+  }
+
   // Legacy uploaded files are absent from a static deploy; retain the public portrait.
   if (/^\/api\/portfolio\/photo(?:[?#]|$)/.test(state.content.profile.photo.url || '')) state.content.profile.photo.url = '/images/profile-photo.png';
   state.content.caseStudies = { ...initialPortfolioContent.caseStudies, ...state.content.caseStudies };
