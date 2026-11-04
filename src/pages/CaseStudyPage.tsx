@@ -35,7 +35,7 @@ export const CaseStudyPage: React.FC = () => {
       <div className="min-h-screen pt-32 pb-20 px-4 max-w-4xl mx-auto text-center text-[var(--text-primary)]">
         <h1 className="text-2xl font-bold mb-4">Case Study Not Found</h1>
         <p className="text-sm text-[var(--text-secondary)] mb-8">
-          The requested case study has not been verified or does not exist.
+          This case study is unavailable. Check the project link or return to the portfolio.
         </p>
         <Link
           to="/"
