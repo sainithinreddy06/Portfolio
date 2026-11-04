@@ -19,11 +19,41 @@ export const CaseStudyPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { content } = usePortfolio();
-  const caseStudy = slug ? content.caseStudies[slug] : undefined;
 
   const matchingProject = content.projects.find(
     (p) => p.caseStudySlug === slug || p.id.toLowerCase() === slug?.toLowerCase()
   );
+  const storedCaseStudy = slug ? content.caseStudies[slug] : undefined;
+
+  // GitHub-discovered projects receive a useful generated case study automatically.
+  // Curated case studies always take precedence when richer project-specific content exists.
+  const caseStudy = storedCaseStudy || (matchingProject ? {
+    slug: matchingProject.caseStudySlug || matchingProject.id,
+    title: matchingProject.name,
+    subtitle: matchingProject.tagline || matchingProject.category || 'Project Case Study',
+    overview: matchingProject.description || matchingProject.summary || `${matchingProject.name} is a software project documented from its available portfolio and repository metadata.`,
+    problem: `This project explores the problem space described by its repository and project summary: ${matchingProject.summary || matchingProject.description || matchingProject.tagline || 'building a practical software solution'}.`,
+    whyBuilt: `This project was developed to explore and implement ${matchingProject.tagline || matchingProject.name + ' capabilities'} using the technologies and engineering approach listed below. This generated case study is a starting point and can be enriched with project-specific implementation details.`,
+    architectureSummary: matchingProject.architectureFlow?.summary || `The project is organised around the technologies in its stack: ${(matchingProject.stack || []).join(', ') || 'the project technology stack'}. The architecture description is based on available repository metadata and should be expanded as implementation details are confirmed.`,
+    architectureFlow: matchingProject.architectureFlow?.nodes || [
+      { id: '1', label: 'User Interface', sublabel: 'Project client and interaction layer', status: 'Prototype' as const },
+      { id: '2', label: 'Application Services', sublabel: 'Core application logic and APIs', status: 'Prototype' as const },
+      { id: '3', label: 'Data & Integrations', sublabel: 'Persistence and external services', status: 'Prototype' as const },
+    ],
+    dataPipeline: matchingProject.summary || matchingProject.description || 'Data flow details will be added as the repository implementation is reviewed.',
+    frontendNotes: `Frontend technologies identified for this project: ${(matchingProject.stack || []).filter((item) => /react|next|vue|angular|html|css|vite|tailwind/i.test(item)).join(', ') || 'See the repository for the current client implementation.'}`,
+    backendNotes: `Backend and service technologies identified for this project: ${(matchingProject.stack || []).filter((item) => /python|fastapi|node|express|java|spring|django|flask|go|rust/i.test(item)).join(', ') || 'See the repository for the current service implementation.'}`,
+    databaseNotes: `Data technologies identified for this project: ${(matchingProject.stack || []).filter((item) => /sql|mongo|postgres|mysql|supabase|firebase|redis/i.test(item)).join(', ') || 'Database details should be confirmed from the repository configuration.'}`,
+    technicalDecisions: [{
+      decision: 'Technology selection',
+      rationale: `The listed stack includes ${(matchingProject.stack || []).join(', ') || 'the technologies documented in the repository'}. Specific trade-offs should be documented after reviewing the implementation.`,
+    }],
+    challenges: ['Implementation-specific challenges should be added after reviewing the repository issues, code, and development history.'],
+    lessons: ['Document measurable engineering outcomes and lessons as the project evolves.'],
+    futureWork: [{ item: 'Expand this generated case study with verified architecture, implementation details, and project outcomes', status: 'Planned' as const }],
+    repoUrl: matchingProject.githubUrl,
+    stack: matchingProject.stack || [],
+  } : undefined);
   const liveUrl = matchingProject?.liveUrl;
 
   useEffect(() => {
