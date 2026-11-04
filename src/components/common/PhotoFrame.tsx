@@ -61,8 +61,12 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
         return;
       }
 
-      const visited = new Uint8Array(w * h);
-      const queue: number[] = [];
+      const pixelCount = w * h;
+      const visited = new Uint8Array(pixelCount);
+      // A bounded typed queue avoids dynamic array growth and boxed numbers
+      // while traversing large image backgrounds.
+      const queue = new Uint32Array(pixelCount);
+      let tail = 0;
 
       const isWhitePixel = (idx: number) => {
         const r = data[idx];
@@ -75,12 +79,12 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
       for (let x = 0; x < w; x++) {
         const top = 0 * w + x;
         if (isWhitePixel(top * 4)) {
-          queue.push(top);
+          queue[tail++] = top;
           visited[top] = 1;
         }
         const bottom = (h - 1) * w + x;
         if (isWhitePixel(bottom * 4)) {
-          queue.push(bottom);
+          queue[tail++] = bottom;
           visited[bottom] = 1;
         }
       }
@@ -88,18 +92,18 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
       for (let y = 0; y < h; y++) {
         const left = y * w + 0;
         if (!visited[left] && isWhitePixel(left * 4)) {
-          queue.push(left);
+          queue[tail++] = left;
           visited[left] = 1;
         }
         const right = y * w + (w - 1);
         if (!visited[right] && isWhitePixel(right * 4)) {
-          queue.push(right);
+          queue[tail++] = right;
           visited[right] = 1;
         }
       }
 
       let head = 0;
-      while (head < queue.length) {
+      while (head < tail) {
         const curr = queue[head++];
         const cx = curr % w;
         const cy = Math.floor(curr / w);
@@ -107,30 +111,32 @@ export function processImageTransparency(sourceUrl: string, onProcessed: (url: s
 
         data[pixelIdx + 3] = 0;
 
-        const neighbors = [
-          cx > 0 ? curr - 1 : -1,
-          cx < w - 1 ? curr + 1 : -1,
-          cy > 0 ? curr - w : -1,
-          cy < h - 1 ? curr + w : -1,
-        ];
+        // Visit neighbors inline to avoid allocating a temporary array per pixel.
+        const left = cx > 0 ? curr - 1 : -1;
+        const right = cx < w - 1 ? curr + 1 : -1;
+        const up = cy > 0 ? curr - w : -1;
+        const down = cy < h - 1 ? curr + w : -1;
 
-        for (let i = 0; i < 4; i++) {
-          const n = neighbors[i];
-          if (n !== -1 && !visited[n]) {
-            visited[n] = 1;
-            const nIdx = n * 4;
-            const r = data[nIdx];
-            const g = data[nIdx + 1];
-            const b = data[nIdx + 2];
-            if (r > 220 && g > 220 && b > 220) {
-              queue.push(n);
-            } else if (r > 195 && g > 195 && b > 195) {
-              const avg = (r + g + b) / 3;
-              const alphaFactor = Math.max(0, Math.min(1, (230 - avg) / 35));
-              data[nIdx + 3] = Math.round(data[nIdx + 3] * alphaFactor);
-            }
+        const visitNeighbor = (n: number) => {
+          if (n === -1 || visited[n]) return;
+          visited[n] = 1;
+          const nIdx = n * 4;
+          const r = data[nIdx];
+          const g = data[nIdx + 1];
+          const b = data[nIdx + 2];
+          if (r > 220 && g > 220 && b > 220) {
+            queue[tail++] = n;
+          } else if (r > 195 && g > 195 && b > 195) {
+            const avg = (r + g + b) / 3;
+            const alphaFactor = Math.max(0, Math.min(1, (230 - avg) / 35));
+            data[nIdx + 3] = Math.round(data[nIdx + 3] * alphaFactor);
           }
-        }
+        };
+
+        visitNeighbor(left);
+        visitNeighbor(right);
+        visitNeighbor(up);
+        visitNeighbor(down);
       }
 
       ctx.putImageData(imgData, 0, 0);
