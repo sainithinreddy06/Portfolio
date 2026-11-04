@@ -436,3 +436,9 @@ At the end of every session:
 - Profile photos now use eager/high-priority loading only for the hero image, lazy loading for non-hero instances, and asynchronous image decoding. Commit: `e5a35bf4ec09d4e66d0499bff17136e2e0b151c6`.
 - Added the canonical production URL to Open Graph metadata and changed the Twitter card to `summary` because the repository currently has no confirmed social preview image asset. Commit: `0b90b1abb74872ebde3e3e81db055edd469baee7`.
 - **Verification pending:** production build and deployment checks are queued after these changes. No real-device/mobile-browser walkthrough, Lighthouse audit, or social preview validator has been run. P0-05 and P0-06 remain in progress.
+
+
+### 2026-11-04 — Resume and certification claim accuracy
+- Removed unsupported verification language from the resume section: changed the badge to `RESUME PDF`, the engineering note to neutral resume wording, and the document description to a direct hosted PDF description. Commit: `e0dda8cda51f6094a1d8a16c0f8d589a903fa16b`.
+- Changed the certification timeline from an asserted `Verified` period and `Industry Credentials` organization to `Listed in resume` and `Certificate details`, pending issuer names or verification URLs. Updated the unavailable-resume fallback copy to remove an unsupported verification claim. Commit: `9bcd2c47bf994c41de4c7b06ae7931069c7447a5`.
+- **Verification boundary:** source changes are pushed to `main`; Render deployment is queued. No certificate issuer links or certificate files were supplied, so no independent verification is claimed. No GitHub Actions workflow is configured in `.github/workflows`; the repository's package scripts expose `npm test` and `npm run lint`, but these were not run in this pass. Continue to use Render's production build logs as build evidence only.
