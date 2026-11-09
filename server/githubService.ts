@@ -903,74 +903,94 @@ async function fetchAllUserReposWithPagination(
   headers: Record<string, string>
 ): Promise<GitHubRepoPayload[]> {
   const allRepos: GitHubRepoPayload[] = [];
-  let page = 1;
   const perPage = 100;
-  let hasMore = true;
+  let page = 1;
 
-  while (hasMore) {
-    try {
-      const res = await fetch(
-        `https://api.github.com/users/${username}/repos?sort=updated&page=${page}&per_page=${perPage}`,
-        { headers, signal: AbortSignal.timeout(8000) }
-      );
-      trackRateLimit(res);
-      if (!res.ok) {
-        const errorMsg = `HTTP ${res.status} from GitHub API /users/${username}/repos?page=${page}`;
-        console.warn(`[GitHub Pagination] ${errorMsg}`);
-        lastSyncErrors.push(errorMsg);
-        break;
+  // Retry transient GitHub/network failures on the server, where the private
+  // token can be used safely. Never silently treat an API error as an empty repo list.
+  while (true) {
+    let repos: GitHubRepoPayload[] | null = null;
+    let lastError = '';
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(
+          `https://api.github.com/users/${username}/repos?sort=updated&page=${page}&per_page=${perPage}`,
+          { headers, signal: AbortSignal.timeout(12000) }
+        );
+        trackRateLimit(res);
+
+        if (res.ok) {
+          const payload = (await res.json()) as GitHubRepoPayload[];
+          if (!Array.isArray(payload)) {
+            lastError = 'GitHub returned an unexpected repository response.';
+          } else {
+            repos = payload;
+            break;
+          }
+        } else {
+          const resetAt = res.headers.get('x-ratelimit-reset');
+          const rateLimited = res.status === 403 && res.headers.get('x-ratelimit-remaining') === '0';
+          const resetMessage = rateLimited && resetAt
+            ? ` Rate limit resets at ${new Date(Number(resetAt) * 1000).toISOString()}.`
+            : '';
+          lastError = res.status === 401
+            ? 'GitHub rejected the configured token (HTTP 401). Check GITHUB_TOKEN in Render.'
+            : rateLimited
+              ? `GitHub API rate limit exceeded (HTTP 403).${resetMessage}`
+              : `GitHub API returned HTTP ${res.status} while listing repositories.`;
+          if (res.status === 404) break;
+        }
+      } catch (err: any) {
+        lastError = err?.name === 'TimeoutError' || err?.name === 'AbortError'
+          ? 'Timed out connecting to api.github.com.'
+          : `Network error connecting to api.github.com: ${err?.message || 'unknown error'}`;
       }
-      const repos = (await res.json()) as GitHubRepoPayload[];
-      if (!Array.isArray(repos) || repos.length === 0) {
-        hasMore = false;
-        break;
+
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
-      allRepos.push(...repos);
-      const linkHeader = res.headers.get('link');
-      if (!linkHeader || !linkHeader.includes('rel="next"')) {
-        hasMore = false;
-      } else {
-        page++;
-      }
-    } catch (err: any) {
-      const errorMsg = `Error fetching page ${page}: ${err.message}`;
-      console.warn(`[GitHub Pagination] ${errorMsg}`);
-      lastSyncErrors.push(errorMsg);
-      break;
     }
+
+    if (!repos) {
+      const message = `GitHub repository discovery failed on page ${page}: ${lastError || 'unknown error'}`;
+      lastSyncErrors.push(message);
+      throw Object.assign(new Error(message), { code: 'GITHUB_DISCOVERY_FAILED' });
+    }
+
+    if (repos.length === 0) break;
+    allRepos.push(...repos);
+    if (repos.length < perPage) break;
+    page++;
   }
 
-  // If authenticated, also fetch /user/repos with pagination to capture any private/internal repos
+  // If authenticated, also fetch /user/repos to include private/internal repositories
+  // owned by this user. Public portfolio discovery above remains the source of truth.
   if (headers.Authorization) {
     try {
       let userPage = 1;
-      let userHasMore = true;
-      while (userHasMore) {
+      while (true) {
         const userRes = await fetch(
           `https://api.github.com/user/repos?page=${userPage}&per_page=${perPage}&type=all`,
-          { headers, signal: AbortSignal.timeout(8000) }
+          { headers, signal: AbortSignal.timeout(12000) }
         );
         trackRateLimit(userRes);
         if (!userRes.ok) break;
         const userRepos = (await userRes.json()) as GitHubRepoPayload[];
         if (!Array.isArray(userRepos) || userRepos.length === 0) break;
-        for (const ur of userRepos) {
+        for (const repo of userRepos) {
           if (
-            ur.owner?.login?.toLowerCase() === username.toLowerCase() &&
-            !allRepos.some((r) => r.id === ur.id)
+            repo.owner?.login?.toLowerCase() === username.toLowerCase() &&
+            !allRepos.some((existing) => existing.id === repo.id)
           ) {
-            allRepos.push(ur);
+            allRepos.push(repo);
           }
         }
-        const linkHeader = userRes.headers.get('link');
-        if (!linkHeader || !linkHeader.includes('rel="next"')) {
-          userHasMore = false;
-        } else {
-          userPage++;
-        }
+        if (userRepos.length < perPage) break;
+        userPage++;
       }
-    } catch {
-      // Non-fatal
+    } catch (err: any) {
+      console.warn(`[GitHub Pagination] Optional authenticated repository scan failed: ${err?.message || 'unknown error'}`);
     }
   }
 
