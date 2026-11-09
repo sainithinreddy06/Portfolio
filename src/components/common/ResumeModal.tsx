@@ -187,7 +187,7 @@ export const ResumeModal: React.FC = () => {
                 Sai_Nithin_Reddy_Resume.pdf
               </h3>
               <p className="text-xs font-mono text-[var(--text-secondary)] mb-6 max-w-md">
-                Official Curriculum Vitae · Computer Science &amp; Engineering · CBIT (CGPA: 9.06)
+                Official Curriculum Vitae · Computer Science &amp; Engineering · CBIT{typeof content.profile.cgpa === 'number' ? ` (CGPA: ${content.profile.cgpa.toFixed(2)})` : ''}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 max-w-xl">
                 <a
@@ -293,7 +293,7 @@ export const ResumeModal: React.FC = () => {
                 Introduction
               </h2>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                Third-year Computer Science undergraduate with proficiency in Python, C, C++, Java, JavaScript, SQL, and web development, with a strong foundation in Data Structures, Object-Oriented Programming, and Machine Learning. Experienced in developing AI-powered and full-stack applications using React, FastAPI, Node.js, MongoDB, and modern APIs, with a focus on building practical software solutions.
+                {content.profile.currentYear || 'Computer Science'} Computer Science undergraduate with proficiency in Python, C, C++, Java, JavaScript, SQL, and web development, with a strong foundation in Data Structures, Object-Oriented Programming, and Machine Learning. Experienced in developing AI-powered and full-stack applications using React, FastAPI, Node.js, MongoDB, and modern APIs, with a focus on building practical software solutions.
               </p>
             </div>
 
@@ -312,7 +312,7 @@ export const ResumeModal: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right font-mono text-xs text-[var(--text-muted)] mt-1 sm:mt-0">
-                    <span className="font-semibold text-[var(--color-success)]">CGPA: 9.06</span>
+                    {typeof content.profile.cgpa === 'number' && <span className="font-semibold text-[var(--color-success)]">CGPA: {content.profile.cgpa.toFixed(2)}</span>}
                     <span className="mx-2">·</span>
                     <span>2024 – 2028</span>
                   </div>
