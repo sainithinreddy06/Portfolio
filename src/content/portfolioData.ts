@@ -49,7 +49,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'AICTE Approval Workflow Automation, Compliance Monitoring & Alert Management',
       category: 'AI / FULL STACK',
       stack: ['React', 'TypeScript', 'Python', 'FastAPI', 'PostgreSQL', 'SQLAlchemy', 'Supabase'],
-      description: 'An enterprise workflow automation platform designed to streamline AICTE approval processes through policy-aware workflows, compliance monitoring, obligation tracking, and actionable alerts. Its architecture emphasizes policy version pinning, migration simulation, deterministic evidence, concurrent obligation management, transactional event delivery, and tamper-evident audit trails.',
+      description: 'An enterprise-grade workflow automation platform that streamlines institutional approval processes through intelligent document verification, compliance monitoring, automated alerts, and tamper-evident audit trails.',
       summary: 'Enterprise approval workflow and compliance platform combining policy lifecycle management, deterministic proof generation, obligation tracking, alert orchestration, and hash-chain auditability.',
       status: 'Prototype',
       features: [
@@ -85,8 +85,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'Thermal Analytics & Public-health Advisory System',
       category: 'FULL STACK',
       stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
-      description:
-        'An India-ready public heat-safety prototype engineered for the Smart India Hackathon. Integrates geospatial place discovery, public weather feeds, interactive MapLibre mapped emergency shelters, and public-health reference guidance with D3 contour thermal risk modeling without invented boundary data.',
+      description: 'An intelligent public-health platform that analyzes environmental conditions to assess human thermal stress, identify heat-related risks, and deliver data-driven health advisories.',
       summary:
         'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.',
       status: 'Implemented',
@@ -123,8 +122,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'AI-Powered Outdoor Safety & Navigation Platform',
       category: 'COMPUTER VISION',
       stack: ['React', 'TypeScript', 'Node.js', 'Python', 'FastAPI', 'PyTorch', 'Ultralytics YOLO', 'Scikit-learn', 'OpenCV', 'GPS Telemetry'],
-      description:
-        'An advanced outdoor navigation and autonomous terrain hazard intelligence platform combining computer vision with geospatial telemetry. Deploys Ultralytics YOLO object detection models for real-time obstacle and trail hazard classification alongside a Random Forest model trained on USGS slope, elevation, and seismic data. Provides tactical off-grid routing, offline tile caching, and an AI Ranger Copilot for contextual environmental safety.',
+      description: 'An AI-powered hiking safety platform that combines computer vision, terrain analysis, and GPS telemetry to detect environmental hazards and support safer outdoor navigation.',
       summary:
         'Multi-modal outdoor navigation and hazard assessment platform integrating Ultralytics YOLO computer vision with Random Forest terrain risk modeling. Evaluates real-time GPS coordinates, environmental sensors, and seismic telemetry to generate predictive trail safety indices and route recommendations.',
       status: 'Prototype',
@@ -167,8 +165,7 @@ export const initialPortfolioContent: PortfolioContent = {
         'Tailwind CSS',
         'Geospatial APIs',
       ],
-      description:
-        'An intelligent urban traffic optimization and accident-risk prediction platform engineered to process spatial telemetry in real time. Combines historical road network sensor data with Scikit-learn regressors and spatial windowing algorithms to forecast severe congestion waves and highlight localized collision risk zones before incidents occur. Features interactive geospatial heatmaps, live weather indices, and asynchronous FastAPI REST endpoints backed by MongoDB.',
+      description: 'An intelligent traffic management platform that predicts road congestion, identifies accident-prone zones, and visualizes traffic patterns through interactive maps and predictive analytics.',
       summary:
         'Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.',
       status: 'Prototype',

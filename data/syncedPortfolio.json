@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-11-04T08:17:08.868Z",
+  "lastUpdated": "2026-11-09T22:44:00+05:30",
   "content": {
     "profile": {
       "name": "Sai Nithin Reddy",
@@ -102,7 +102,7 @@
           "SQLAlchemy",
           "Supabase"
         ],
-        "description": "An enterprise workflow automation platform designed to streamline AICTE approval processes through policy-aware workflows, compliance monitoring, obligation tracking, and actionable alerts. Its architecture emphasizes policy version pinning, migration simulation, deterministic evidence, concurrent obligation management, transactional event delivery, and tamper-evident audit trails.",
+        "description": "An enterprise-grade workflow automation platform that streamlines institutional approval processes through intelligent document verification, compliance monitoring, automated alerts, and tamper-evident audit trails.",
         "summary": "Enterprise approval workflow and compliance platform combining policy lifecycle management, deterministic proof generation, obligation tracking, alert orchestration, and hash-chain auditability.",
         "status": "Prototype",
         "features": [
@@ -182,7 +182,7 @@
         "name": "TAPAS",
         "tagline": "Thermal Analytics & Public-health Advisory System",
         "category": "FULL STACK",
-        "description": "TAPAS — Thermal Analytics & Public-health Advisory System",
+        "description": "An intelligent public-health platform that analyzes environmental conditions to assess human thermal stress, identify heat-related risks, and deliver data-driven health advisories.",
         "summary": "Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.",
         "stack": [
           "Next.js 15",
@@ -286,7 +286,7 @@
           "OpenCV",
           "GPS Telemetry"
         ],
-        "description": "AI-powered terrain intelligence and backcountry safety platform for smarter and safer hiking.",
+        "description": "An AI-powered hiking safety platform that combines computer vision, terrain analysis, and GPS telemetry to detect environmental hazards and support safer outdoor navigation.",
         "summary": "Multi-modal outdoor navigation and hazard assessment platform integrating Ultralytics YOLO computer vision with Random Forest terrain risk modeling. Evaluates real-time GPS coordinates, environmental sensors, and seismic telemetry to generate predictive trail safety indices and route recommendations.",
         "status": "Prototype",
         "features": [
@@ -384,7 +384,7 @@
           "Tailwind CSS",
           "Geospatial APIs"
         ],
-        "description": "TRAFFIQ is an AI-powered traffic intelligence platform designed to analyze traffic conditions, predict congestion, identify accident-prone areas, and provide real-time visual insights through an interactive map-based dashboard.",
+        "description": "An intelligent traffic management platform that predicts road congestion, identifies accident-prone zones, and visualizes traffic patterns through interactive maps and predictive analytics.",
         "summary": "Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.",
         "status": "Prototype",
         "features": [
@@ -1062,7 +1062,7 @@
         "description": "Engaged in Capture The Flag technical challenges focusing on systems analysis, web security, and cryptographic problem solving."
       }
     ],
-    "lastSynced": "2026-10-16T18:01:25.333Z"
+    "lastSynced": "2026-11-09T22:44:00+05:30"
   },
   "syncedRepositories": {
     "1393161731": {
