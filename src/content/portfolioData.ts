@@ -578,6 +578,16 @@ export const initialPortfolioContent: PortfolioContent = {
         'Higher secondary education with intensive foundation in Mathematics, Physics, and Chemistry.',
     },
     {
+      id: 'ied eathon-iete-cbit-2026',
+      role: '1st Place — IEDeathon',
+      organization: 'IETE CBIT Club',
+      period: '2026',
+      type: 'Competition',
+      achievementBadge: '1st Place',
+      description:
+        'Secured first place for a smart-city solution aligned with UN Sustainable Development Goal 11 (Sustainable Cities and Communities), focused on improving urban living through efficient resource management, waste reduction, and enhanced public services.',
+    },
+    {
       id: 'asteroid-comp',
       role: '3rd Place Awardee',
       organization: 'Asteroid Hazard Classification Competition',
