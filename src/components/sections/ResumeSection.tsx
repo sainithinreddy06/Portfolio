@@ -48,7 +48,7 @@ export const ResumeSection: React.FC = () => {
         </div>
 
         {/* Main Document Card */}
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-6 sm:p-8 shadow-xs">
+        <div className="p-0 sm:p-2">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--border-subtle)]">
             <div className="flex items-start gap-4">
               <div className="p-3.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-subtle)] text-[var(--accent-primary)] shrink-0 shadow-xs">
@@ -105,35 +105,7 @@ export const ResumeSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Credential Highlights */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-            <div className="p-4 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)]">
-              <div className="flex items-center gap-2 text-[var(--accent-primary)] text-xs font-mono font-semibold mb-1">
-                <GraduationCap className="w-4 h-4" />
-                <span>EDUCATION</span>
-              </div>
-              <p className="text-xs font-semibold text-[var(--text-primary)]">B.E. Computer Science</p>
-              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">CBIT · CGPA: 9.06 (2024–2028)</p>
-            </div>
 
-            <div className="p-4 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)]">
-              <div className="flex items-center gap-2 text-[var(--color-success)] text-xs font-mono font-semibold mb-1">
-                <Briefcase className="w-4 h-4" />
-                <span>FOCUS DOMAINS</span>
-              </div>
-              <p className="text-xs font-semibold text-[var(--text-primary)]">AI Systems &amp; Full Stack</p>
-              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">Python, React, TypeScript, Node.js</p>
-            </div>
-
-            <div className="p-4 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)]">
-              <div className="flex items-center gap-2 text-[var(--accent-primary)] text-xs font-mono font-semibold mb-1">
-                <Award className="w-4 h-4" />
-                <span>DOCUMENT INTEGRITY</span>
-              </div>
-              <p className="text-xs font-semibold text-[var(--text-primary)]">Direct PDF Delivery</p>
-              <p className="text-[11px] text-[var(--text-secondary)] font-mono mt-0.5">PDF file hosted for direct access</p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
