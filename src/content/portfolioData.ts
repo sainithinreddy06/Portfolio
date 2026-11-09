@@ -568,6 +568,16 @@ export const initialPortfolioContent: PortfolioContent = {
         'Undergraduate studies in core Computer Science & Engineering covering Data Structures, Algorithms, Discrete Mathematics, Operating Systems, Database Management Systems, and Machine Learning.',
     },
     {
+      id: 'iedeathon-iete-cbit-2026',
+      role: 'CivicSnap — 1st Place, IEDeathon',
+      organization: 'IETE CBIT Club',
+      period: '2026',
+      type: 'Competition',
+      achievementBadge: '1st Place Winner',
+      description:
+        'Won 1st place at IEDeathon with CivicSnap, a smart-city solution aligned with UN Sustainable Development Goal 11 (Sustainable Cities and Communities), focused on efficient resource management, waste reduction, and better public services.',
+    },
+    {
       id: 'narayana-intermediate',
       role: 'Board of Intermediate Education, Telangana',
       organization: 'Narayana Institutions, Hyderabad',
@@ -576,16 +586,6 @@ export const initialPortfolioContent: PortfolioContent = {
       achievementBadge: 'CGPA: 9.41',
       description:
         'Higher secondary education with intensive foundation in Mathematics, Physics, and Chemistry.',
-    },
-    {
-      id: 'iedeathon-iete-cbit-2026',
-      role: '1st Place — IEDeathon',
-      organization: 'IETE CBIT Club',
-      period: '2026',
-      type: 'Competition',
-      achievementBadge: '1st Place',
-      description:
-        'Secured 1st place with CivicSnap, a smart-city application aligned with UN Sustainable Development Goal 11 (Sustainable Cities and Communities), focused on improving urban living through efficient resource management, waste reduction, and enhanced public services.',
     },
     {
       id: 'asteroid-comp',
