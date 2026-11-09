@@ -578,7 +578,7 @@ export const initialPortfolioContent: PortfolioContent = {
         'Higher secondary education with intensive foundation in Mathematics, Physics, and Chemistry.',
     },
     {
-      id: 'ied eathon-iete-cbit-2026',
+      id: 'iedeathon-iete-cbit-2026',
       role: '1st Place — IEDeathon',
       organization: 'IETE CBIT Club',
       period: '2026',
