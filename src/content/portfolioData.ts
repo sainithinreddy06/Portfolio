@@ -585,7 +585,7 @@ export const initialPortfolioContent: PortfolioContent = {
       type: 'Competition',
       achievementBadge: '1st Place',
       description:
-        'Secured first place for a smart-city solution aligned with UN Sustainable Development Goal 11 (Sustainable Cities and Communities), focused on improving urban living through efficient resource management, waste reduction, and enhanced public services.',
+        'Secured 1st place with CivicSnap, a smart-city application aligned with UN Sustainable Development Goal 11 (Sustainable Cities and Communities), focused on improving urban living through efficient resource management, waste reduction, and enhanced public services.',
     },
     {
       id: 'asteroid-comp',
