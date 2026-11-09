@@ -20,6 +20,17 @@ test('portfolio content validator accepts curated content and rejects unsafe ass
   assert.equal(isPortfolioContent(content), false);
 });
 
+test('portfolio profile accepts editable academic year and validates CGPA on a 10-point scale', () => {
+  const content = structuredClone(initialPortfolioContent);
+  content.profile.currentYear = 'Fourth Year';
+  content.profile.cgpa = 9.25;
+  assert.equal(isPortfolioContent(content), true);
+  content.profile.cgpa = 10.5;
+  assert.equal(isPortfolioContent(content), false);
+  content.profile.cgpa = -0.1;
+  assert.equal(isPortfolioContent(content), false);
+});
+
 test('GitHub webhook signature verification requires a valid HMAC', () => {
   const secret = 'test-webhook-secret';
   const body = Buffer.from('{"action":"opened"}');

@@ -12,6 +12,8 @@ export function isPortfolioContent(value: any): value is PortfolioContent {
   const p = value.profile;
   if (!p.photo || !p.resume || !Array.isArray(p.aboutText) || !p.aboutText.every((s: unknown) => typeof s === 'string')) return false;
   if (!['name','wordmark','positioning','headline','supportingCopy','institution','degree','batchPeriod','email','githubUrl','linkedinUrl','currentLearningDirection'].every(k => typeof p[k] === 'string')) return false;
+  if (p.currentYear !== undefined && typeof p.currentYear !== 'string') return false;
+  if (p.cgpa !== undefined && p.cgpa !== null && (typeof p.cgpa !== 'number' || !Number.isFinite(p.cgpa) || p.cgpa < 0 || p.cgpa > 10)) return false;
   if (!isSafeAssetUrl(p.photo.url) || !isSafeAssetUrl(p.resume.fileUrl)) return false;
   return value.projects.every((project: any) => project && typeof project.id === 'string' && typeof project.name === 'string' && project.name.trim() && typeof project.description === 'string' && Array.isArray(project.stack) && project.stack.every((s: unknown) => typeof s === 'string') && Array.isArray(project.features) && [project.githubUrl, project.liveUrl].every(url => !url || isSafeAssetUrl(url)));
 }

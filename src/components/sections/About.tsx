@@ -52,8 +52,7 @@ export const About: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start pt-2 sm:pt-4">
           <div className="lg:col-span-7 space-y-6 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
             <p>
-              I am a third-year Computer Science &amp; Engineering student at Chaitanya Bharathi
-              Institute of Technology (CBIT), pursuing my degree from 2024 to 2028. My interest lies
+              I am a {profile.currentYear || 'Computer Science & Engineering'} {profile.degree || 'student'} at {profile.institution || 'my university'}, pursuing my degree from {profile.batchPeriod || 'an undergraduate programme'}. My interest lies
               in artificial intelligence, machine learning, and core software engineering, and I
               have found that the most effective way for me to understand complex technology is to
               learn primarily through building.
@@ -92,14 +91,20 @@ export const About: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <h3 className="text-base sm:text-lg font-medium text-[var(--text-primary)]">
-                  Computer Science &amp; Engineering
+                  {profile.degree || 'Computer Science & Engineering'}
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)]">
-                  Chaitanya Bharathi Institute of Technology (CBIT)
+                  {profile.institution || 'Institution not specified'}
                 </p>
                 <div className="font-mono text-xs text-[var(--text-muted)] pt-0.5 space-y-0.5">
-                  <p>2024 – 2028</p>
-                  <p>Third Year · CGPA: 9.06</p>
+                  <p>{profile.batchPeriod || 'Academic period not specified'}</p>
+                  {(profile.currentYear || profile.cgpa !== undefined) && (
+                    <p>
+                      {[profile.currentYear, profile.cgpa !== undefined && profile.cgpa !== null ? `CGPA: ${profile.cgpa.toFixed(2)}` : null]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

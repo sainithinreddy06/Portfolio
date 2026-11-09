@@ -144,6 +144,10 @@ export interface ProfileData {
   institution: string;
   degree: string;
   batchPeriod: string;
+  /** Current academic year displayed in the About section (e.g. Third Year). */
+  currentYear?: string;
+  /** CGPA on a 10-point scale; null hides the value. */
+  cgpa?: number | null;
   email: string;
   githubUrl: string;
   linkedinUrl: string;

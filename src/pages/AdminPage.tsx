@@ -1974,6 +1974,39 @@ export const AdminPage: React.FC = () => {
                   className="w-full px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-mono text-[var(--text-secondary)] mb-1 uppercase">Current Academic Year</label>
+                <select
+                  value={draft.profile.currentYear || ''}
+                  onChange={(e) => setDraft({ ...draft, profile: { ...draft.profile, currentYear: e.target.value } })}
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
+                >
+                  <option value="">Not displayed</option>
+                  <option value="First Year">First Year</option>
+                  <option value="Second Year">Second Year</option>
+                  <option value="Third Year">Third Year</option>
+                  <option value="Fourth Year">Fourth Year</option>
+                  <option value="Final Year">Final Year</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-[var(--text-secondary)] mb-1 uppercase">CGPA (out of 10)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.01"
+                  inputMode="decimal"
+                  placeholder="Leave blank to hide CGPA"
+                  value={draft.profile.cgpa ?? ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setDraft({ ...draft, profile: { ...draft.profile, cgpa: raw === '' ? null : Number(raw) } });
+                  }}
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
+                />
+                <p className="text-[11px] text-[var(--text-muted)] mt-1">Enter a value from 0 to 10. Changes appear publicly after saving.</p>
+              </div>
             </div>
             <button
               type="button"
