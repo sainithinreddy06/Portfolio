@@ -49,7 +49,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'AICTE Approval Workflow Automation, Compliance Monitoring & Alert Management',
       category: 'AI / FULL STACK',
       stack: ['React', 'TypeScript', 'Python', 'FastAPI', 'PostgreSQL', 'SQLAlchemy', 'Supabase'],
-      description: 'An enterprise-grade workflow automation platform that streamlines institutional approval processes through intelligent document verification, compliance monitoring, automated alerts, and tamper-evident audit trails.',
+      description: 'A role-based approval workflow prototype for institutional applications, combining evidence uploads and review, versioned policy metadata, obligation tracking, readiness assessments, in-app notifications, and verifiable hash-chain audit history.',
       summary: 'Enterprise approval workflow and compliance platform combining policy lifecycle management, deterministic proof generation, obligation tracking, alert orchestration, and hash-chain auditability.',
       status: 'Prototype',
       features: [
@@ -85,7 +85,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'Thermal Analytics & Public-health Advisory System',
       category: 'FULL STACK',
       stack: ['Next.js 15', 'React 19', 'TypeScript', 'MapLibre GL', 'D3 Contour', 'Recharts', 'Tailwind CSS'],
-      description: 'An intelligent public-health platform that analyzes environmental conditions to assess human thermal stress, identify heat-related risks, and deliver data-driven health advisories.',
+      description: 'A geospatial heat-safety application that maps weather-driven heat-index conditions with thermal contours, location-aware forecasts, nearby mapped services, and sourced public-health guidance, while clearly marking unavailable scientific data.',
       summary:
         'Public heat-safety platform combining MapLibre GL geospatial mapping with meteorological analysis, thermal contour rendering, and dynamic reference health advisory workflows.',
       status: 'Implemented',
@@ -122,7 +122,7 @@ export const initialPortfolioContent: PortfolioContent = {
       tagline: 'AI-Powered Outdoor Safety & Navigation Platform',
       category: 'COMPUTER VISION',
       stack: ['React', 'TypeScript', 'Node.js', 'Python', 'FastAPI', 'PyTorch', 'Ultralytics YOLO', 'Scikit-learn', 'OpenCV', 'GPS Telemetry'],
-      description: 'An AI-powered hiking safety platform that combines computer vision, terrain analysis, and GPS telemetry to detect environmental hazards and support safer outdoor navigation.',
+      description: 'A hiking-safety application combining YOLO-based visual hazard detection, Random Forest terrain-risk scoring, GPS route tracking, weather context, geological alerts, hazard reporting, and an AI Ranger copilot.',
       summary:
         'Multi-modal outdoor navigation and hazard assessment platform integrating Ultralytics YOLO computer vision with Random Forest terrain risk modeling. Evaluates real-time GPS coordinates, environmental sensors, and seismic telemetry to generate predictive trail safety indices and route recommendations.',
       status: 'Prototype',
@@ -165,7 +165,7 @@ export const initialPortfolioContent: PortfolioContent = {
         'Tailwind CSS',
         'Geospatial APIs',
       ],
-      description: 'An intelligent traffic management platform that predicts road congestion, identifies accident-prone zones, and visualizes traffic patterns through interactive maps and predictive analytics.',
+      description: 'A traffic-intelligence dashboard for exploring road and environmental data, with FastAPI and MongoDB services, interactive maps, congestion and accident-risk prototypes, spatial heatmaps, and historical trend views.',
       summary:
         'Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.',
       status: 'Prototype',
