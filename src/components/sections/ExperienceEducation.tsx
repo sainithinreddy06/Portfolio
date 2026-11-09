@@ -61,7 +61,7 @@ export const ExperienceEducation: React.FC = () => {
                     {item.achievementBadge && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-[var(--color-warning)] text-[11px] font-mono font-medium">
                         <Award className="w-3 h-3" />
-                        {item.achievementBadge}
+                        {item.id === 'cbit-education' && typeof content.profile.cgpa === 'number' ? `CGPA: ${content.profile.cgpa.toFixed(2)}` : item.id === 'cbit-education' ? null : item.achievementBadge}
                       </span>
                     )}
                   </div>
