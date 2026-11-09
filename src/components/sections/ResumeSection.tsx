@@ -63,11 +63,9 @@ export const ResumeSection: React.FC = () => {
                     RESUME PDF
                   </span>
                 </div>
-                <p className="text-xs font-mono text-[var(--text-secondary)] mt-1">
-                  File: <span className="text-[var(--text-primary)]">{resume.fileName || 'Sai_Nithin_Reddy_Resume.pdf'}</span> ({resume.fileSize || '137 KB'})
-                </p>
-                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                  Computer Science &amp; Engineering · Chaitanya Bharathi Institute of Technology (CBIT) · CGPA: 9.06
+                <p className="text-xs text-[var(--text-secondary)] mt-1">
+                  Computer Science &amp; Engineering · Chaitanya Bharathi Institute of Technology (CBIT)
+                  {typeof content.profile.cgpa === 'number' && ` · CGPA: ${content.profile.cgpa.toFixed(2)}`}
                 </p>
               </div>
             </div>
