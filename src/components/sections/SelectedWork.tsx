@@ -35,7 +35,7 @@ export const SelectedWork: React.FC = () => {
       setTimeout(() => setSyncFeedback(null), 4000);
     } catch (err: any) {
       console.error('Failed to sync repositories:', err);
-      setSyncFeedback('Could not reach GitHub API; displayed cached projects.');
+      setSyncFeedback(err?.message || 'GitHub sync failed. Showing the last saved project data.');
       setTimeout(() => setSyncFeedback(null), 4000);
     } finally {
       setIsSyncing(false);
@@ -188,8 +188,9 @@ export const SelectedWork: React.FC = () => {
               <span>Offline or network notice: displaying cached repository snapshot.</span>
             </div>
             <button
-              onClick={refreshServerPortfolio}
-              className="min-h-11 px-2 inline-flex items-center underline hover:text-[var(--text-primary)] text-xs cursor-pointer"
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="min-h-11 px-2 inline-flex items-center underline hover:text-[var(--text-primary)] text-xs cursor-pointer disabled:opacity-50"
             >
               Retry
             </button>
