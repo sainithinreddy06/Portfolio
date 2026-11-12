@@ -628,11 +628,19 @@ export const initialPortfolioContent: PortfolioContent = {
     {
       id: 'technical-certifications',
       role: 'Technical Certifications',
+<<<<<<< HEAD
       organization: 'Verified Online Credentials & Professional Assessments',
       period: '2024 – 2026',
       type: 'Involvement',
       description:
         '• React Web Development Certification • Generative AI & LLM Architecture Certification • Java Programming & OOP Principles Certification',
+=======
+      organization: 'Certificate details',
+      period: 'Listed in resume',
+      type: 'Involvement',
+      description:
+        '• React Web Development Certification • Generative AI Certification • Java Programming Certification',
+>>>>>>> 54fa652225020e21ec1a21030af86038cfe6e302
     },
     {
       id: 'sih-nominations',

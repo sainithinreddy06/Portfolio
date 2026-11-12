@@ -11,9 +11,14 @@ export const CustomCursor: React.FC = () => {
 
   useEffect(() => {
     const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+<<<<<<< HEAD
     const canHover = window.matchMedia('(hover: hover)').matches;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!hasFinePointer || !canHover || prefersReducedMotion) {
+=======
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!hasFinePointer || prefersReducedMotion) {
+>>>>>>> 54fa652225020e21ec1a21030af86038cfe6e302
       setIsEnabled(false);
       return;
     }

@@ -107,20 +107,36 @@ export const ResumeModal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('pdf')}
+<<<<<<< HEAD
                 className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${viewMode === 'pdf'
                     ? 'bg-[var(--bg-primary)] text-[var(--accent-primary)] font-bold shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
+=======
+                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                  viewMode === 'pdf'
+                    ? 'bg-[var(--bg-primary)] text-[var(--accent-primary)] font-bold shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+>>>>>>> 54fa652225020e21ec1a21030af86038cfe6e302
               >
                 PDF Document
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('transcript')}
+<<<<<<< HEAD
                 className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${viewMode === 'transcript'
                     ? 'bg-[var(--bg-primary)] text-[var(--accent-primary)] font-bold shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
+=======
+                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                  viewMode === 'transcript'
+                    ? 'bg-[var(--bg-primary)] text-[var(--accent-primary)] font-bold shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+>>>>>>> 54fa652225020e21ec1a21030af86038cfe6e302
               >
                 Structured CV
               </button>
@@ -241,6 +257,7 @@ export const ResumeModal: React.FC = () => {
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                   Tadugam Sai Nithin Reddy
                 </h1>
+<<<<<<< HEAD
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-mono text-[var(--text-secondary)]">
                   <a
                     href="mailto:sainithinreddytadugam@gmail.com"
@@ -389,6 +406,156 @@ export const ResumeModal: React.FC = () => {
             </div>
           </div>
         )}
+=======
+              <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-mono text-[var(--text-secondary)]">
+                <a
+                  href="mailto:sainithinreddytadugam@gmail.com"
+                  className="flex items-center gap-1 hover:text-[var(--accent-primary)] transition-colors"
+                >
+                  <Mail className="w-3 h-3 text-[var(--text-muted)]" />
+                  <span>sainithinreddytadugam@gmail.com</span>
+                </a>
+                <span>·</span>
+                <a
+                  href="https://github.com/sainithinreddy06"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-[var(--accent-primary)] transition-colors"
+                >
+                  <Github className="w-3 h-3 text-[var(--text-muted)]" />
+                  <span>sainithinreddy06</span>
+                </a>
+                <span>·</span>
+                <a
+                  href="https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-[var(--accent-primary)] transition-colors"
+                >
+                  <Linkedin className="w-3 h-3 text-[var(--text-muted)]" />
+                  <span>Sai Nithin Reddy Tadugam</span>
+                </a>
+                {content.profile.leetcodeUrl && (
+                  <>
+                    <span>·</span>
+                    <a
+                      href={content.profile.leetcodeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 hover:text-[var(--accent-primary)] transition-colors"
+                    >
+                      <Code2 className="w-3 h-3 text-[#FFA116]" />
+                      <span>leetcode/{content.profile.leetcodeUsername || 'Nithinreddy_06'}</span>
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--accent-primary)] pb-1 border-b border-[var(--border-subtle)] mb-2">
+                Introduction
+              </h2>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                {content.profile.currentYear || 'Computer Science'} Computer Science undergraduate with proficiency in Python, C, C++, Java, JavaScript, SQL, and web development, with a strong foundation in Data Structures, Object-Oriented Programming, and Machine Learning. Experienced in developing AI-powered and full-stack applications using React, FastAPI, Node.js, MongoDB, and modern APIs, with a focus on building practical software solutions.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--accent-primary)] pb-1 border-b border-[var(--border-subtle)] mb-3">
+                Education
+              </h2>
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs sm:text-sm">
+                  <div>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad
+                    </span>
+                    <div className="text-[var(--text-secondary)] text-xs mt-0.5">
+                      B.E./B.Tech. – Computer Science &amp; Engineering
+                    </div>
+                  </div>
+                  <div className="text-right font-mono text-xs text-[var(--text-muted)] mt-1 sm:mt-0">
+                    {typeof content.profile.cgpa === 'number' && <span className="font-semibold text-[var(--color-success)]">CGPA: {content.profile.cgpa.toFixed(2)}</span>}
+                    <span className="mx-2">·</span>
+                    <span>2024 – 2028</span>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between text-xs sm:text-sm">
+                  <div>
+                    <span className="font-bold text-[var(--text-primary)]">
+                      Narayana Institutions, Hyderabad
+                    </span>
+                    <div className="text-[var(--text-secondary)] text-xs mt-0.5">
+                      Board of Intermediate Education, Telangana
+                    </div>
+                  </div>
+                  <div className="text-right font-mono text-xs text-[var(--text-muted)] mt-1 sm:mt-0">
+                    <span className="font-semibold text-[var(--color-success)]">CGPA: 9.41</span>
+                    <span className="mx-2">·</span>
+                    <span>2022 – 2024</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--accent-primary)] pb-1 border-b border-[var(--border-subtle)] mb-2.5">
+                Technical Skills
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Programming Languages: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">Python, C, C++, Java, JavaScript, SQL</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Web Technologies: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">HTML, CSS, React, Node.js, FastAPI</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Databases: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">MySQL, MongoDB, PostgreSQL</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Machine Learning: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">Scikit-learn, XGBoost, Pandas, NumPy</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Tools &amp; Infrastructure: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">Git, GitHub, Docker, VS Code</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[var(--text-primary)]">Core Concepts: </span>
+                  <span className="text-[var(--text-secondary)] font-mono">Data Structures, Algorithms, OOP, DBMS, OS, Computer Networks</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--accent-primary)] pb-1 border-b border-[var(--border-subtle)] mb-3">
+                Key Engineering Projects
+              </h2>
+              <div className="space-y-4 text-xs">
+                {content.projects.map((proj) => (
+                  <div key={proj.id}>
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between font-bold text-[var(--text-primary)]">
+                      <span>{proj.name} – {proj.tagline}</span>
+                      <span className="font-mono text-[11px] text-[var(--accent-secondary)] font-normal">{proj.status}</span>
+                    </div>
+                    <div className="font-mono text-[11px] text-[var(--text-muted)] mb-1">
+                      {proj.stack.join(', ')}
+                    </div>
+                    <p className="text-[var(--text-secondary)]">
+                      {proj.description || proj.summary}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+>>>>>>> 54fa652225020e21ec1a21030af86038cfe6e302
       </div>
     </div>
   );
