@@ -119,9 +119,11 @@ export const AdminPage: React.FC = () => {
 
   // Helper to obtain current token
   const getAdminToken = (): string | null => {
+    // localStorage is the canonical copy shared across tabs. Prefer it so an
+    // older per-tab sessionStorage token cannot shadow a newer valid login.
     return (
-      sessionStorage.getItem('sai_nithin_admin_token') ||
-      localStorage.getItem('sai_nithin_admin_token')
+      localStorage.getItem('sai_nithin_admin_token') ||
+      sessionStorage.getItem('sai_nithin_admin_token')
     );
   };
 
