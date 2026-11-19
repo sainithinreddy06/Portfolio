@@ -4,10 +4,8 @@ export const initialPortfolioContent: PortfolioContent = {
   profile: {
     name: 'Sai Nithin Reddy',
     wordmark: 'SAI NITHIN REDDY',
-    positioning: 'AI ENGINEER · FULL-STACK DEVELOPER · SYSTEMS BUILDER',
-    headline: 'I BUILD INTELLIGENT SYSTEMS FOR REAL-WORLD PROBLEMS.',
-    supportingCopy:
-      'Computer Science & Engineering student at Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad building AI-powered products, full-stack applications and practical software systems.',
+    positioning: 'PRODUCTION-FULLSTACK ENGINEER · REACT & NODE · CLOUD INFRASTRUCTURE',
+    headline: 'I build production-grade full-stack systems with React, Node, and cloud infrastructure',
     institution: 'Chaitanya Bharathi Institute of Technology (CBIT)',
     degree: 'Computer Science & Engineering',
     batchPeriod: '2024 – 2028',
@@ -19,9 +17,9 @@ export const initialPortfolioContent: PortfolioContent = {
     leetcodeUrl: 'https://leetcode.com/u/Nithinreddy_06/',
     leetcodeUsername: 'Nithinreddy_06',
     aboutText: [
-      'I am an engineering undergraduate and software builder focused on applying machine learning, computer vision, and robust backend engineering to practical, physical-world problems.',
-      'Rather than assembling toy demos, I prioritize building end-to-end architectures from data ingestion pipelines and mathematical modeling to reactive client interfaces and geospatial visualizations.',
-      'My work centers on intelligent navigation, environmental sensing, and predictive systems where latency, correctness, and reliable data flow matter.',
+      'I build production-grade full-stack systems with React, Node, and cloud infrastructure, delivering end-to-end architectures from data ingestion pipelines and mathematical modeling to reactive client interfaces and geospatial visualizations.',
+      'My work focuses on production-grade architectures where latency, correctness, and reliable data flow matter — including intelligent navigation, environmental sensing, and predictive systems deployed at scale.',
+      'I bridge the gap between research prototypes and production systems, ensuring engineering rigor, scalable design, and measurable outcomes across the full stack.',
     ],
     currentLearningDirection:
       'Deepening systems programming, distributed backend architectures, and production-grade ML inference optimization.',
@@ -358,8 +356,9 @@ export const initialPortfolioContent: PortfolioContent = {
       slug: 'traffiq',
       title: 'TRAFFIQ',
       subtitle: 'AI Traffic & Accident Risk Prediction — 48-Hour Hackathon Prototype',
+      status: 'prototype',
       overview:
-        'TRAFFIQ is a 48-hour hackathon prototype (2 GitHub commits) exploring ML-based traffic prediction. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope.',
+        'TRAFFIQ is a 48-hour hackathon prototype (2 GitHub commits) exploring ML-based traffic prediction. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope. This case study documents a learning experiment only.',
       problem:
         'Urban traffic telemetry is frequently reactive: navigation systems route vehicles around accidents only after congestion has already formed. Drivers and municipality coordinators lack accessible predictive tools that evaluate spatial risk factors before incidents happen.',
       whyBuilt:
@@ -418,8 +417,9 @@ export const initialPortfolioContent: PortfolioContent = {
       slug: 'surestep',
       title: 'SureStep',
       subtitle: 'AI-Powered Outdoor Safety & Navigation Platform — 48-Hour Hackathon Prototype',
+      status: 'prototype',
       overview:
-        'SureStep is a 48-hour hackathon prototype (8 GitHub commits) exploring on-device computer vision inferences, GPS telemetry, and machine learning models for outdoor navigation. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope.',
+        'SureStep is a 48-hour hackathon prototype (8 GitHub commits) exploring on-device computer vision inferences, GPS telemetry, and machine learning models for outdoor navigation. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope. This case study documents a learning experiment only.',
       problem:
         'Standard turn-by-turn navigation platforms fail when navigating remote wilderness or challenging terrain. They offer no insights into trail conditions, visual hazards, terrain stability, geological hazard monitoring, or offline availability.',
       whyBuilt:
@@ -469,8 +469,9 @@ export const initialPortfolioContent: PortfolioContent = {
       slug: 'vidyavistaar',
       title: 'VidyaVistaar',
       subtitle: 'AI-Powered Educational Learning Platform — Hackathon Prototype',
+      status: 'prototype',
       overview:
-        'VidyaVistaar is a hackathon prototype (4 GitHub commits) exploring Google Gemini AI integration with React 19 for educational Q&A. It is NOT a production system — the GitHub history does not support the claimed production scope.',
+        'VidyaVistaar is a hackathon prototype (4 GitHub commits) exploring Google Gemini AI integration with React 19 for educational Q&A. It is NOT a production system — the GitHub history does not support the claimed production scope. This case study documents a learning experiment only.',
       problem:
         'Traditional learning management systems often deliver static content without immediate, adaptive explanations or visual progress feedback, leading to disengagement during self-guided study.',
       whyBuilt:

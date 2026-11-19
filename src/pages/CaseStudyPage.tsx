@@ -13,6 +13,7 @@ import {
   Lightbulb,
   CheckCircle2,
   Clock,
+  AlertCircle,
 } from 'lucide-react';
 
 export const CaseStudyPage: React.FC = () => {
@@ -153,6 +154,17 @@ export const CaseStudyPage: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--text-primary)]">
             {caseStudy.title}
           </h1>
+          {(matchingProject && matchingProject.status === 'Prototype' && matchingProject.category === 'LEARNING EXPERIMENTS') || (caseStudy && (caseStudy as any).status === 'prototype') && (
+            <div className="mt-3 mb-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-xs font-mono text-[var(--color-warning)]">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>HACKATHON PROTOTYPE</span>
+              <span className="text-[10px] opacity-60">
+                {matchingProject
+                  ? `(${matchingProject.githubUrl?.match(/\/([^\/]+)$/)?.[1] || 'unknown'} · {matchingProject.features?.filter(f => f.status === 'Prototype').length || '0'} prototype features)`
+                  : 'This case study documents a learning experiment only'}
+              </span>
+            </div>
+          )}
           <div className="border-b border-dashed border-[var(--border-subtle)] my-3 w-full" />
           <p className="mt-2 text-base sm:text-lg text-[var(--text-secondary)]">
             {caseStudy.subtitle}
@@ -236,7 +248,7 @@ export const CaseStudyPage: React.FC = () => {
             <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-6">
               {caseStudy.architectureSummary}
             </p>
-            <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-transparent">
+            <section role="dialog" aria-modal="true" aria-label="Architecture & Pipeline">
               <div className="text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider mb-4">
                 Component Flow
               </div>

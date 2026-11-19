@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-11-09T22:44:00+05:30",
+  "lastUpdated": "2026-11-19T12:35:27.954Z",
   "content": {
     "profile": {
       "name": "Sai Nithin Reddy",
@@ -129,7 +129,7 @@
             "status": "Prototype"
           }
         ],
-        "githubUrl": "https://github.com/sainithinreddy06/PRAVAAH-2",
+        "githubUrl": "https://github.com/sainithinreddy06/PRAVAAH",
         "hasArchitecture": true,
         "featured": true,
         "order": 0,
@@ -177,7 +177,14 @@
           "verified": true,
           "notes": "Previously confirmed live PRAVAAH frontend deployment on Render."
         },
-        "isManualOverride": true
+        "isManualOverride": true,
+        "repositoryId": 1432409181,
+        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastUpdated": "2026-11-01T15:54:18Z",
+        "starsCount": 0,
+        "topics": [],
+        "isArchived": false,
+        "isUnavailable": false
       },
       {
         "id": "tapas",
@@ -262,7 +269,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-10-16T18:01:25.333Z",
+        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-10-12T19:13:44Z",
@@ -275,7 +282,7 @@
         "id": "surestep",
         "name": "SureStep",
         "tagline": "AI-Powered Outdoor Safety & Navigation Platform",
-        "category": "COMPUTER VISION",
+        "category": "LEARNING EXPERIMENTS",
         "stack": [
           "React",
           "TypeScript",
@@ -363,7 +370,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-10-16T18:01:25.333Z",
+        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-10-02T16:43:55Z",
@@ -376,7 +383,7 @@
         "id": "traffiq",
         "name": "TRAFFIQ",
         "tagline": "AI Traffic & Accident Risk Prediction System",
-        "category": "AI / ML",
+        "category": "LEARNING EXPERIMENTS",
         "stack": [
           "React",
           "FastAPI",
@@ -386,7 +393,7 @@
           "Tailwind CSS",
           "Geospatial APIs"
         ],
-        "description": "A traffic-intelligence dashboard for exploring road and environmental data, with FastAPI and MongoDB services, interactive maps, congestion and accident-risk prototypes, spatial heatmaps, and historical trend views.",
+        "description": "TRAFFIQ is an AI-powered traffic intelligence platform designed to analyze traffic conditions, predict congestion, identify accident-prone areas, and provide real-time visual insights through an interactive map-based dashboard.",
         "summary": "Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.",
         "status": "Prototype",
         "features": [
@@ -465,7 +472,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-10-16T18:01:25.333Z",
+        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-09-28T15:59:51Z",
@@ -476,7 +483,7 @@
         "id": "vidyavistaar",
         "name": "VidyaVistaar",
         "tagline": "AI-Powered Educational Learning & Intelligence Platform",
-        "category": "FULL STACK",
+        "category": "LEARNING EXPERIMENTS",
         "stack": [
           "React 19",
           "TypeScript",
@@ -487,7 +494,7 @@
         ],
         "description": "VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience.",
         "summary": "Modern educational platform combining component-based React 19 architecture with Google Gemini AI for contextual student guidance. Integrates reactive Recharts performance visualizers and modular services to track student concept mastery across personalized learning curricula.",
-        "status": "Implemented",
+        "status": "Prototype",
         "features": [
           {
             "name": "Intelligent AI Question Answering",
@@ -554,7 +561,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-10-16T18:01:25.333Z",
+        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-09-28T16:26:45Z",
@@ -563,6 +570,122 @@
       }
     ],
     "caseStudies": {
+      "pravaah": {
+        "slug": "pravaah",
+        "title": "PRAVAAH",
+        "subtitle": "Enterprise Autonomous Transformation — Policy-Aware Approval & Compliance Platform",
+        "overview": "PRAVAAH is an academic prototype for AICTE-oriented approval workflow automation and compliance operations. It brings role-based institutional workspaces, policy version pinning, policy migration simulation, deterministic compliance proofs, evidence reviews, a concurrent obligation ledger, transactional alert processing, and a tamper-evident audit trail into one platform. It supports structured human review; it is not an official AICTE service and does not issue regulatory approvals.",
+        "problem": "Approval and compliance work can span multiple stakeholders, policy requirements, supporting documents, review stages, deadlines, and follow-up actions. When these activities are distributed across separate records and communication channels, teams can struggle to identify missing evidence, understand application status, and maintain a traceable history.",
+        "whyBuilt": "The project explores how policy-aware workflow software can make institutional reviews more consistent and auditable. Its design connects versioned policy context to deterministic checks, evidence-backed application records, obligation tracking, reliable alert processing, and verifiable audit events while keeping final decisions with authorised human reviewers.",
+        "architectureSummary": "The React, TypeScript, and Vite frontend communicates with a Python FastAPI backend over HTTP APIs. The backend separates policy lifecycle, application workflow, deterministic compliance evaluation, evidence handling, obligation management, notification delivery, and audit services. SQLAlchemy provides data access to PostgreSQL, while Alembic manages schema migrations. A transactional outbox pattern is used to coordinate durable event recording with asynchronous alert processing; hash-chain verification provides an application-level audit-integrity check.",
+        "architectureFlow": [
+          {
+            "id": "1",
+            "label": "Role-based Workspace",
+            "sublabel": "React, TypeScript & Vite",
+            "status": "Implemented"
+          },
+          {
+            "id": "2",
+            "label": "API & Access Layer",
+            "sublabel": "FastAPI Authentication & Scoped Authorisation",
+            "status": "Implemented"
+          },
+          {
+            "id": "3",
+            "label": "Policy Registry",
+            "sublabel": "Version Pinning & Migration Simulation",
+            "status": "Prototype"
+          },
+          {
+            "id": "4",
+            "label": "Deterministic Proof Engine",
+            "sublabel": "Policy-Driven Evidence & Compliance Checks",
+            "status": "Prototype"
+          },
+          {
+            "id": "5",
+            "label": "Obligation Ledger",
+            "sublabel": "Concurrent Tracking & Undertakings",
+            "status": "Prototype"
+          },
+          {
+            "id": "6",
+            "label": "Transactional Outbox",
+            "sublabel": "Reliable Alert & Event Processing",
+            "status": "Prototype"
+          },
+          {
+            "id": "7",
+            "label": "Audit & Persistence",
+            "sublabel": "PostgreSQL, SQLAlchemy & Hash-Chain Verification",
+            "status": "Implemented"
+          }
+        ],
+        "dataPipeline": "An application record moves through authenticated workflow transitions and is evaluated against its pinned policy version. Evidence metadata and file digests are associated with the record; the deterministic proof layer evaluates configured requirements and produces explainable results for review. Policy migration simulation compares the impact of a proposed policy version before adoption. Obligations and undertakings are tracked in a shared ledger, while transactional outbox events are processed for dependable in-app alerts. Readiness snapshots bring evidence state, open obligations, and unaccepted undertakings together for human assessment.",
+        "frontendNotes": "The React, TypeScript, and Vite client presents role-oriented workspaces for submitting, reviewing, administering, and monitoring workflow records. The interface consumes backend APIs rather than treating client-side state as the source of truth for workflow decisions.",
+        "backendNotes": "FastAPI exposes application, policy, evidence, compliance, and administrative workflows. Authentication and role/region-scoped authorisation protect supported operations. Services cover application transitions, policy version pinning and migration simulation, deterministic proof evaluation, evidence review, concurrent obligation tracking, undertakings, readiness snapshots, rule-based recommendations, transactional outbox processing, in-app notifications, operational metrics, and audit verification.",
+        "databaseNotes": "SQLAlchemy provides the data-access layer and Alembic manages schema migrations. PostgreSQL is the intended deployment database, while selected tests may use SQLite. Relational records hold workflow, policy, obligation, event, and audit metadata; evidence files use configured storage paths. The outbox and audit chain are application-level reliability and integrity mechanisms, not a claim of independently immutable infrastructure.",
+        "technicalDecisions": [
+          {
+            "decision": "Separate the client interface from workflow enforcement",
+            "rationale": "Keeping workflow operations behind FastAPI endpoints allows authentication, authorisation, validation, policy-version checks, and business rules to be applied at the service boundary."
+          },
+          {
+            "decision": "Use role- and region-scoped authorisation",
+            "rationale": "Different participants need different operational views, and access should be constrained by role and applicable regional scope rather than relying on UI visibility alone."
+          },
+          {
+            "decision": "Represent readiness as a point-in-time snapshot",
+            "rationale": "Pinning the applicable policy version makes later reviews reproducible, while migration simulation helps assess policy changes before they affect active workflows."
+          },
+          {
+            "decision": "Use a transactional outbox and explicit audit-integrity checks",
+            "rationale": "The outbox separates committed workflow changes from asynchronous notification processing, reducing the risk of losing an alert between a database update and event delivery. The administrator verification workflow checks event hashes and links and compares the calculated chain head with the stored chain head; this provides an application-level integrity signal, not independently immutable storage."
+          }
+        ],
+        "challenges": [
+          "Keeping policy versions, evidence decisions, obligation state, asynchronous alert events, and audit history consistent across related workflow operations.",
+          "Applying role- and region-scoped access consistently across workflow operations.",
+          "Communicating the boundary between rule-based readiness guidance and decisions that must remain with authorised human reviewers.",
+          "Making audit-chain verification understandable while accurately describing its application-level trust boundary."
+        ],
+        "lessons": [
+          "Compliance software needs explainable workflow state and traceable evidence, not only a collection of forms and dashboards.",
+          "Readiness summaries should support human review rather than imply that an automated system grants regulatory approval.",
+          "Reliable event delivery, deterministic evaluation, and audit-chain verification each have explicit trust boundaries and should be tested independently."
+        ],
+        "futureWork": [
+          {
+            "item": "Expand automated end-to-end coverage across role-specific workflows",
+            "status": "Planned"
+          },
+          {
+            "item": "Harden evidence storage, retention, backup, and deployment safeguards",
+            "status": "Planned"
+          },
+          {
+            "item": "Evaluate audit-chain anchoring and independent verification options",
+            "status": "Research"
+          },
+          {
+            "item": "Validate operational performance and accessibility with representative users",
+            "status": "Planned"
+          }
+        ],
+        "repoUrl": "https://github.com/sainithinreddy06/PRAVAAH",
+        "stack": [
+          "React",
+          "TypeScript",
+          "Vite",
+          "Python",
+          "FastAPI",
+          "SQLAlchemy",
+          "Alembic",
+          "PostgreSQL",
+          "Supabase"
+        ]
+      },
       "tapas": {
         "slug": "tapas",
         "title": "TAPAS",
@@ -648,7 +771,7 @@
       "traffiq": {
         "slug": "traffiq",
         "title": "TRAFFIQ",
-        "subtitle": "AI Traffic & Accident Risk Prediction Platform",
+        "subtitle": "AI Traffic & Accident Risk Prediction Platform — 48-Hour Hackathon Prototype",
         "overview": "TRAFFIQ is an engineering initiative investigating whether real-time traffic sensor streams combined with historical road segment features can surface localized accident risks and predict sudden congestion spikes before they cascade through an urban corridor.",
         "problem": "Urban traffic telemetry is frequently reactive: navigation systems route vehicles around accidents only after congestion has already formed. Drivers and municipality coordinators lack accessible predictive tools that evaluate spatial risk factors before incidents happen.",
         "whyBuilt": "I built TRAFFIQ to experiment with combining geospatial web representations with machine learning backends in Python and FastAPI, moving past static visualizations into dynamic risk scoring and reactive dashboards.",
@@ -736,12 +859,13 @@
           "Scikit-learn",
           "MongoDB",
           "Tailwind CSS"
-        ]
+        ],
+        "status": "prototype"
       },
       "surestep": {
         "slug": "surestep",
         "title": "SureStep",
-        "subtitle": "AI-Powered Outdoor Safety & Navigation Platform",
+        "subtitle": "AI-Powered Outdoor Safety & Navigation Platform — 48-Hour Hackathon Prototype",
         "overview": "SureStep explores combining on-device computer vision inferences, GPS telemetry, and machine learning models to help hikers, field researchers, and outdoor adventurers navigate rough trails and off-grid environments safely.",
         "problem": "Standard turn-by-turn navigation platforms fail when navigating remote wilderness or challenging terrain. They offer no insights into trail conditions, visual hazards, terrain stability, geological hazard monitoring, or offline availability.",
         "whyBuilt": "To engineer a reliable system that aids physical situational awareness in off-grid environments using modular vision, GPS telemetry, and an AI Ranger Copilot for contextual assistance.",
@@ -819,12 +943,13 @@
           "FastAPI",
           "Python",
           "Scikit-learn"
-        ]
+        ],
+        "status": "prototype"
       },
       "vidyavistaar": {
         "slug": "vidyavistaar",
         "title": "VidyaVistaar",
-        "subtitle": "AI-Powered Educational Learning & Intelligence Platform",
+        "subtitle": "AI-Powered Educational Learning & Intelligence Platform — 48-Hour Hackathon Prototype",
         "overview": "VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience, combining Google Gemini AI with reactive data visualization.",
         "problem": "Traditional learning management systems often deliver static content without immediate, adaptive explanations or visual progress feedback, leading to disengagement during self-guided study.",
         "whyBuilt": "Built to explore practical integration of modern LLMs via the Google GenAI SDK with type-safe React frontend workflows, creating an interactive educational companion rather than a simple chatbot.",
@@ -894,7 +1019,8 @@
           "Recharts",
           "Vite",
           "Tailwind CSS"
-        ]
+        ],
+        "status": "prototype"
       }
     },
     "skillCategories": [
@@ -902,45 +1028,49 @@
         "title": "AI & Machine Learning",
         "skills": [
           {
-            "name": "Python"
+            "name": "Python",
+            "verifyTag": true
           },
           {
-            "name": "Scikit-learn"
+            "name": "Scikit-learn",
+            "verifyTag": true
           },
           {
-            "name": "XGBoost"
+            "name": "XGBoost",
+            "verifyTag": true
           },
           {
-            "name": "PyTorch"
+            "name": "YOLO & Computer Vision",
+            "verifyTag": true
           },
           {
-            "name": "YOLO & Computer Vision"
-          },
-          {
-            "name": "Pandas & NumPy"
+            "name": "Pandas & NumPy",
+            "verifyTag": true
           }
         ]
       },
       {
-        "title": "Frontend & Backend Development",
+        "title": "Cloud & DevOps",
         "skills": [
           {
-            "name": "HTML5 & CSS3"
+            "name": "GitHub Actions",
+            "verifyTag": false
           },
           {
-            "name": "JavaScript & TypeScript"
+            "name": "Docker",
+            "verifyTag": true
           },
           {
-            "name": "React"
+            "name": "Render",
+            "verifyTag": true
           },
           {
-            "name": "Node.js & Express"
+            "name": "Supabase",
+            "verifyTag": true
           },
           {
-            "name": "FastAPI"
-          },
-          {
-            "name": "REST API Development"
+            "name": "REST API Development",
+            "verifyTag": true
           }
         ]
       },
@@ -948,16 +1078,20 @@
         "title": "Databases & Data Management",
         "skills": [
           {
-            "name": "MySQL"
+            "name": "PostgreSQL",
+            "verifyTag": true
           },
           {
-            "name": "MongoDB"
+            "name": "MongoDB",
+            "verifyTag": false
           },
           {
-            "name": "PostgreSQL"
+            "name": "SQL",
+            "verifyTag": true
           },
           {
-            "name": "SQL"
+            "name": "MySQL",
+            "verifyTag": false
           }
         ]
       },
@@ -965,22 +1099,28 @@
         "title": "Core Computer Science & Tools",
         "skills": [
           {
-            "name": "Data Structures & Algorithms"
+            "name": "Data Structures & Algorithms",
+            "verifyTag": true
           },
           {
-            "name": "Object-Oriented Programming"
+            "name": "Object-Oriented Programming",
+            "verifyTag": true
           },
           {
-            "name": "DBMS, Operating Systems & Networks"
+            "name": "DBMS, Operating Systems & Networks",
+            "verifyTag": true
           },
           {
-            "name": "Git & GitHub"
+            "name": "Git & GitHub",
+            "verifyTag": true
           },
           {
-            "name": "Docker"
+            "name": "Docker",
+            "verifyTag": true
           },
           {
-            "name": "Visual Studio Code"
+            "name": "Visual Studio Code",
+            "verifyTag": true
           }
         ]
       }
@@ -1064,35 +1204,45 @@
         "description": "Engaged in Capture The Flag technical challenges focusing on systems analysis, web security, and cryptographic problem solving."
       }
     ],
-    "lastSynced": "2026-11-09T22:44:00+05:30"
+    "lastSynced": "2026-11-19T12:35:27.953Z"
   },
   "syncedRepositories": {
     "1393161731": {
       "repoId": 1393161731,
       "name": "TRAFFIQ",
       "fullName": "TRAFFIQ",
-      "syncedAt": "2026-10-16T18:01:25.333Z",
+      "syncedAt": "2026-11-19T12:35:27.953Z",
       "topics": []
     },
     "1393223013": {
       "repoId": 1393223013,
       "name": "VidyaVistaar",
       "fullName": "VidyaVistaar",
-      "syncedAt": "2026-10-16T18:01:25.333Z",
+      "syncedAt": "2026-11-19T12:35:27.953Z",
       "topics": []
     },
     "1396317703": {
       "repoId": 1396317703,
       "name": "SureStep",
       "fullName": "SureStep",
-      "syncedAt": "2026-10-16T18:01:25.333Z",
+      "liveUrl": "https://terra-guard-ai-five.vercel.app",
+      "syncedAt": "2026-11-19T12:35:27.953Z",
       "topics": []
     },
     "1415788245": {
       "repoId": 1415788245,
       "name": "TAPAS",
       "fullName": "TAPAS",
-      "syncedAt": "2026-10-16T18:01:25.333Z",
+      "liveUrl": "https://tapas-heat-intelligence.netlify.app/",
+      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "topics": []
+    },
+    "1432409181": {
+      "repoId": 1432409181,
+      "name": "PRAVAAH",
+      "fullName": "PRAVAAH",
+      "liveUrl": "https://pravaah-iku7.onrender.com",
+      "syncedAt": "2026-11-19T12:35:27.953Z",
       "topics": []
     }
   },

@@ -13,6 +13,8 @@
     --border-card: rgba(255, 255, 255, 0.14);
     --accent-primary: #8b6dff;
     --accent-secondary: #22d3ee;
+    --color-brand-primary: #6366f1;   /* Deep indigo - distinctive brand accent */
+    --color-brand-secondary: #06b6d4; /* Teal - complementary brand accent */
     --color-success: #34d399;
     --color-warning: #f59e0b;
     --color-danger: #f87171;
@@ -92,7 +94,7 @@
 
   /* Accessible focus states */
   :focus-visible {
-    outline: 2px solid var(--accent-primary);
+    outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
   }
 }

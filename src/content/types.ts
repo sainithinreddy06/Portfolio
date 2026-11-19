@@ -39,6 +39,7 @@ export interface CaseStudyData {
   futureWork: { item: string; status: 'Planned' | 'Research' }[];
   repoUrl?: string;
   stack: string[];
+  status?: 'prototype' | 'production';
 }
 
 export interface DeploymentSourceInfo {
