@@ -4,8 +4,9 @@ export const initialPortfolioContent: PortfolioContent = {
   profile: {
     name: 'Sai Nithin Reddy',
     wordmark: 'SAI NITHIN REDDY',
-    positioning: 'PRODUCTION-FULLSTACK ENGINEER · REACT & NODE · CLOUD INFRASTRUCTURE',
-    headline: 'I build production-grade full-stack systems with React, Node, and cloud infrastructure',
+    positioning: 'AI-FIRST FULL-STACK ENGINEER · PROTOTYPE-TO-PRODUCTION · CLOUD INFRASTRUCTURE',
+    headline: 'I turn AI research prototypes into production-grade full-stack systems with React, Node, and cloud infrastructure',
+    supportingCopy: 'I bridge the gap between research prototypes and production systems, ensuring engineering rigor, scalable design, and measurable outcomes across the full stack.',
     institution: 'Chaitanya Bharathi Institute of Technology (CBIT)',
     degree: 'Computer Science & Engineering',
     batchPeriod: '2024 – 2028',
@@ -17,9 +18,9 @@ export const initialPortfolioContent: PortfolioContent = {
     leetcodeUrl: 'https://leetcode.com/u/Nithinreddy_06/',
     leetcodeUsername: 'Nithinreddy_06',
     aboutText: [
-      'I build production-grade full-stack systems with React, Node, and cloud infrastructure, delivering end-to-end architectures from data ingestion pipelines and mathematical modeling to reactive client interfaces and geospatial visualizations.',
-      'My work focuses on production-grade architectures where latency, correctness, and reliable data flow matter — including intelligent navigation, environmental sensing, and predictive systems deployed at scale.',
-      'I bridge the gap between research prototypes and production systems, ensuring engineering rigor, scalable design, and measurable outcomes across the full stack.',
+      'I build AI-first full-stack systems that connect intelligent data pipelines with production-grade, human-centered software — from data ingestion and mathematical modeling to reactive client interfaces and geospatial visualizations.',
+      'My work focuses on architectures where latency, correctness, and reliable data flow matter — including intelligent navigation, environmental sensing, and predictive systems deployed at scale, with measurable engineering outcomes.',
+      'I specialize in turning research prototypes into production systems, ensuring engineering rigor, scalable design, and measurable outcomes across the full stack, from edge to cloud.',
     ],
     currentLearningDirection:
       'Deepening systems programming, distributed backend architectures, and production-grade ML inference optimization.',

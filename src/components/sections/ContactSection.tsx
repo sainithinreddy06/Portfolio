@@ -3,7 +3,7 @@ import { usePortfolio } from '../../content';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { Mail, Copy, Check, Github, Linkedin, Code2, ExternalLink } from 'lucide-react';
 
-export const ContactSection: React.FC = () => {
+export const ContactSection: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { content } = usePortfolio();
   const { profile } = content;
   const [copied, setCopied] = useState(false);

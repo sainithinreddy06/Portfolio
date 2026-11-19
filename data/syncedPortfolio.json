@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-11-19T12:35:27.954Z",
+  "lastUpdated": "2026-11-19T14:05:28.038Z",
   "content": {
     "profile": {
       "name": "Sai Nithin Reddy",
@@ -179,7 +179,7 @@
         },
         "isManualOverride": true,
         "repositoryId": 1432409181,
-        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastSyncedAt": "2026-11-19T14:05:28.037Z",
         "lastUpdated": "2026-11-01T15:54:18Z",
         "starsCount": 0,
         "topics": [],
@@ -269,7 +269,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastSyncedAt": "2026-11-19T14:05:28.037Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-10-12T19:13:44Z",
@@ -282,7 +282,7 @@
         "id": "surestep",
         "name": "SureStep",
         "tagline": "AI-Powered Outdoor Safety & Navigation Platform",
-        "category": "LEARNING EXPERIMENTS",
+        "category": "COMPUTER VISION",
         "stack": [
           "React",
           "TypeScript",
@@ -370,7 +370,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastSyncedAt": "2026-11-19T14:05:28.037Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-10-02T16:43:55Z",
@@ -383,7 +383,7 @@
         "id": "traffiq",
         "name": "TRAFFIQ",
         "tagline": "AI Traffic & Accident Risk Prediction System",
-        "category": "LEARNING EXPERIMENTS",
+        "category": "AI / ML",
         "stack": [
           "React",
           "FastAPI",
@@ -472,7 +472,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastSyncedAt": "2026-11-19T14:05:28.037Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-09-28T15:59:51Z",
@@ -483,7 +483,7 @@
         "id": "vidyavistaar",
         "name": "VidyaVistaar",
         "tagline": "AI-Powered Educational Learning & Intelligence Platform",
-        "category": "LEARNING EXPERIMENTS",
+        "category": "FULL STACK",
         "stack": [
           "React 19",
           "TypeScript",
@@ -494,7 +494,7 @@
         ],
         "description": "VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience.",
         "summary": "Modern educational platform combining component-based React 19 architecture with Google Gemini AI for contextual student guidance. Integrates reactive Recharts performance visualizers and modular services to track student concept mastery across personalized learning curricula.",
-        "status": "Prototype",
+        "status": "Implemented",
         "features": [
           {
             "name": "Intelligent AI Question Answering",
@@ -561,7 +561,7 @@
             }
           ]
         },
-        "lastSyncedAt": "2026-11-19T12:35:27.953Z",
+        "lastSyncedAt": "2026-11-19T14:05:28.038Z",
         "isArchived": false,
         "isUnavailable": false,
         "lastUpdated": "2026-09-28T16:26:45Z",
@@ -771,7 +771,7 @@
       "traffiq": {
         "slug": "traffiq",
         "title": "TRAFFIQ",
-        "subtitle": "AI Traffic & Accident Risk Prediction Platform — 48-Hour Hackathon Prototype",
+        "subtitle": "AI Traffic & Accident Risk Prediction Platform",
         "overview": "TRAFFIQ is an engineering initiative investigating whether real-time traffic sensor streams combined with historical road segment features can surface localized accident risks and predict sudden congestion spikes before they cascade through an urban corridor.",
         "problem": "Urban traffic telemetry is frequently reactive: navigation systems route vehicles around accidents only after congestion has already formed. Drivers and municipality coordinators lack accessible predictive tools that evaluate spatial risk factors before incidents happen.",
         "whyBuilt": "I built TRAFFIQ to experiment with combining geospatial web representations with machine learning backends in Python and FastAPI, moving past static visualizations into dynamic risk scoring and reactive dashboards.",
@@ -859,13 +859,12 @@
           "Scikit-learn",
           "MongoDB",
           "Tailwind CSS"
-        ],
-        "status": "prototype"
+        ]
       },
       "surestep": {
         "slug": "surestep",
         "title": "SureStep",
-        "subtitle": "AI-Powered Outdoor Safety & Navigation Platform — 48-Hour Hackathon Prototype",
+        "subtitle": "AI-Powered Outdoor Safety & Navigation Platform",
         "overview": "SureStep explores combining on-device computer vision inferences, GPS telemetry, and machine learning models to help hikers, field researchers, and outdoor adventurers navigate rough trails and off-grid environments safely.",
         "problem": "Standard turn-by-turn navigation platforms fail when navigating remote wilderness or challenging terrain. They offer no insights into trail conditions, visual hazards, terrain stability, geological hazard monitoring, or offline availability.",
         "whyBuilt": "To engineer a reliable system that aids physical situational awareness in off-grid environments using modular vision, GPS telemetry, and an AI Ranger Copilot for contextual assistance.",
@@ -943,13 +942,12 @@
           "FastAPI",
           "Python",
           "Scikit-learn"
-        ],
-        "status": "prototype"
+        ]
       },
       "vidyavistaar": {
         "slug": "vidyavistaar",
         "title": "VidyaVistaar",
-        "subtitle": "AI-Powered Educational Learning & Intelligence Platform — 48-Hour Hackathon Prototype",
+        "subtitle": "AI-Powered Educational Learning & Intelligence Platform",
         "overview": "VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience, combining Google Gemini AI with reactive data visualization.",
         "problem": "Traditional learning management systems often deliver static content without immediate, adaptive explanations or visual progress feedback, leading to disengagement during self-guided study.",
         "whyBuilt": "Built to explore practical integration of modern LLMs via the Google GenAI SDK with type-safe React frontend workflows, creating an interactive educational companion rather than a simple chatbot.",
@@ -1019,8 +1017,7 @@
           "Recharts",
           "Vite",
           "Tailwind CSS"
-        ],
-        "status": "prototype"
+        ]
       }
     },
     "skillCategories": [
@@ -1204,21 +1201,21 @@
         "description": "Engaged in Capture The Flag technical challenges focusing on systems analysis, web security, and cryptographic problem solving."
       }
     ],
-    "lastSynced": "2026-11-19T12:35:27.953Z"
+    "lastSynced": "2026-11-19T14:05:28.038Z"
   },
   "syncedRepositories": {
     "1393161731": {
       "repoId": 1393161731,
       "name": "TRAFFIQ",
       "fullName": "TRAFFIQ",
-      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "syncedAt": "2026-11-19T14:05:28.037Z",
       "topics": []
     },
     "1393223013": {
       "repoId": 1393223013,
       "name": "VidyaVistaar",
       "fullName": "VidyaVistaar",
-      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "syncedAt": "2026-11-19T14:05:28.038Z",
       "topics": []
     },
     "1396317703": {
@@ -1226,7 +1223,7 @@
       "name": "SureStep",
       "fullName": "SureStep",
       "liveUrl": "https://terra-guard-ai-five.vercel.app",
-      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "syncedAt": "2026-11-19T14:05:28.037Z",
       "topics": []
     },
     "1415788245": {
@@ -1234,7 +1231,7 @@
       "name": "TAPAS",
       "fullName": "TAPAS",
       "liveUrl": "https://tapas-heat-intelligence.netlify.app/",
-      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "syncedAt": "2026-11-19T14:05:28.037Z",
       "topics": []
     },
     "1432409181": {
@@ -1242,7 +1239,7 @@
       "name": "PRAVAAH",
       "fullName": "PRAVAAH",
       "liveUrl": "https://pravaah-iku7.onrender.com",
-      "syncedAt": "2026-11-19T12:35:27.953Z",
+      "syncedAt": "2026-11-19T14:05:28.037Z",
       "topics": []
     }
   },

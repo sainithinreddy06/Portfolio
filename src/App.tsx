@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { PortfolioProvider } from './content';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CustomCursor } from './components/common/CustomCursor';
@@ -26,22 +27,24 @@ export default function App() {
             onClose={() => setIsCommandPaletteOpen(false)}
           />
           <ResumeModal />
-          <main id="main-content" className="flex-1">
-            <Suspense
-              fallback={
-                <div className="min-h-[50vh] flex items-center justify-center text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">
-                  Loading page…
-                </div>
-              }
-            >
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/work/:slug" element={<CaseStudyPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Suspense>
-          </main>
+          <ErrorBoundary fallback={<div className="p-8 text-center text-[var(--text-secondary)]">Something went wrong. Please try again.</div>}>
+            <main id="main-content" className="flex-1">
+              <Suspense
+                fallback={
+                  <div className="min-h-[50vh] flex items-center justify-center text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">
+                    Loading page…
+                  </div>
+                }
+              >
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/work/:slug" element={<CaseStudyPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+            </main>
+          </ErrorBoundary>
           <Footer onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
         </div>
       </BrowserRouter>

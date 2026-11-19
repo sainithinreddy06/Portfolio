@@ -15,6 +15,7 @@
     --accent-secondary: #22d3ee;
     --color-brand-primary: #6366f1;   /* Deep indigo - distinctive brand accent */
     --color-brand-secondary: #06b6d4; /* Teal - complementary brand accent */
+    --color-brand-tertiary: #a78bfa; /* Lavender - secondary brand accent for gradients */
     --color-success: #34d399;
     --color-warning: #f59e0b;
     --color-danger: #f87171;

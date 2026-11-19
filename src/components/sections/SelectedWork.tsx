@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
 import type { ProjectItem } from '../../content/types';
@@ -33,6 +33,11 @@ export const SelectedWork: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+  const [isLoadingProjectsState, setIsLoadingProjectsState] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsLoadingProjectsState(isLoadingProjects);
+  }, [isLoadingProjects]);
 
   const handleManualSync = async () => {
     setIsSyncing(true);
@@ -283,6 +288,16 @@ export const SelectedWork: React.FC = () => {
                 <div className="h-4 bg-[var(--surface-elevated)] rounded-sm w-1/4 mb-3" />
                 <div className="h-3 bg-[var(--surface-elevated)] rounded-sm w-3/4 mb-2" />
                 <div className="h-3 bg-[var(--surface-elevated)] rounded-sm w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : isLoadingProjectsState ? (
+          <div className="space-y-6 animate-pulse py-8">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="p-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)]/40">
+                <div className="h-3 bg-[var(--surface-elevated)] rounded-sm w-2/3 mb-2" />
+                <div className="h-3 bg-[var(--surface-elevated)] rounded-sm w-1/2 mb-1" />
+                <div className="h-3 bg-[var(--surface-elevated)] rounded-sm w-1/3" />
               </div>
             ))}
           </div>

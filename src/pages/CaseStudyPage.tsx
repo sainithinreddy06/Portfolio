@@ -243,7 +243,7 @@ export const CaseStudyPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
               <span className="text-xs font-mono text-[var(--accent-primary)]">02</span>
-              <span>Architecture &amp; Pipeline</span>
+              <span>Architecture & Pipeline</span>
             </h2>
             <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-6">
               {caseStudy.architectureSummary}
@@ -273,14 +273,14 @@ export const CaseStudyPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           </section>
 
           <section className="space-y-6">
             <div>
               <h2 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                 <span className="text-xs font-mono text-[var(--accent-primary)]">03</span>
-                <span>Data Pipeline &amp; Modeling</span>
+                <span>Data Pipeline & Modeling</span>
               </h2>
               <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
                 {caseStudy.dataPipeline}
@@ -393,7 +393,7 @@ export const CaseStudyPage: React.FC = () => {
           <section className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
             <h2 className="text-sm font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
               <Clock className="w-4 h-4 text-[var(--text-muted)]" />
-              <span>Future Work &amp; Next Iterations</span>
+              <span>Future Work & Next Iterations</span>
             </h2>
             <div className="space-y-2">
               {caseStudy.futureWork.map((fw, i) => (
