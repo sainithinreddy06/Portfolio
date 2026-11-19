@@ -8,6 +8,12 @@ import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckC
 // Known demo URLs retained for projects whose persisted snapshots omit liveUrl.
 // SureStep is intentionally excluded until its current deployment is verified.
 const learningExperimentIds = new Set(['surestep', 'traffiq', 'vidyavistaar']);
+const featuredProjectIds = new Set(['pravaah', 'tapas']);
+const learningExperimentDescriptions: Record<string, string> = {
+  surestep: 'A 48-hour hackathon prototype exploring hiking-safety workflows, visual hazard detection, terrain-risk scoring, and GPS context. It is not a production navigation or safety system.',
+  traffiq: 'A 48-hour hackathon prototype exploring a traffic dashboard and risk-analysis workflow. Prediction and external data integrations are experimental and should not be treated as operational traffic guidance.',
+  vidyavistaar: 'A hackathon prototype exploring a student question-and-answer interface with Gemini AI and learning-progress visualizations. Personalization and analytics workflows remain experimental.',
+};
 
 const knownLiveDemoUrls: Record<string, string> = {
   pravaah: 'https://pravaah-frontend-bx3o.onrender.com',
@@ -49,7 +55,7 @@ export const SelectedWork: React.FC = () => {
     [projects]
   );
   const featuredProjects = useMemo(
-    () => projects.filter((project) => !learningExperimentIds.has(project.id.toLowerCase()) && project.category?.trim().toUpperCase() !== 'LEARNING EXPERIMENTS'),
+    () => projects.filter((project) => !learningExperimentIds.has(project.id.toLowerCase()) && project.category?.trim().toUpperCase() !== 'LEARNING EXPERIMENTS' && (featuredProjectIds.has(project.id.toLowerCase()) || project.featured === true)),
     [projects]
   );
 
@@ -123,9 +129,9 @@ export const SelectedWork: React.FC = () => {
       ? 'AI / ML'
       : 'FULL STACK';
     const displayedStatus = isLearningExperiment || projectId === 'tapas' ? 'Prototype' : project.isArchived ? 'Archived' : project.status;
-    const displayedDescription = projectId === 'tapas'
+    const displayedDescription = learningExperimentDescriptions[projectId] || (projectId === 'tapas'
       ? 'A public heat-safety frontend prototype combining place discovery, weather context, nearby map information, and sourced public-health references. Scientific risk layers and official relief inventories depend on separately configured, validated provider data.'
-      : project.description || project.summary;
+      : project.description || project.summary);
 
     return (
       <article
