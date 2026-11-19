@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../content';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
-import { FileText, Download, ExternalLink, Eye, GraduationCap, Award, Briefcase } from 'lucide-react';
+import { FileText, Download, ExternalLink } from 'lucide-react';
 import { downloadResume, getResumeFileUrl } from '../../utils/resumeManager';
 
 export const ResumeSection: React.FC = () => {
-  const { content, setIsResumeModalOpen } = usePortfolio();
+  const { content } = usePortfolio();
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const resume = content.profile.resume;
   const resumeFileUrl = getResumeFileUrl(content);
@@ -30,7 +30,7 @@ export const ResumeSection: React.FC = () => {
         <div className="mb-10">
           <EngineeringModeBadge
             componentName="ResumeSection"
-            notes="Resume Document · Education & Engineering Experience"
+            notes="Original Resume PDF"
             className="mb-3"
           />
           <div className="flex items-center gap-2 mb-2">
@@ -39,15 +39,14 @@ export const ResumeSection: React.FC = () => {
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            Resume &amp; Credentials
+            Original Resume
           </h2>
           <div className="border-b border-dashed border-[var(--border-subtle)] my-2 w-full" />
           <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
-            Resume detailing undergraduate coursework at Chaitanya Bharathi Institute of Technology (CBIT), full-stack software systems, ML pipelines, and technical leadership.
+            View or download the original PDF. The document is served as supplied, without AI rewriting or reconstruction.
           </p>
         </div>
 
-        {/* Main Document Card */}
         <div className="p-0 sm:p-2">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[var(--border-subtle)]">
             <div className="flex items-start gap-4">
@@ -55,16 +54,12 @@ export const ResumeSection: React.FC = () => {
                 <FileText className="w-8 h-8" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[var(--text-primary)]">
-                    {content.profile.name}
-                  </h3>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] border border-[var(--accent-primary)]/20">
-                    RESUME PDF
-                  </span>
-                </div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                  {resume.fileName || 'Original Resume.pdf'}
+                </h3>
                 <p className="text-xs text-[var(--text-secondary)] mt-1">
-                  Computer Science &amp; Engineering · Chaitanya Bharathi Institute of Technology (CBIT)
+                  PDF document
+                  {resume.fileSize ? ` · ${resume.fileSize}` : ''}
                   {typeof content.profile.cgpa === 'number' && ` · CGPA: ${content.profile.cgpa.toFixed(2)}`}
                 </p>
               </div>
@@ -75,7 +70,7 @@ export const ResumeSection: React.FC = () => {
                 href={resumeFileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="View Resume PDF in New Tab"
+                aria-label="View original resume PDF in a new tab"
                 className="px-5 py-2.5 rounded-sm bg-[var(--text-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-xs cursor-pointer focus-visible:outline-hidden"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -85,25 +80,32 @@ export const ResumeSection: React.FC = () => {
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                aria-label="Download Original Resume PDF"
+                aria-label="Download original resume PDF"
                 className="px-5 py-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)] text-[var(--text-primary)] font-mono text-xs tracking-wider uppercase font-semibold transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-hidden shadow-xs disabled:opacity-50"
               >
                 <Download className="w-4 h-4 text-[var(--color-success)]" />
-                <span>{isDownloading ? 'DOWNLOADING...' : 'DOWNLOAD RESUME'}</span>
-              </button>
-
-              <button
-                onClick={() => setIsResumeModalOpen(true)}
-                aria-label="Preview Structured CV"
-                className="px-5 py-2.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--accent-primary)] text-[var(--text-primary)] font-mono text-xs tracking-wider uppercase font-semibold transition-colors flex items-center gap-2 cursor-pointer focus-visible:outline-hidden shadow-xs"
-              >
-                <Eye className="w-4 h-4 text-[var(--accent-primary)]" />
-                <span>STRUCTURED CV</span>
+                <span>{isDownloading ? 'DOWNLOADING...' : 'DOWNLOAD ORIGINAL RESUME'}</span>
               </button>
             </div>
           </div>
 
-
+          {resume.isAvailable ? (
+            <div className="mt-6 overflow-hidden rounded-sm border border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
+              <iframe
+                src={resumeFileUrl}
+                title={`${content.profile.name} original resume PDF`}
+                className="block w-full min-h-[560px] sm:min-h-[760px]"
+                loading="lazy"
+              />
+              <p className="px-4 py-3 text-xs text-[var(--text-secondary)] border-t border-[var(--border-subtle)]">
+                If the PDF preview is unavailable in your browser, use View Resume or Download Original Resume.
+              </p>
+            </div>
+          ) : (
+            <p role="status" className="mt-6 rounded-sm border border-[var(--border-subtle)] p-5 text-sm text-[var(--text-secondary)]">
+              The original resume PDF is currently unavailable.
+            </p>
+          )}
         </div>
       </div>
     </section>
