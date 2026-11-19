@@ -12,7 +12,7 @@ export const initialPortfolioContent: PortfolioContent = {
     degree: 'Computer Science & Engineering',
     batchPeriod: '2024 – 2028',
     currentYear: 'Third Year',
-    cgpa: 9.06,
+    cgpa: 8.96,
     email: 'sainithinreddytadugam@gmail.com',
     githubUrl: 'https://github.com/sainithinreddy06',
     linkedinUrl: 'https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372',
@@ -569,7 +569,7 @@ export const initialPortfolioContent: PortfolioContent = {
       organization: 'Chaitanya Bharathi Institute of Technology (CBIT), Hyderabad',
       period: '2024 – 2028',
       type: 'Education',
-      achievementBadge: 'CGPA: 9.06',
+      achievementBadge: 'CGPA: 8.96',
       description:
         'Undergraduate studies in core Computer Science & Engineering covering Data Structures, Algorithms, Discrete Mathematics, Operating Systems, Database Management Systems, and Machine Learning.',
     },
@@ -612,15 +612,6 @@ export const initialPortfolioContent: PortfolioContent = {
       achievementBadge: 'Rank 2337',
       description:
         'Secured Rank 2337 in the Telangana State Engineering Entrance Test (TS EAMCET) 2024.',
-    },
-    {
-      id: 'summer-2024-research',
-      role: 'Independent Systems Research',
-      organization: 'Self-Directed',
-      period: 'Summer 2024',
-      type: 'Research',
-      description:
-        'Built PRAVAAH (744-commit AICTE workflow automation system with React, FastAPI, PostgreSQL, Docker, CI/CD) and production-grade portfolio infrastructure (Express + React + Supabase + GitHub webhook reconciliation + Admin CMS with JWT auth, asset versioning with rollback, curated-data-preserving merge logic). 2× SIH college-level nominee.',
     },
     {
       id: 'rmc-involvement',
