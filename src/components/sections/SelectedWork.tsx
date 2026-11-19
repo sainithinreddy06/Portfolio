@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
+import { ProjectItem } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
@@ -9,7 +10,6 @@ import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckC
 const knownLiveDemoUrls: Record<string, string> = {
   pravaah: 'https://pravaah-frontend-bx3o.onrender.com',
   tapas: 'https://tapas-g0ly.onrender.com',
-  surestep: 'https://terra-guard-ai-five.vercel.app',
 };
 
 export const SelectedWork: React.FC = () => {
@@ -42,12 +42,21 @@ export const SelectedWork: React.FC = () => {
     }
   };
 
-  // Derive categories and counts dynamically from actual synchronized project data
+  const learningExperiments = useMemo(
+    () => projects.filter((project) => project.category?.trim().toUpperCase() === 'LEARNING EXPERIMENTS'),
+    [projects]
+  );
+  const featuredProjects = useMemo(
+    () => projects.filter((project) => project.category?.trim().toUpperCase() !== 'LEARNING EXPERIMENTS'),
+    [projects]
+  );
+
+  // Keep category filters scoped to the curated work section.
   const { categories, categoryCounts } = useMemo(() => {
-    const counts: Record<string, number> = { ALL: projects.length };
+    const counts: Record<string, number> = { ALL: featuredProjects.length };
     const catsSet = new Set<string>();
 
-    projects.forEach((p) => {
+    featuredProjects.forEach((p) => {
       const cat = p.category
         ? p.category.trim().toUpperCase()
         : p.status === 'Research'
@@ -82,12 +91,12 @@ export const SelectedWork: React.FC = () => {
       categories: sortedCategories,
       categoryCounts: counts,
     };
-  }, [projects]);
+  }, [featuredProjects]);
 
-  // Filter projects dynamically based on category
+  // Filter only the featured work; experiments are shown in their own section.
   const filteredProjects = useMemo(() => {
-    if (activeCategory === 'ALL') return projects;
-    return projects.filter((p) => {
+    if (activeCategory === 'ALL') return featuredProjects;
+    return featuredProjects.filter((p) => {
       const cat = p.category
         ? p.category.trim().toUpperCase()
         : p.status === 'Research'
@@ -97,7 +106,68 @@ export const SelectedWork: React.FC = () => {
         : 'FULL STACK';
       return cat === activeCategory;
     });
-  }, [projects, activeCategory]);
+  }, [featuredProjects, activeCategory]);
+
+  const renderProjectRows = (items: ProjectItem[], isLearningExperiment = false) => items.map((project, index) => {
+    const projectId = project.id.toLowerCase();
+    // SureStep's old TerraGuard deployment is stale and is intentionally hidden until a current URL is verified.
+    const liveDemoUrl = projectId === 'surestep' ? undefined : project.liveUrl || knownLiveDemoUrls[projectId];
+    const projectNumber = String(index + 1).padStart(2, '0');
+    const categoryLabel = project.category
+      ? project.category.toUpperCase()
+      : project.status === 'Research'
+      ? 'RESEARCH'
+      : project.stack.some((s) => /scikit|learn|ml|ai|yolo|pytorch|vision/i.test(s))
+      ? 'AI / ML'
+      : 'FULL STACK';
+    const displayedStatus = isLearningExperiment || projectId === 'tapas' ? 'Prototype' : project.isArchived ? 'Archived' : project.status;
+    const displayedDescription = projectId === 'tapas'
+      ? 'A public heat-safety frontend prototype combining place discovery, weather context, nearby map information, and sourced public-health references. Scientific risk layers and official relief inventories depend on separately configured, validated provider data.'
+      : project.description || project.summary;
+
+    return (
+      <article
+        key={project.id}
+        data-cursor="project"
+        className="group relative py-7 sm:py-9 transition-colors duration-200 hover:bg-[var(--surface-elevated)]/25 px-2 sm:px-4 -mx-2 sm:-mx-4 rounded-lg"
+      >
+        <div aria-hidden="true" className="absolute left-0 top-3 bottom-3 w-[2px] bg-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+          <div className="lg:col-span-4 flex items-start gap-4">
+            <span className="font-mono text-xs sm:text-sm font-semibold tracking-widest text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-colors shrink-0 pt-0.5 select-none">{projectNumber}</span>
+            <div className="space-y-1 min-w-0">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] tracking-tight leading-snug">{project.name}</h3>
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                <span className="text-[11px] font-mono tracking-wider uppercase text-[var(--text-secondary)] font-medium">{categoryLabel}</span>
+                <span className="text-[var(--text-muted)] text-[10px]" aria-hidden="true">·</span>
+                {project.achievementBadge ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono tracking-wider uppercase text-[var(--color-warning)] font-medium"><Award className="w-3 h-3 shrink-0" /><span>{project.achievementBadge}</span></span>
+                ) : (
+                  <span className={`text-[11px] font-mono tracking-wider uppercase ${displayedStatus === 'Archived' ? 'text-[var(--text-muted)]' : 'text-[var(--accent-secondary)]'}`}>{displayedStatus}</span>
+                )}
+              </div>
+              {isLearningExperiment && <p className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Exploratory prototype · not production software</p>}
+            </div>
+          </div>
+          <div className="lg:col-span-5">
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-sans">{displayedDescription}</p>
+          </div>
+          <div className="lg:col-span-3 flex flex-col justify-between gap-4 lg:items-end">
+            {project.stack && project.stack.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 lg:justify-end">
+                {project.stack.map((tech) => <span key={tech} className="px-2 py-0.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[10px] font-mono tracking-wide text-[var(--text-secondary)]">{tech}</span>)}
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-3 pt-1 lg:justify-end">
+              {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer" aria-label={`View source repository for ${project.name} on GitHub`}><Github className="w-3.5 h-3.5 shrink-0" /><span>CODE</span><span className="text-[11px] text-[var(--text-muted)]">↗</span></a>}
+              {liveDemoUrl && <a href={liveDemoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer" aria-label={`Open live demo for ${project.name}`}><ExternalLink className="w-3.5 h-3.5 shrink-0" /><span>LIVE DEMO</span><span className="text-[11px]">↗</span></a>}
+              <Link to={`/work/${project.caseStudySlug || project.id}`} data-cursor="case-study" className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--accent-primary)] hover:underline transition-colors ml-auto lg:ml-0 cursor-pointer" aria-label={`Detailed case study for ${project.name}`}><span>CASE STUDY</span><span className="text-[11px]">→</span></Link>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  });
 
   return (
     <section
@@ -111,7 +181,7 @@ export const SelectedWork: React.FC = () => {
           <div>
             <EngineeringModeBadge
               componentName="SelectedWork"
-              notes={`${projects.length} Synchronized Repositories · Dynamic Feed`}
+              notes={`${featuredProjects.length} Featured Projects · ${learningExperiments.length} Learning Experiments`}
               className="mb-3"
             />
             <div className="flex items-center gap-2 mb-2">
@@ -208,7 +278,7 @@ export const SelectedWork: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : filteredProjects.length === 0 ? (
+        ) : filteredProjects.length === 0 && learningExperiments.length === 0 ? (
           /* Empty State */
           <div className="py-20 px-6 rounded-xl border border-dashed border-[var(--border-subtle)] bg-[var(--surface-card)]/40 text-center">
             <p className="font-mono text-xs uppercase tracking-widest text-[var(--text-muted)] mb-2 font-semibold">
@@ -228,140 +298,21 @@ export const SelectedWork: React.FC = () => {
         ) : (
           /* Dynamic Editorial Engineering Project Index */
           <div className="border-t border-[var(--border-subtle)] divide-y divide-[var(--border-subtle)]">
-            {filteredProjects.map((project, index) => {
-              const liveDemoUrl = project.liveUrl || knownLiveDemoUrls[project.id.toLowerCase()];
-              const projectNumber = String(index + 1).padStart(2, '0');
-              const categoryLabel = project.category
-                ? project.category.toUpperCase()
-                : project.status === 'Research'
-                ? 'RESEARCH'
-                : project.stack.some((s) => /scikit|learn|ml|ai|yolo|pytorch|vision/i.test(s))
-                ? 'AI / ML'
-                : 'FULL STACK';
-
-              return (
-                <article
-                  key={project.id}
-                  data-cursor="project"
-                  className="group relative py-7 sm:py-9 transition-colors duration-200 hover:bg-[var(--surface-elevated)]/25 px-2 sm:px-4 -mx-2 sm:-mx-4 rounded-lg"
-                >
-                  {/* Subtle Accent Indicator on Desktop Hover */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute left-0 top-3 bottom-3 w-[2px] bg-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full"
-                  />
-
-                  {/* Responsive Row Grid:
-                      Mobile: Stacked 1-column
-                      Desktop: 3-column [Left: 30-35%] [Center: 38-42%] [Right: 25-30%] */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
-                    {/* LEFT COLUMN: Project Number, Name, Category & Status */}
-                    <div className="lg:col-span-4 flex items-start gap-4">
-                      {/* Project Number */}
-                      <span className="font-mono text-xs sm:text-sm font-semibold tracking-widest text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-colors shrink-0 pt-0.5 select-none">
-                        {projectNumber}
-                      </span>
-                      <div className="space-y-1 min-w-0">
-                        {/* Project Name */}
-                        <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--text-primary)] transition-colors tracking-tight leading-snug">
-                          {project.name}
-                        </h3>
-                        {/* Category & Status */}
-                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          <span className="text-[11px] font-mono tracking-wider uppercase text-[var(--text-secondary)] font-medium">
-                            {categoryLabel}
-                          </span>
-                          <span className="text-[var(--text-muted)] text-[10px]" aria-hidden="true">
-                            ·
-                          </span>
-                          {project.achievementBadge ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-mono tracking-wider uppercase text-[var(--color-warning)] font-medium">
-                              <Award className="w-3 h-3 shrink-0" />
-                              <span>{project.achievementBadge}</span>
-                            </span>
-                          ) : (
-                            <span className={`text-[11px] font-mono tracking-wider uppercase ${project.isArchived ? 'text-[var(--text-muted)]' : 'text-[var(--accent-secondary)]'}`}>
-                              {project.isArchived ? 'Archived' : project.status}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CENTER COLUMN: Technical Description from synchronized repository */}
-                    <div className="lg:col-span-5">
-                      <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-sans">
-                        {project.description || project.summary}
-                      </p>
-                    </div>
-
-                    {/* RIGHT COLUMN: Technologies & Actions */}
-                    <div className="lg:col-span-3 flex flex-col justify-between gap-4 lg:items-end">
-                      {/* Technology Tags */}
-                      {project.stack && project.stack.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 lg:justify-end">
-                          {project.stack.map((tech) => (
-                            <span
-                              key={tech}
-                              className="px-2 py-0.5 rounded-sm border border-[var(--border-subtle)] bg-[var(--surface-card)] text-[10px] font-mono tracking-wide text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] group-hover:border-[var(--border-subtle)]/80 transition-colors"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Available Actions: CODE, LIVE DEMO, CASE STUDY */}
-                      <div className="flex flex-wrap items-center gap-3 pt-1 lg:justify-end">
-                        {/* VIEW ON GITHUB Action */}
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer group/link"
-                            aria-label={`View source repository for ${project.name} on GitHub`}
-                          >
-                            <Github className="w-3.5 h-3.5 shrink-0 group-hover/link:text-[var(--accent-primary)] transition-colors" />
-                            <span>CODE</span>
-                            <span className="text-[11px] text-[var(--text-muted)] group-hover/link:text-[var(--text-primary)] transition-colors">↗</span>
-                          </a>
-                        )}
-
-                        {/* LIVE DEMO Action: STRICTLY displayed only when verified deployment URL exists */}
-                        {liveDemoUrl && (
-                          <a
-                            href={liveDemoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--color-success)] hover:underline transition-colors cursor-pointer"
-                            aria-label={`Open live demo for ${project.name}`}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                            <span>LIVE DEMO</span>
-                            <span className="text-[11px]">↗</span>
-                          </a>
-                        )}
-
-                        {/* CASE STUDY Action */}
-                        {(
-                          <Link
-                            to={`/work/${project.caseStudySlug || project.id}`}
-                            data-cursor="case-study"
-                            className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-mono font-medium tracking-wider text-[var(--accent-primary)] hover:underline transition-colors ml-auto lg:ml-0 cursor-pointer"
-                            aria-label={`Detailed case study for ${project.name}`}
-                          >
-                            <span>CASE STUDY</span>
-                            <span className="text-[11px]">→</span>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {renderProjectRows(filteredProjects)}
           </div>
+        )}
+
+        {learningExperiments.length > 0 && (
+          <section aria-labelledby="learning-experiments-heading" className="mt-16">
+            <div className="mb-5">
+              <span className="font-mono text-xs font-semibold tracking-widest text-[var(--text-muted)] uppercase">EXPLORATION / PROTOTYPES</span>
+              <h3 id="learning-experiments-heading" className="mt-2 text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">Learning Experiments</h3>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">Smaller experiments and hackathon builds. These are presented as prototypes, not production-ready systems.</p>
+            </div>
+            <div className="border-t border-[var(--border-subtle)] divide-y divide-[var(--border-subtle)]">
+              {renderProjectRows(learningExperiments, true)}
+            </div>
+          </section>
         )}
 
         {/* GitHub Synchronization & View All Repositories Footer */}
