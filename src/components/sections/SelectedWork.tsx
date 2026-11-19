@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
-import { ProjectItem } from '../../content/types';
+import type { ProjectItem } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
