@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { usePortfolio, ArchitectureDiagramNode } from '../../content';
+import { usePortfolio } from '../../content';
+import type { ArchitectureDiagramNode } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ArrowRight, CheckCircle2, Clock, Cpu } from 'lucide-react';
 
@@ -14,6 +15,17 @@ export const Architecture: React.FC = () => {
 
   const currentProject =
     architectureProjects.find((p) => p.id === activeProjectId) || architectureProjects[0];
+  // The persisted live snapshot may predate the curated TAPAS status correction.
+  // Keep the public architecture view honest until the database snapshot is refreshed.
+  const currentNodes = currentProject?.id === 'tapas'
+    ? currentProject.architectureFlow?.nodes.map((node) => ({
+        ...node,
+        status: node.status === 'Planned' ? 'Planned' as const : 'Prototype' as const,
+      })) || []
+    : currentProject?.architectureFlow?.nodes || [];
+  const currentArchitectureSummary = currentProject?.id === 'tapas'
+    ? 'Frontend prototype architecture. Scientific risk layers and verified relief inventories depend on configured, validated data providers.'
+    : currentProject?.architectureFlow?.summary || '';
 
   const getStatusIcon = (status: ArchitectureDiagramNode['status']) => {
     switch (status) {
@@ -85,7 +97,7 @@ export const Architecture: React.FC = () => {
                     {currentProject.architectureFlow.title}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mt-1">
-                    {currentProject.architectureFlow.summary}
+                    {currentArchitectureSummary}
                   </p>
                 </div>
                 <div className="flex items-center gap-4 text-[11px] font-mono text-[var(--text-muted)]">
@@ -103,7 +115,7 @@ export const Architecture: React.FC = () => {
 
               <div className="pb-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-stretch gap-2">
-                  {currentProject.architectureFlow.nodes.map((node, idx, arr) => (
+                  {currentNodes.map((node, idx, arr) => (
                     <React.Fragment key={node.id}>
                       <div className="min-w-0 lg:flex-1 flex flex-col justify-between p-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--text-primary)]/50 transition-colors">
                         <div className="flex items-center justify-between gap-2 mb-3">
