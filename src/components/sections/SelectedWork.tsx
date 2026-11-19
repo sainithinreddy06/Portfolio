@@ -5,8 +5,10 @@ import { ProjectItem } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-// Canonical demo deployments confirmed in curated project data.
-// Fallbacks keep known demos visible when older persisted snapshots omit liveUrl.
+// Known demo URLs retained for projects whose persisted snapshots omit liveUrl.
+// SureStep is intentionally excluded until its current deployment is verified.
+const learningExperimentIds = new Set(['surestep', 'traffiq', 'vidyavistaar']);
+
 const knownLiveDemoUrls: Record<string, string> = {
   pravaah: 'https://pravaah-frontend-bx3o.onrender.com',
   tapas: 'https://tapas-g0ly.onrender.com',
@@ -43,11 +45,11 @@ export const SelectedWork: React.FC = () => {
   };
 
   const learningExperiments = useMemo(
-    () => projects.filter((project) => project.category?.trim().toUpperCase() === 'LEARNING EXPERIMENTS'),
+    () => projects.filter((project) => learningExperimentIds.has(project.id.toLowerCase()) || project.category?.trim().toUpperCase() === 'LEARNING EXPERIMENTS'),
     [projects]
   );
   const featuredProjects = useMemo(
-    () => projects.filter((project) => project.category?.trim().toUpperCase() !== 'LEARNING EXPERIMENTS'),
+    () => projects.filter((project) => !learningExperimentIds.has(project.id.toLowerCase()) && project.category?.trim().toUpperCase() !== 'LEARNING EXPERIMENTS'),
     [projects]
   );
 
