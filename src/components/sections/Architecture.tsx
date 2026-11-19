@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { usePortfolio, ArchitectureDiagramNode } from '../../content';
+import { usePortfolio } from '../../content';
+import type { ArchitectureDiagramNode } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { ArrowRight, CheckCircle2, Clock, Cpu } from 'lucide-react';
 
