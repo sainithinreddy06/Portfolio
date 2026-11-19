@@ -247,28 +247,16 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
           className="relative inline-block cursor-default"
           aria-label={photo.altText || 'Portrait of Sai Nithin Reddy'}
         >
-          <picture>
-            {size === 'hero' && (
-              <source
-                srcSet={`/images/hero-photo.webp 1x, /images/hero-photo.webp 2x`}
-                type="image/webp"
-              />
-            )}
-            <source
-              srcSet={`/images/hero-photo.avif 1x, /images/hero-photo.avif 2x`}
-              type="image/avif"
-            />
-            <img
-              src={processedUrl || activeUrl}
-              alt={photo.altText || 'Portrait of Sai Nithin Reddy'}
-              loading={size === 'hero' ? 'eager' : 'lazy'}
-              fetchPriority={size === 'hero' ? 'high' : 'auto'}
-              decoding="async"
-              onError={handleImageError}
-              className="max-h-[360px] sm:max-h-[430px] w-auto max-w-[280px] sm:max-w-[340px] object-contain object-bottom drop-shadow-sm transition-all duration-300 block select-none pointer-events-none"
-              referrerPolicy="no-referrer"
-            />
-          </picture>
+          <img
+            src={processedUrl || activeUrl}
+            alt={photo.altText || 'Portrait of Sai Nithin Reddy'}
+            loading={size === 'hero' ? 'eager' : 'lazy'}
+            fetchPriority={size === 'hero' ? 'high' : 'auto'}
+            decoding="async"
+            onError={handleImageError}
+            className="max-h-[360px] sm:max-h-[430px] w-auto max-w-[280px] sm:max-w-[340px] object-contain object-bottom drop-shadow-sm transition-all duration-300 block select-none pointer-events-none"
+            referrerPolicy="no-referrer"
+          />
         </div>
         {caption && (
           <div className={`w-full ${textAlign} mt-2 flex items-center justify-center gap-1.5`}>
