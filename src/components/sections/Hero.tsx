@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
             <div className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
               <button
                 onClick={() => scrollTo('work')}
-                className="min-h-11 px-5 py-2.5 rounded-sm bg-[var(--color-brand-primary)] text-[var(--bg-primary)] font-mono text-xs tracking-wider uppercase font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm focus-visible:outline-hidden cursor-pointer"
+                className="min-h-11 px-5 py-2.5 rounded-sm bg-[#17191d] text-white font-mono text-xs tracking-wider uppercase font-semibold hover:bg-[#30343b] transition-colors flex items-center gap-2 shadow-sm focus-visible:outline-hidden cursor-pointer"
               >
                 <span>VIEW WORK</span>
                 <ArrowDown className="w-3.5 h-3.5" />
