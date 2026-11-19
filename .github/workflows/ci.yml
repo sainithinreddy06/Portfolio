@@ -1,4 +1,4 @@
-name: Portfolio CI
+name: CI
 
 on:
   push:
@@ -6,31 +6,23 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
-
-concurrency:
-  group: portfolio-ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  validate:
-    name: Typecheck, tests, and production build
+  check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Typecheck
+      - name: Run TypeScript type check
         run: npm run lint
 
       - name: Run tests

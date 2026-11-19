@@ -90,7 +90,7 @@ export interface ExperienceItem {
   role: string;
   organization: string;
   period: string;
-  type: 'Education' | 'Involvement' | 'Competition';
+  type: 'Education' | 'Involvement' | 'Competition' | 'Research';
   description?: string;
   verifyNote?: string;
   achievementBadge?: string;

@@ -103,6 +103,8 @@ export const initialPortfolioContent: PortfolioContent = {
       liveUrl: 'https://tapas-g0ly.onrender.com',
       caseStudySlug: 'tapas',
       hasArchitecture: true,
+      featured: true,
+      order: 1,
       architectureFlow: {
         title: 'TAPAS Architecture Flow',
         summary:
@@ -121,12 +123,12 @@ export const initialPortfolioContent: PortfolioContent = {
       source: 'curated',
       isManualOverride: true,
       name: 'SureStep',
-      tagline: 'AI-Powered Outdoor Safety & Navigation Platform',
-      category: 'COMPUTER VISION',
+      tagline: 'AI-Powered Outdoor Safety & Navigation Platform — 48-Hour Hackathon Prototype',
+      category: 'LEARNING EXPERIMENTS',
       stack: ['React', 'TypeScript', 'Node.js', 'Python', 'FastAPI', 'PyTorch', 'Ultralytics YOLO', 'Scikit-learn', 'OpenCV', 'GPS Telemetry'],
-      description: 'A hiking-safety application combining YOLO-based visual hazard detection, Random Forest terrain-risk scoring, GPS route tracking, weather context, geological alerts, hazard reporting, and an AI Ranger copilot.',
+      description: 'A hiking-safety application combining YOLO-based visual hazard detection, Random Forest terrain-risk scoring, GPS route tracking, weather context, geological alerts, hazard reporting, and an AI Ranger copilot. Built as a 48-hour hackathon prototype (8 commits) — not a production system.',
       summary:
-        'Multi-modal outdoor navigation and hazard assessment platform integrating Ultralytics YOLO computer vision with Random Forest terrain risk modeling. Evaluates real-time GPS coordinates, environmental sensors, and seismic telemetry to generate predictive trail safety indices and route recommendations.',
+        '48-hour hackathon prototype exploring multi-modal outdoor navigation and hazard assessment with Ultralytics YOLO computer vision and Random Forest terrain risk modeling. GitHub history: 8 commits. Not production-ready.',
       status: 'Prototype',
       features: [
         { name: 'AI Terrain Risk Prediction (Random Forest)', status: 'Prototype' },
@@ -142,7 +144,7 @@ export const initialPortfolioContent: PortfolioContent = {
       architectureFlow: {
         title: 'SureStep Pipeline Flow',
         summary:
-          'Sensor processing and navigation pipeline from client to intelligent safety services.',
+          'Sensor processing and navigation pipeline from client to intelligent safety services. (Hackathon prototype — 8 commits)',
         nodes: [
           { id: '1', label: 'Client Application', sublabel: 'React & TypeScript UI', status: 'Prototype' },
           { id: '2', label: 'Location & GPS', sublabel: 'Telemetry Engine', status: 'Prototype' },
@@ -156,8 +158,8 @@ export const initialPortfolioContent: PortfolioContent = {
     {
       id: 'traffiq',
       name: 'TRAFFIQ',
-      tagline: 'AI Traffic & Accident Risk Prediction System',
-      category: 'AI / ML',
+      tagline: 'AI Traffic & Accident Risk Prediction — 48-Hour Hackathon Prototype',
+      category: 'LEARNING EXPERIMENTS',
       stack: [
         'React',
         'FastAPI',
@@ -167,9 +169,9 @@ export const initialPortfolioContent: PortfolioContent = {
         'Tailwind CSS',
         'Geospatial APIs',
       ],
-      description: 'A traffic-intelligence dashboard for exploring road and environmental data, with FastAPI and MongoDB services, interactive maps, congestion and accident-risk prototypes, spatial heatmaps, and historical trend views.',
+      description: 'A traffic-intelligence dashboard for exploring road and environmental data, with FastAPI and MongoDB services, interactive maps, congestion and accident-risk prototypes, spatial heatmaps, and historical trend views. Built as a 48-hour hackathon prototype (2 commits) — not a production system.',
       summary:
-        'Predictive traffic intelligence platform leveraging machine learning to detect urban congestion anomalies and localized collision hazards before they propagate. Ingests high-frequency road sensor telemetry into FastAPI microservices and visualizes risk heatmaps through interactive geospatial interfaces.',
+        '48-hour hackathon prototype exploring ML-based traffic prediction with FastAPI and MongoDB. GitHub history: 2 commits. Not production-ready.',
       status: 'Prototype',
       features: [
         { name: 'Congestion Prediction Engine', status: 'Prototype' },
@@ -186,7 +188,7 @@ export const initialPortfolioContent: PortfolioContent = {
       architectureFlow: {
         title: 'TRAFFIQ System Flow',
         summary:
-          'High-level intended flow from geospatial telemetry to prediction models and reactive mapping.',
+          'High-level intended flow from geospatial telemetry to prediction models and reactive mapping. (Hackathon prototype — 2 commits)',
         nodes: [
           { id: '1', label: 'Frontend Client', sublabel: 'React & Mapping UI', status: 'Implemented' },
           { id: '2', label: 'FastAPI Backend', sublabel: 'Async REST Service', status: 'Implemented' },
@@ -200,19 +202,19 @@ export const initialPortfolioContent: PortfolioContent = {
     {
       id: 'vidyavistaar',
       name: 'VidyaVistaar',
-      tagline: 'AI-Powered Educational Learning & Intelligence Platform',
-      category: 'FULL STACK',
+      tagline: 'AI-Powered Educational Learning Platform — Hackathon Prototype',
+      category: 'LEARNING EXPERIMENTS',
       stack: ['React 19', 'TypeScript', 'Google Gemini AI', 'Recharts', 'Vite', 'Tailwind CSS'],
       description:
-        'A modern AI-powered educational intelligence platform designed to deliver personalized student tutoring and adaptive learning workflows. Connects a type-safe React 19 frontend with Google Gemini AI generative models for contextual multi-turn Q&A, backed by dynamic Recharts visual analytics tracking student concept mastery and engagement curves over time.',
+        'A modern AI-powered educational intelligence platform designed to deliver personalized student tutoring and adaptive learning workflows. Connects a type-safe React 19 frontend with Google Gemini AI generative models for contextual multi-turn Q&A, backed by dynamic Recharts visual analytics tracking student concept mastery and engagement curves over time. Built as a hackathon prototype (4 commits) — not a production system.',
       summary:
-        'Modern educational platform combining component-based React 19 architecture with Google Gemini AI for contextual student guidance. Integrates reactive Recharts performance visualizers and modular services to track student concept mastery across personalized learning curricula.',
-      status: 'Implemented',
+        'Hackathon prototype exploring Google Gemini AI integration with React 19 and Recharts for educational Q&A. GitHub history: 4 commits. Not production-ready.',
+      status: 'Prototype',
       features: [
-        { name: 'Intelligent AI Question Answering', status: 'Implemented' },
-        { name: 'Google Gemini GenAI Integration', status: 'Implemented' },
-        { name: 'Interactive Performance Visualizations (Recharts)', status: 'Implemented' },
-        { name: 'Modular Type-Safe React 19 Architecture', status: 'Implemented' },
+        { name: 'Intelligent AI Question Answering', status: 'Prototype' },
+        { name: 'Google Gemini GenAI Integration', status: 'Prototype' },
+        { name: 'Interactive Performance Visualizations (Recharts)', status: 'Prototype' },
+        { name: 'Modular Type-Safe React 19 Architecture', status: 'Prototype' },
         { name: 'Student Analytics & Activity Tracking', status: 'Prototype' },
         { name: 'Personalized Learning Workflows', status: 'Planned' },
       ],
@@ -222,13 +224,13 @@ export const initialPortfolioContent: PortfolioContent = {
       architectureFlow: {
         title: 'VidyaVistaar Architecture Flow',
         summary:
-          'Modular component-based frontend architecture routing student queries to Google Gemini AI and Recharts visual analytics.',
+          'Modular component-based frontend architecture routing student queries to Google Gemini AI and Recharts visual analytics. (Hackathon prototype — 4 commits)',
         nodes: [
-          { id: '1', label: 'User Client', sublabel: 'React & Responsive UI', status: 'Implemented' },
-          { id: '2', label: 'Component Layer', sublabel: 'Interactive UI Elements', status: 'Implemented' },
-          { id: '3', label: 'Services Layer', sublabel: 'Google GenAI SDK Integration', status: 'Implemented' },
-          { id: '4', label: 'Gemini AI Engine', sublabel: 'Educational Intelligence & Q&A', status: 'Implemented' },
-          { id: '5', label: 'Recharts Visualizer', sublabel: 'Learning Progress & Analytics', status: 'Implemented' },
+          { id: '1', label: 'User Client', sublabel: 'React & Responsive UI', status: 'Prototype' },
+          { id: '2', label: 'Component Layer', sublabel: 'Interactive UI Elements', status: 'Prototype' },
+          { id: '3', label: 'Services Layer', sublabel: 'Google GenAI SDK Integration', status: 'Prototype' },
+          { id: '4', label: 'Gemini AI Engine', sublabel: 'Educational Intelligence & Q&A', status: 'Prototype' },
+          { id: '5', label: 'Recharts Visualizer', sublabel: 'Learning Progress & Analytics', status: 'Prototype' },
         ],
       },
     },
@@ -355,52 +357,54 @@ export const initialPortfolioContent: PortfolioContent = {
     traffiq: {
       slug: 'traffiq',
       title: 'TRAFFIQ',
-      subtitle: 'AI Traffic & Accident Risk Prediction Platform',
+      subtitle: 'AI Traffic & Accident Risk Prediction — 48-Hour Hackathon Prototype',
       overview:
-        'TRAFFIQ is an engineering initiative investigating whether real-time traffic sensor streams combined with historical road segment features can surface localized accident risks and predict sudden congestion spikes before they cascade through an urban corridor.',
+        'TRAFFIQ is a 48-hour hackathon prototype (2 GitHub commits) exploring ML-based traffic prediction. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope.',
       problem:
         'Urban traffic telemetry is frequently reactive: navigation systems route vehicles around accidents only after congestion has already formed. Drivers and municipality coordinators lack accessible predictive tools that evaluate spatial risk factors before incidents happen.',
       whyBuilt:
-        'I built TRAFFIQ to experiment with combining geospatial web representations with machine learning backends in Python and FastAPI, moving past static visualizations into dynamic risk scoring and reactive dashboards.',
+        'Built as a rapid hackathon experiment to explore combining geospatial web representations with FastAPI/ML backends. The prototype demonstrates conceptual architecture only.',
       architectureSummary:
-        'The architecture decouples the reactive client view from the computational backend. The FastAPI server ingests segment speed and coordinate coordinates, extracts windowed features, runs them through risk estimation estimators, and serves geoJSON layers back to the client.',
+        'Conceptual architecture decoupling reactive client view from computational backend. The FastAPI server would ingest segment speed/coordinates, extract windowed features, run through risk estimators, and serve geoJSON layers. Not production-implemented (2 commits total).',
       architectureFlow: [
-        { id: '1', label: 'Frontend Client', sublabel: 'React & Interactive Maps', status: 'Implemented' },
-        { id: '2', label: 'FastAPI Backend', sublabel: 'Async REST Service', status: 'Implemented' },
-        { id: '3', label: 'Data Processing', sublabel: 'Feature Extraction & Windows', status: 'Implemented' },
+        { id: '1', label: 'Frontend Client', sublabel: 'React & Interactive Maps', status: 'Prototype' },
+        { id: '2', label: 'FastAPI Backend', sublabel: 'Async REST Service', status: 'Prototype' },
+        { id: '3', label: 'Data Processing', sublabel: 'Feature Extraction & Windows', status: 'Prototype' },
         { id: '4', label: 'ML Models', sublabel: 'Scikit-learn Regressors/Classifiers', status: 'Prototype' },
-        { id: '5', label: 'MongoDB', sublabel: 'Historical Spatial Collection', status: 'Implemented' },
+        { id: '5', label: 'MongoDB', sublabel: 'Historical Spatial Collection', status: 'Prototype' },
         { id: '6', label: 'Geospatial APIs', sublabel: 'External Tiles & Routing [Planned]', status: 'Planned' },
       ],
       dataPipeline:
-        'Segment data is standardized into uniform temporal buckets. Numerical features include historical speed variance, lane density, junction distance, and simulated weather indices. Missing values are filled via localized spatial nearest-neighbor interpolation.',
+        'Conceptual: Segment data would be standardized into uniform temporal buckets. Numerical features include historical speed variance, lane density, junction distance, and simulated weather indices. Not production-implemented.',
       mlPipeline:
-        'Feature engineering isolates road curvature, average segment velocity degradation, and historical peak indices. Trained regression and classification models estimate congestion likelihood and high-risk flags per spatial node.',
+        'Conceptual: Feature engineering would isolate road curvature, average segment velocity degradation, and historical peak indices. Not production-implemented (2 commits total).',
       frontendNotes:
-        'Constructed with React and Tailwind CSS. Employs clean vector-rendered maps with custom SVG overlays, rendering danger heatmaps without blocking user panning or zooming.',
+        'React and Tailwind CSS prototype with vector-rendered maps and SVG overlays. Not production-implemented.',
       backendNotes:
-        'FastAPI asynchronous handlers expose coordinate-query endpoints, with response performance dependent on cache state, payload size, and deployment conditions.',
+        'FastAPI asynchronous handlers concept. Not production-implemented (2 commits total).',
       databaseNotes:
-        'MongoDB document schema stores temporal snapshots indexed by geospatial 2dsphere coordinates for fast bounding-box queries.',
+        'MongoDB document schema concept. Not production-implemented.',
       technicalDecisions: [
         {
-          decision: 'FastAPI instead of Flask or Express for the core service',
+          decision: 'FastAPI instead of Flask or Express for the core service (conceptual)',
           rationale:
-            'Async Python execution and Pydantic validation provide structured request parsing for spatial coordinate data.',
+            'Async Python execution and Pydantic validation would provide structured request parsing for spatial coordinate data. Not implemented.',
         },
         {
-          decision: 'Strict client-side separation of map rendering from ML inference',
+          decision: 'Strict client-side separation of map rendering from ML inference (conceptual)',
           rationale:
-            'Keeps predictive computation separate from map rendering to help preserve a responsive pan-and-zoom experience.',
+            'Would keep predictive computation separate from map rendering to preserve responsive pan-and-zoom. Not implemented.',
         },
       ],
       challenges: [
         'Handling high-frequency coordinate payload serialization without frame stutter on the client.',
         'Normalizing uneven road segment lengths into standardized spatial grids for statistical consistency.',
+        'GitHub history: 2 commits — does not support production ML/AI claims.',
       ],
       lessons: [
         'Real-world sensor feeds suffer from sudden dropouts; input validators must handle incomplete feature arrays gracefully.',
         'Visualizing risk gradients requires careful color palette contrast calibration to avoid ambiguous reading in daylight scenarios.',
+        'Hackathon prototypes should be clearly labeled — do not present them as production systems.',
       ],
       futureWork: [
         { item: 'Integration with live municipality open-data feeds', status: 'Planned' },
@@ -413,15 +417,15 @@ export const initialPortfolioContent: PortfolioContent = {
     surestep: {
       slug: 'surestep',
       title: 'SureStep',
-      subtitle: 'AI-Powered Outdoor Safety & Navigation Platform',
+      subtitle: 'AI-Powered Outdoor Safety & Navigation Platform — 48-Hour Hackathon Prototype',
       overview:
-        'SureStep explores combining on-device computer vision inferences, GPS telemetry, and machine learning models to help hikers, field researchers, and outdoor adventurers navigate rough trails and off-grid environments safely.',
+        'SureStep is a 48-hour hackathon prototype (8 GitHub commits) exploring on-device computer vision inferences, GPS telemetry, and machine learning models for outdoor navigation. It is NOT a production system — the GitHub history does not support the claimed production ML/AI scope.',
       problem:
         'Standard turn-by-turn navigation platforms fail when navigating remote wilderness or challenging terrain. They offer no insights into trail conditions, visual hazards, terrain stability, geological hazard monitoring, or offline availability.',
       whyBuilt:
-        'To engineer a reliable system that aids physical situational awareness in off-grid environments using modular vision, GPS telemetry, and an AI Ranger Copilot for contextual assistance.',
+        'Built as a rapid hackathon experiment to explore combining YOLO-based computer vision, Random Forest terrain scoring, and GPS telemetry. The prototype demonstrates conceptual architecture only.',
       architectureSummary:
-        'Designed as an edge-oriented full-stack ML architecture. Camera frames and terrain features are processed through lightweight models to evaluate surface hazards, while GPS coordinates query local geospatial caches.',
+        'Designed as an edge-oriented full-stack ML architecture concept. Camera frames and terrain features would be processed through lightweight models to evaluate surface hazards, while GPS coordinates query local geospatial caches. None of this is production-implemented.',
       architectureFlow: [
         { id: '1', label: 'Client Application', sublabel: 'React & TypeScript Interface', status: 'Prototype' },
         { id: '2', label: 'Location & GPS', sublabel: 'Device Telemetry Engine', status: 'Prototype' },
@@ -431,26 +435,28 @@ export const initialPortfolioContent: PortfolioContent = {
         { id: '6', label: 'Offline / Cloud Data', sublabel: 'Synced Map Layers', status: 'Planned' },
       ],
       dataPipeline:
-        'Processes GPS latitude, longitude, elevation, and heading telemetry in continuous sample buffers, paired with analyzed camera frames and terrain gradient indicators.',
+        'Conceptual: Processes GPS latitude, longitude, elevation, and heading telemetry in continuous sample buffers, paired with analyzed camera frames and terrain gradient indicators. Not implemented in production.',
       frontendNotes:
-        'React and TypeScript interface with high-contrast outdoor visibility modes and minimal battery consumption footprint.',
+        'React and TypeScript interface concept with high-contrast outdoor visibility modes. Prototype only.',
       backendNotes:
-        'Full-stack architecture combining Node.js/Express and FastAPI for machine learning evaluation and route scoring.',
+        'Conceptual full-stack architecture combining Node.js/Express and FastAPI for ML evaluation. Not production-implemented (8 commits total).',
       databaseNotes:
-        'Local storage for offline trail paths with lightweight geo-indexing and planned cloud synchronization.',
+        'Conceptual local storage for offline trail paths with lightweight geo-indexing. Not implemented.',
       technicalDecisions: [
         {
-          decision: 'Machine Learning-based Random Forest model for terrain data',
+          decision: 'Machine Learning-based Random Forest model for terrain data (conceptual)',
           rationale:
-            'Provides robust multi-factor risk scoring across slope, terrain roughness, weather conditions, and geological metrics with high interpretability.',
+            'Would provide robust multi-factor risk scoring across slope, terrain roughness, weather conditions, and geological metrics with high interpretability. Not implemented.',
         },
       ],
       challenges: [
         'Battery conservation while simultaneously acquiring GPS locks and running evaluation cycles.',
         'Calibrating orientation sensors under fluctuating magnetic anomalies in outdoor rocky terrains.',
+        'GitHub history: 8 commits — does not support production ML/AI claims.',
       ],
       lessons: [
         'Outdoor navigation requires clear, large typography and single-touch controls designed for one-handed operation.',
+        'Hackathon prototypes should be clearly labeled — do not present them as production systems.',
       ],
       futureWork: [
         { item: 'Offline vector contour map caching', status: 'Planned' },
@@ -462,47 +468,49 @@ export const initialPortfolioContent: PortfolioContent = {
     vidyavistaar: {
       slug: 'vidyavistaar',
       title: 'VidyaVistaar',
-      subtitle: 'AI-Powered Educational Learning & Intelligence Platform',
+      subtitle: 'AI-Powered Educational Learning Platform — Hackathon Prototype',
       overview:
-        'VidyaVistaar is a modern AI-powered educational platform designed to provide students with a smarter, more interactive, and accessible learning experience, combining Google Gemini AI with reactive data visualization.',
+        'VidyaVistaar is a hackathon prototype (4 GitHub commits) exploring Google Gemini AI integration with React 19 for educational Q&A. It is NOT a production system — the GitHub history does not support the claimed production scope.',
       problem:
         'Traditional learning management systems often deliver static content without immediate, adaptive explanations or visual progress feedback, leading to disengagement during self-guided study.',
       whyBuilt:
-        'Built to explore practical integration of modern LLMs via the Google GenAI SDK with type-safe React frontend workflows, creating an interactive educational companion rather than a simple chatbot.',
+        'Built as a rapid hackathon experiment to explore practical integration of Google GenAI SDK with type-safe React frontend workflows. The prototype demonstrates conceptual architecture only.',
       architectureSummary:
-        'Follows a modular component-based frontend architecture connecting client UI components, Recharts telemetry visualizations, and secure Google Gemini API services.',
+        'Conceptual modular component-based frontend architecture connecting client UI components, Recharts telemetry visualizations, and Google Gemini API services. Not production-implemented (4 commits total).',
       architectureFlow: [
-        { id: '1', label: 'User Interface', sublabel: 'Type-Safe React 19 & Tailwind', status: 'Implemented' },
-        { id: '2', label: 'Service Layer', sublabel: 'Google GenAI SDK Connector', status: 'Implemented' },
-        { id: '3', label: 'Gemini AI Engine', sublabel: 'Contextual Student Guidance', status: 'Implemented' },
-        { id: '4', label: 'Data Visualizer', sublabel: 'Interactive Recharts Dashboards', status: 'Implemented' },
+        { id: '1', label: 'User Interface', sublabel: 'Type-Safe React 19 & Tailwind', status: 'Prototype' },
+        { id: '2', label: 'Service Layer', sublabel: 'Google GenAI SDK Connector', status: 'Prototype' },
+        { id: '3', label: 'Gemini AI Engine', sublabel: 'Contextual Student Guidance', status: 'Prototype' },
+        { id: '4', label: 'Data Visualizer', sublabel: 'Interactive Recharts Dashboards', status: 'Prototype' },
       ],
       dataPipeline:
-        'User queries and study contexts are structured and dispatched to Gemini models with targeted instructional prompts. Student performance metrics are mapped to Recharts data streams.',
+        'Conceptual: User queries and study contexts would be structured and dispatched to Gemini models with targeted instructional prompts. Student performance metrics would be mapped to Recharts data streams. Not production-implemented.',
       frontendNotes:
-        'Constructed with React 19, Vite, and Tailwind CSS. Features accessible responsive components and real-time visualization dashboards.',
+        'React 19, Vite, and Tailwind CSS prototype. Features accessible responsive components and visualization dashboards. Not production-implemented.',
       backendNotes:
-        'The frontend service layer calls Google Gemini through the configured Google GenAI integration; API availability, latency, quotas, and key protection depend on deployment configuration.',
+        'Frontend service layer calls Google Gemini through GenAI SDK. API availability, latency, quotas, and key protection depend on deployment configuration. Not production-implemented (4 commits total).',
       databaseNotes:
-        'Stateless client architecture with browser caching and environment-based configuration for API sessions.',
+        'Conceptual stateless client architecture with browser caching. Not production-implemented.',
       technicalDecisions: [
         {
-          decision: 'Google GenAI SDK over generic REST endpoints',
+          decision: 'Google GenAI SDK over generic REST endpoints (conceptual)',
           rationale:
-            'Native TypeScript SDK provides typed responses, built-in retry handling, and direct prompt streaming capability.',
+            'Native TypeScript SDK would provide typed responses, built-in retry handling, and direct prompt streaming capability. Not implemented.',
         },
         {
-          decision: 'Recharts for data visualization',
+          decision: 'Recharts for data visualization (conceptual)',
           rationale:
-            'Declarative SVG charting designed for React, providing smooth animations and responsiveness across screen sizes.',
+            'Declarative SVG charting designed for React, providing smooth animations and responsiveness across screen sizes. Not implemented.',
         },
       ],
       challenges: [
         'Formatting structured generative responses into digestible study cards without UI layout shifts.',
         'Optimizing chart re-renders when student telemetry streams update.',
+        'GitHub history: 4 commits — does not support production AI/ML claims.',
       ],
       lessons: [
         'Pairing generated explanations with charts can make learning content easier to explore; the educational impact has not been formally measured.',
+        'Hackathon prototypes should be clearly labeled — do not present them as production systems.',
       ],
       futureWork: [
         { item: 'Adaptive multi-subject learning pathways', status: 'Planned' },
@@ -516,43 +524,41 @@ export const initialPortfolioContent: PortfolioContent = {
     {
       title: 'AI & Machine Learning',
       skills: [
-        { name: 'Python' },
-        { name: 'Scikit-learn' },
-        { name: 'XGBoost' },
-        { name: 'PyTorch' },
-        { name: 'YOLO & Computer Vision' },
-        { name: 'Pandas & NumPy' },
+        { name: 'Python', verifyTag: true },
+        { name: 'Scikit-learn', verifyTag: true },
+        { name: 'XGBoost', verifyTag: true },
+        { name: 'YOLO & Computer Vision', verifyTag: true },
+        { name: 'Pandas & NumPy', verifyTag: true },
       ],
     },
     {
-      title: 'Frontend & Backend Development',
+      title: 'Cloud & DevOps',
       skills: [
-        { name: 'HTML5 & CSS3' },
-        { name: 'JavaScript & TypeScript' },
-        { name: 'React' },
-        { name: 'Node.js & Express' },
-        { name: 'FastAPI' },
-        { name: 'REST API Development' },
+        { name: 'GitHub Actions', verifyTag: false },
+        { name: 'Docker', verifyTag: true },
+        { name: 'Render', verifyTag: true },
+        { name: 'Supabase', verifyTag: true },
+        { name: 'REST API Development', verifyTag: true },
       ],
     },
     {
       title: 'Databases & Data Management',
       skills: [
-        { name: 'MySQL' },
-        { name: 'MongoDB' },
-        { name: 'PostgreSQL' },
-        { name: 'SQL' },
+        { name: 'PostgreSQL', verifyTag: true },
+        { name: 'MongoDB', verifyTag: false },
+        { name: 'SQL', verifyTag: true },
+        { name: 'MySQL', verifyTag: false },
       ],
     },
     {
       title: 'Core Computer Science & Tools',
       skills: [
-        { name: 'Data Structures & Algorithms' },
-        { name: 'Object-Oriented Programming' },
-        { name: 'DBMS, Operating Systems & Networks' },
-        { name: 'Git & GitHub' },
-        { name: 'Docker' },
-        { name: 'Visual Studio Code' },
+        { name: 'Data Structures & Algorithms', verifyTag: true },
+        { name: 'Object-Oriented Programming', verifyTag: true },
+        { name: 'DBMS, Operating Systems & Networks', verifyTag: true },
+        { name: 'Git & GitHub', verifyTag: true },
+        { name: 'Docker', verifyTag: true },
+        { name: 'Visual Studio Code', verifyTag: true },
       ],
     },
   ],
@@ -606,6 +612,15 @@ export const initialPortfolioContent: PortfolioContent = {
       achievementBadge: 'Rank 2337',
       description:
         'Secured Rank 2337 in the Telangana State Engineering Entrance Test (TS EAMCET) 2024.',
+    },
+    {
+      id: 'summer-2024-research',
+      role: 'Independent Systems Research',
+      organization: 'Self-Directed',
+      period: 'Summer 2024',
+      type: 'Research',
+      description:
+        'Built PRAVAAH (744-commit AICTE workflow automation system with React, FastAPI, PostgreSQL, Docker, CI/CD) and production-grade portfolio infrastructure (Express + React + Supabase + GitHub webhook reconciliation + Admin CMS with JWT auth, asset versioning with rollback, curated-data-preserving merge logic). 2× SIH college-level nominee.',
     },
     {
       id: 'rmc-involvement',
