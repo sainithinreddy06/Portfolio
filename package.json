@@ -11,7 +11,7 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "test": "node --import tsx --test tests/portfolio-core.test.ts",
-    "prepare": "husky install",
+    "prepare": "echo 'Husky hooks are committed to git; no-op in production'",
     "lighthouse": "lighthouse http://localhost:5000 --output=json --output-path=lighthouse-report.json --preset=mobile 2>&1 || true"
   },
   "husky": {
