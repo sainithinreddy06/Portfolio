@@ -1894,7 +1894,7 @@ export const AdminPage: React.FC = () => {
                   GitHub Repository Synchronization
                 </h2>
                 <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                  Discover repositories tagged with <code>portfolio</code> on <code>sainithinreddy06</code>.
+                  Refresh eligible public repositories from the configured GitHub account.
                 </p>
               </div>
               <button
@@ -1905,7 +1905,7 @@ export const AdminPage: React.FC = () => {
                     const res = await authFetch('/api/github/sync', { method: 'POST' });
                     const data = await readApiJson(res);
                     setGithubSyncMsg(data.message || 'Repositories synced successfully.');
-                    await fetchDiagnostics();
+                    await Promise.all([fetchDiagnostics(), refreshServerPortfolio()]);
                   } catch (err: any) {
                     setErrorMessage(err.message || 'Failed to sync GitHub repositories.');
                   } finally {

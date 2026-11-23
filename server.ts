@@ -833,7 +833,7 @@ app.get('/api/github/projects', (_req: Request, res: Response) => {
  */
 app.post('/api/github/sync', requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const requestedUser = req.body.username;
+    const requestedUser = req.body?.username;
     if (requestedUser && requestedUser.toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
       return res.status(400).json({
         success: false,
