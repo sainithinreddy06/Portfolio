@@ -115,6 +115,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return offlineContent;
   });
 
+  const [publicationPending, setPublicationPending] = useState(false);
   const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(false);
   const [projectsError, setProjectsError] = useState<string | null>(null);
   const [lastSyncedTimestamp, setLastSyncedTimestamp] = useState<string | null>(content.lastSynced || null);
@@ -151,6 +152,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setProjectsError(null);
     try {
       const data = await fetchPortfolioSnapshot();
+      setPublicationPending(data.publicationPending === true);
       if (data.success && data.content) {
         const serverProjects = normalizeProjectList(data.content.projects || []);
         setContent((prev) => {
@@ -183,6 +185,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (err: any) {
       console.warn('[Portfolio Sync] Using cached portfolio state:', err.message);
       setProjectsError(err.message);
+      setPublicationPending(false);
     } finally {
       setIsLoadingProjects(false);
     }
@@ -223,6 +226,16 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     refreshServerPortfolio();
   }, [refreshServerPortfolio]);
+
+  // Visitors who arrive during startup can see newly verified cards in the
+  // same visit. Poll only the read-only snapshot while verification is active.
+  useEffect(() => {
+    if (!publicationPending) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden && window.location.pathname !== '/admin') void refreshServerPortfolio();
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [publicationPending, refreshServerPortfolio]);
 
   // Synchronize theme attribute on HTML root
   useEffect(() => {

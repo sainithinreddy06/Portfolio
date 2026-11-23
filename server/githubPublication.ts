@@ -121,5 +121,10 @@ export function publicSnapshot() {
   const publicProjects = projects.map(project =>
     allowedLink(project.githubUrl) ? project : { ...project, githubUrl: undefined }
   );
-  return { lastUpdated: store.lastUpdated, content: { ...store.content, projects: publicProjects, caseStudies }, syncedRepositories };
+  return {
+    lastUpdated: store.lastUpdated,
+    publicationPending: pendingScan !== undefined,
+    content: { ...store.content, projects: publicProjects, caseStudies },
+    syncedRepositories,
+  };
 }
