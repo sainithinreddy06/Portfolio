@@ -1,7 +1,5 @@
 import { env } from './runtimeEnv';
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 
 export interface GitHubRepoPayload {
   id: number;
@@ -59,30 +57,7 @@ export interface ExtractedGitHubProject {
   visibility?: string;
 }
 
-export interface GitHubSyncDiagnostics {
-  username: string;
-  lastSyncedAt: string;
-  rateLimitRemaining: number | null;
-  rateLimitReset: string | null;
-  hasTokenConfigured: boolean;
-  hasWebhookSecretConfigured: boolean;
-  totalReposDiscovered: number;
-  eligibleReposCount: number;
-  projects: ExtractedGitHubProject[];
-  errors: string[];
-}
-
 const DEFAULT_GITHUB_USERNAME = 'sainithinreddy06';
-const CACHE_FILE_PATH = path.resolve(process.cwd(), 'data', 'githubProjectsCache.json');
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
-
-// In-memory cache
-let inMemoryCache: {
-  timestamp: number;
-  username: string;
-  projects: ExtractedGitHubProject[];
-} | null = null;
-
 let lastRateLimitRemaining: number | null = null;
 let lastRateLimitReset: string | null = null;
 let lastSyncErrors: string[] = [];
@@ -173,7 +148,7 @@ export function isEligibleRepository(
   repo: Partial<GitHubRepoPayload>,
   hasReadmeOrCode = true
 ): boolean {
-  if (repo.fork) return false;
+  if (repo.visibility !== 'public' || repo.private === true || repo.fork) return false;
   const name = (repo.name || '').trim().toLowerCase();
   if (!name) return false;
 
@@ -622,7 +597,7 @@ export async function discoverLiveDeployment(
 export async function fetchRepositoryData(
   owner: string,
   repoName: string,
-  previousKnownUrl?: string
+  expectedId: number
 ): Promise<ExtractedGitHubProject | null> {
   const headers = getGitHubHeaders();
   let repoPayload: Partial<GitHubRepoPayload> | null = null;
@@ -654,6 +629,12 @@ export async function fetchRepositoryData(
       if (attempt === 1) await new Promise((r) => setTimeout(r, 600));
     }
   }
+
+  // A README or an old snapshot cannot establish visibility. Check the live
+  // identity before any enrichment, including after redirects or transfers.
+  if (!repoPayload || repoPayload.id !== expectedId ||
+      repoPayload.owner?.login?.toLowerCase() !== owner.toLowerCase() ||
+      !isEligibleRepository(repoPayload)) return null;
 
   // 2. Fetch languages
   if (repoPayload) {
@@ -762,10 +743,7 @@ export async function fetchRepositoryData(
   );
 
   // Check eligibility
-  if (repoPayload && !isEligibleRepository(repoPayload, hasReadmeOrCode)) {
-    return null;
-  }
-  if (!repoPayload && !hasReadmeOrCode) {
+  if (!isEligibleRepository(repoPayload, hasReadmeOrCode)) {
     return null;
   }
 
@@ -819,14 +797,13 @@ export async function fetchRepositoryData(
     owner,
     repoName,
     repoPayload,
-    parsedReadme.discoveredLiveUrl,
-    previousKnownUrl
+    parsedReadme.discoveredLiveUrl
   );
 
   const category = inferCategory(formattedName, description, finalStack);
 
   return {
-    repoId: repoPayload?.id || Math.abs(repoName.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0)),
+    repoId: expectedId,
     name: formattedName,
     tagline,
     description,
@@ -845,54 +822,8 @@ export async function fetchRepositoryData(
     isEligible: true,
     category,
     isArchived: repoPayload?.archived || false,
-    visibility: repoPayload?.visibility || 'public',
+    visibility: 'public',
   };
-}
-
-/**
- * Reads cached GitHub projects from disk if available.
- */
-function readDiskCache(): ExtractedGitHubProject[] | null {
-  try {
-    if (fs.existsSync(CACHE_FILE_PATH)) {
-      const data = fs.readFileSync(CACHE_FILE_PATH, 'utf8');
-      const parsed = JSON.parse(data);
-      if (Array.isArray(parsed.projects) && parsed.projects.length > 0) {
-        return parsed.projects;
-      }
-    }
-  } catch {
-    // Non-fatal
-  }
-  return null;
-}
-
-/**
- * Saves GitHub projects cache to disk.
- */
-function writeDiskCache(username: string, projects: ExtractedGitHubProject[]): void {
-  try {
-    const dir = path.dirname(CACHE_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(
-      CACHE_FILE_PATH,
-      JSON.stringify(
-        {
-          username,
-          timestamp: Date.now(),
-          lastUpdated: new Date().toISOString(),
-          projects,
-        },
-        null,
-        2
-      ),
-      'utf8'
-    );
-  } catch (err) {
-    console.error('[GitHub Cache] Failed to write cache:', err);
-  }
 }
 
 /**
@@ -964,155 +895,59 @@ async function fetchAllUserReposWithPagination(
     page++;
   }
 
-  // If authenticated, also fetch /user/repos to include private/internal repositories
-  // owned by this user. Public portfolio discovery above remains the source of truth.
-  if (headers.Authorization) {
-    try {
-      let userPage = 1;
-      while (true) {
-        const userRes = await fetch(
-          `https://api.github.com/user/repos?page=${userPage}&per_page=${perPage}&type=all`,
-          { headers, signal: AbortSignal.timeout(12000) }
-        );
-        trackRateLimit(userRes);
-        if (!userRes.ok) break;
-        const userRepos = (await userRes.json()) as GitHubRepoPayload[];
-        if (!Array.isArray(userRepos) || userRepos.length === 0) break;
-        for (const repo of userRepos) {
-          if (
-            repo.owner?.login?.toLowerCase() === username.toLowerCase() &&
-            !allRepos.some((existing) => existing.id === repo.id)
-          ) {
-            allRepos.push(repo);
-          }
-        }
-        if (userRepos.length < perPage) break;
-        userPage++;
-      }
-    } catch (err: any) {
-      console.warn(`[GitHub Pagination] Optional authenticated repository scan failed: ${err?.message || 'unknown error'}`);
-    }
-  }
-
   return allRepos;
 }
 
 /**
  * Synchronizes all eligible repositories belonging to the GitHub user.
  */
-export async function syncAllPortfolioRepositories(
-  targetUsername?: string,
-  forceRefresh = false,
-  previousKnownUrls: Record<string, string> = {}
-): Promise<ExtractedGitHubProject[]> {
-  const username = targetUsername || env('GITHUB_USERNAME') || DEFAULT_GITHUB_USERNAME;
-  const now = Date.now();
+export async function discoverPublicProjects(username: string): Promise<ExtractedGitHubProject[]> {
   lastSyncErrors = [];
+  const allRepos = await fetchAllUserReposWithPagination(username, getGitHubHeaders());
+  const eligibleRepos = allRepos.filter(repo =>
+    Number.isSafeInteger(repo.id) && repo.id > 0 &&
+    repo.owner?.login?.toLowerCase() === username.toLowerCase() && isEligibleRepository(repo)
+  );
+  const projectsByIndex: Array<ExtractedGitHubProject | null> = new Array(eligibleRepos.length);
+  let nextRepoIndex = 0;
+  const workerCount = Math.min(3, eligibleRepos.length);
 
-  // 1. Check in-memory cache if not forced
-  if (!forceRefresh && inMemoryCache && inMemoryCache.username === username) {
-    if (now - inMemoryCache.timestamp < CACHE_TTL_MS) {
-      return inMemoryCache.projects;
-    }
-  }
-
-  const headers = getGitHubHeaders();
-  console.log(`[GitHub Sync] Scanning repositories with pagination for user: ${username} (auth: ${Boolean(headers.Authorization)})...`);
-
-  try {
-    const allRepos = await fetchAllUserReposWithPagination(username, headers);
-    if (forceRefresh && lastSyncErrors.length) throw Object.assign(new Error('GitHub repository discovery failed.'), { code: 'GITHUB_DISCOVERY_FAILED' });
-    // Process a small, bounded batch concurrently. Repository enrichment makes
-    // several network requests per repo; an unbounded Promise.all would risk
-    // GitHub rate limits, while a sequential loop makes refreshes unnecessarily slow.
-    const eligibleRepos = allRepos.filter(
-      (repo) => !repo.fork && !/^portfolio(-.*)?$/i.test(repo.name)
-    );
-    const projectsByIndex: Array<ExtractedGitHubProject | null> = new Array(eligibleRepos.length);
-    let nextRepoIndex = 0;
-    const workerCount = Math.min(3, eligibleRepos.length);
-
-    const workers = Array.from({ length: workerCount }, async () => {
-      while (true) {
-        const index = nextRepoIndex++;
-        if (index >= eligibleRepos.length) return;
-        const repo = eligibleRepos[index];
-        const previousUrl = previousKnownUrls[repo.name.toLowerCase()];
-        try {
-          projectsByIndex[index] = await fetchRepositoryData(username, repo.name, previousUrl);
-        } catch (error: any) {
-          const message = `Failed to enrich ${repo.name}: ${error?.message || 'unknown error'}`;
-          console.warn(`[GitHub Sync] ${message}`);
-          lastSyncErrors.push(message);
-          projectsByIndex[index] = null;
-        }
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const index = nextRepoIndex++;
+      if (index >= eligibleRepos.length) return;
+      const repo = eligibleRepos[index];
+      try {
+        projectsByIndex[index] = await fetchRepositoryData(username, repo.name, repo.id);
+      } catch (error: any) {
+        const message = `Failed to enrich ${repo.name}: ${error?.message || 'unknown error'}`;
+        console.warn(`[GitHub Sync] ${message}`);
+        lastSyncErrors.push(message);
+        projectsByIndex[index] = null;
       }
-    });
-
-    await Promise.all(workers);
-    const projects = projectsByIndex.filter(
-      (project): project is ExtractedGitHubProject => Boolean(project && project.isEligible)
-    );
-
-    if (projects.length > 0) {
-      inMemoryCache = {
-        timestamp: now,
-        username,
-        projects,
-      };
-
-      console.log(`[GitHub Sync] Successfully discovered ${projects.length} eligible repositories for ${username}.`);
-      return projects;
     }
+  });
 
-    // Fallback if API returned 0 projects (e.g. rate limit reached without token)
-    const diskFallback = readDiskCache();
-    if (diskFallback && diskFallback.length > 0) {
-      console.log(`[GitHub Sync] Using disk cache fallback (${diskFallback.length} projects).`);
-      return diskFallback;
-    }
-    return [];
-  } catch (err: any) {
-    if (forceRefresh) throw err;
-    console.error('[GitHub Sync] Repository discovery failed.');
-    lastSyncErrors.push(err.message);
-    const diskFallback = readDiskCache();
-    if (diskFallback && diskFallback.length > 0) {
-      console.log(`[GitHub Sync] Recovered using disk cache fallback (${diskFallback.length} projects).`);
-      return diskFallback;
-    }
-    return [];
-  }
+  await Promise.all(workers);
+  const projects = projectsByIndex.filter(
+    (project): project is ExtractedGitHubProject => Boolean(project && project.isEligible)
+  );
+
+  return projects;
 }
 
-/**
- * Returns diagnostic information for GitHub sync status and API limits.
- */
-export function getGitHubDiagnostics(): GitHubSyncDiagnostics {
-  const disk = readDiskCache();
-  const currentProjects = inMemoryCache?.projects || disk || [];
+/** Admin-only sync health. Historical repository payloads are never replayed. */
+export function getGitHubDiagnostics(projects: ExtractedGitHubProject[], lastSyncedAt: string | null) {
   return {
     username: env('GITHUB_USERNAME') || DEFAULT_GITHUB_USERNAME,
-    lastSyncedAt: new Date(inMemoryCache?.timestamp || Date.now()).toISOString(),
+    lastSyncedAt,
     rateLimitRemaining: lastRateLimitRemaining,
     rateLimitReset: lastRateLimitReset,
     hasTokenConfigured: Boolean(env('GITHUB_TOKEN')?.trim()),
     hasWebhookSecretConfigured: Boolean(env('GITHUB_WEBHOOK_SECRET')?.trim()),
-    totalReposDiscovered: currentProjects.length,
-    eligibleReposCount: currentProjects.filter((p) => p.isEligible).length,
-    projects: currentProjects,
+    totalReposDiscovered: projects.length,
+    eligibleReposCount: projects.length,
+    projects,
     errors: lastSyncErrors,
   };
-}
-
-/**
- * Returns currently cached projects without waiting for remote API.
- */
-export function getCachedGitHubProjects(): ExtractedGitHubProject[] {
-  if (inMemoryCache) {
-    return inMemoryCache.projects;
-  }
-  const disk = readDiskCache();
-  if (disk) return disk;
-  return [];
 }
