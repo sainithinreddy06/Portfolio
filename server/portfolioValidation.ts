@@ -15,5 +15,10 @@ export function isPortfolioContent(value: any): value is PortfolioContent {
   if (p.currentYear !== undefined && typeof p.currentYear !== 'string') return false;
   if (p.cgpa !== undefined && p.cgpa !== null && (typeof p.cgpa !== 'number' || !Number.isFinite(p.cgpa) || p.cgpa < 0 || p.cgpa > 10)) return false;
   if (!isSafeAssetUrl(p.photo.url) || !isSafeAssetUrl(p.resume.fileUrl)) return false;
+  if (![p.githubUrl, p.linkedinUrl, p.leetcodeUrl].every(url => !url || isSafeAssetUrl(url))) return false;
+  if (!value.skillCategories.every((c: any) => typeof c?.title === 'string' && Array.isArray(c.skills) && c.skills.every((s: any) => typeof s?.name === 'string'))) return false;
+  if (!value.timeline.every((e: any) => e && ['id','role','organization','period','type'].every(k => typeof e[k] === 'string'))) return false;
+  if (!Object.values(value.caseStudies).every((study: any) => study && (!study.repoUrl || isSafeAssetUrl(study.repoUrl)) &&
+    ['architectureFlow','technicalDecisions','challenges','lessons','futureWork','stack'].every(key => Array.isArray(study[key])))) return false;
   return value.projects.every((project: any) => project && typeof project.id === 'string' && typeof project.name === 'string' && project.name.trim() && typeof project.description === 'string' && Array.isArray(project.stack) && project.stack.every((s: unknown) => typeof s === 'string') && Array.isArray(project.features) && [project.githubUrl, project.liveUrl].every(url => !url || isSafeAssetUrl(url)));
 }

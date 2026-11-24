@@ -13,3 +13,6 @@ data/githubProjectsCache.json
 
 .env
 .env.*
+
+data/uploads/
+data/*.tmp

@@ -79,7 +79,7 @@ export function verifyGitHubSignature(
   }
 
   const prefix = 'sha256=';
-  if (!signatureHeader.startsWith(prefix)) {
+  if (!/^sha256=[a-f0-9]{64}$/.test(signatureHeader)) {
     return false;
   }
 
@@ -431,24 +431,13 @@ export function parseReadmeContent(
  */
 async function verifyUrlReachable(url: string): Promise<boolean> {
   try {
-    const res = await fetch(url, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(4000),
-      headers: { 'User-Agent': 'sainithinreddy-portfolio-discovery' },
-    });
-    return res.status < 400;
-  } catch {
-    try {
-      const getRes = await fetch(url, {
-        method: 'GET',
-        signal: AbortSignal.timeout(4000),
-        headers: { 'User-Agent': 'sainithinreddy-portfolio-discovery' },
-      });
-      return getRes.status < 400;
-    } catch {
-      return false;
-    }
-  }
+    const target = new URL(url);
+    const hosts = ['onrender.com', 'vercel.app', 'netlify.app', 'github.io', 'pages.dev'];
+    if (target.protocol !== 'https:' || target.port || target.username || target.password ||
+      !hosts.some(host => target.hostname.endsWith('.' + host))) return false;
+    const response = await fetch(target, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(4000) });
+    return response.ok;
+  } catch { return false; }
 }
 
 /**
@@ -472,7 +461,7 @@ export async function discoverLiveDeployment(
   // When user adds or changes homepage on GitHub, this reflects immediately
   if (repoPayload?.homepage && typeof repoPayload.homepage === 'string') {
     const rawHomepage = repoPayload.homepage.trim();
-    if (rawHomepage.startsWith('http')) {
+    if (/^https?:\/\//i.test(rawHomepage)) {
       const isOk = await verifyUrlReachable(rawHomepage);
       if (isOk) {
         return {
@@ -487,7 +476,7 @@ export async function discoverLiveDeployment(
           provider: 'github_homepage',
           url: rawHomepage,
           verified: false,
-          notes: 'Configured in GitHub repository homepage (transient HTTP timeout)',
+          notes: 'Configured in GitHub repository homepage; availability unverified',
         };
       }
     }
@@ -542,9 +531,9 @@ export async function discoverLiveDeployment(
       const deps = (await depsRes.json()) as any[];
       if (Array.isArray(deps) && deps.length > 0) {
         for (const dep of deps.slice(0, 3)) {
-          if (!dep.statuses_url) continue;
+          if (!Number.isSafeInteger(dep.id) || dep.id <= 0) continue;
           try {
-            const statRes = await fetch(dep.statuses_url, {
+            const statRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/deployments/${dep.id}/statuses`, {
               headers,
               signal: AbortSignal.timeout(3000),
             });

@@ -37,8 +37,8 @@ async function scan(owner: string): Promise<ExtractedGitHubProject[]> {
   for (const id of verified.keys()) {
     if (untouched(id)) verified.delete(id);
   }
-  if (current.length) syncGitHubProjects(current);
-  for (const project of current) verified.set(project.repoId, { project, checkedAt: started });
+  if (current.length) await syncGitHubProjects(current);
+  for (const project of current.filter(p => untouched(p.repoId))) verified.set(project.repoId, { project, checkedAt: started });
   completedScanRevision = scanRevision;
   lastScan = new Date().toISOString();
   return current;
@@ -63,7 +63,8 @@ export async function applyRepositoryEvent(owner: string, id: number, name: stri
     verified.delete(id);
     return null;
   }
-  syncGitHubProjects([project]);
+  await syncGitHubProjects([project]);
+  if (latestEvent.get(id) !== eventRevision || completedScanRevision > eventRevision) return null;
   verified.set(id, { project, checkedAt: started });
   return project;
 }
@@ -124,7 +125,10 @@ export function publicSnapshot() {
   return {
     lastUpdated: store.lastUpdated,
     publicationPending: pendingScan !== undefined,
-    content: { ...store.content, projects: publicProjects, caseStudies },
+    content: { ...store.content, profile: { ...store.content.profile,
+      photo: { ...store.content.profile.photo, versions: undefined },
+      resume: { ...store.content.profile.resume, versions: undefined },
+    }, projects: publicProjects, caseStudies },
     syncedRepositories,
   };
 }

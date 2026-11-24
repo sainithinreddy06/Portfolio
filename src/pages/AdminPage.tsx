@@ -49,6 +49,7 @@ export const AdminPage: React.FC = () => {
     );
   });
   const [isVerifyingSession, setIsVerifyingSession] = useState<boolean>(true);
+  const [draftRevision, setDraftRevision] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -146,6 +147,7 @@ export const AdminPage: React.FC = () => {
             setIsAuthenticated(true);
             sessionStorage.setItem('sai_nithin_admin_auth', 'true');
             sessionStorage.setItem('sai_nithin_admin_token', token);
+            localStorage.removeItem('sai_nithin_admin_token');
           } else {
             handleSessionInvalid();
           }
@@ -203,6 +205,7 @@ export const AdminPage: React.FC = () => {
       .then(readApiJson)
       .then(data => {
         if (!active) return;
+        setDraftRevision(data.lastUpdated);
         setDraft(data.content);
         setPhotoUrlInput(data.content.profile.photo.url || '');
         setResumeUrlInput(data.content.profile.resume.fileUrl || '');
@@ -258,7 +261,7 @@ export const AdminPage: React.FC = () => {
         setIsAuthenticated(true);
         sessionStorage.setItem('sai_nithin_admin_auth', 'true');
         sessionStorage.setItem('sai_nithin_admin_token', data.token);
-        localStorage.setItem('sai_nithin_admin_token', data.token);
+        localStorage.removeItem('sai_nithin_admin_token');
         setAuthError('');
       } else {
         if (res.status === 503) {
@@ -780,7 +783,7 @@ export const AdminPage: React.FC = () => {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: draft }),
+        body: JSON.stringify({ content: draft, lastUpdated: draftRevision }),
       });
       await refreshServerPortfolio();
       setSuccessMessage('Settings persisted successfully.');
@@ -795,7 +798,7 @@ export const AdminPage: React.FC = () => {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newContent }),
+        body: JSON.stringify({ content: newContent, lastUpdated: draftRevision }),
       });
       setDraft(newContent);
       await refreshServerPortfolio();

@@ -49,7 +49,7 @@ async function uploadToSupabase(
 
   try {
     const isPdf = path.extname(fileName).toLowerCase() === '.pdf';
-    const mimeType = isPdf ? 'application/pdf' : 'image/png';
+    const mimeType = isPdf ? 'application/pdf' : fileName.endsWith('.jpg') ? 'image/jpeg' : fileName.endsWith('.webp') ? 'image/webp' : 'image/png';
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -59,11 +59,11 @@ async function uploadToSupabase(
         'Content-Type': mimeType,
       },
       body: new Uint8Array(buffer),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Supabase storage upload failed (${response.status}): ${errText}`);
+      throw new Error(`Supabase storage upload failed (${response.status})`);
     }
 
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${storageKey}`;

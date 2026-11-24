@@ -10,12 +10,19 @@ Server.prototype.listen = function (...args) {
   return listen.apply(this, args);
 };
 
+let stored;
 globalThis.fetch = async (url, options = {}) => {
   const { hostname, pathname } = new URL(url);
   appendFileSync('requests.log', JSON.stringify([options.method ?? 'GET', hostname, pathname]) + '\n');
   if (hostname === 'storage.invalid') {
-    if (options.method === 'POST') return new Response(null, { status: 204 });
-    return Response.json([{ state: JSON.parse(readFileSync('data/syncedPortfolio.json', 'utf8')) }]);
+    stored ??= { state: JSON.parse(readFileSync('data/syncedPortfolio.json', 'utf8')), updated_at: '2025-01-01' };
+    if (pathname.startsWith('/storage/')) return new Response(null, { status: existsSync('asset-fail') ? 503 : 200 });
+    if (options.method === 'PATCH') {
+      if (existsSync('save-fail')) return new Response(null, {status: 503});
+      if (new URL(url).searchParams.get('updated_at') !== 'eq.' + stored.updated_at) return Response.json([]);
+      stored = JSON.parse(options.body);
+    }
+    return Response.json([stored]);
   }
   const fixture = JSON.parse(readFileSync('github.json', 'utf8'));
   if (fixture.hold === pathname) {
