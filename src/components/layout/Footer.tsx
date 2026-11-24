@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
-import { Github, Linkedin, Mail, Code2, ShieldCheck } from 'lucide-react';
+import { Github, Linkedin } from '../common/SocialIcons';
+import { Mail, Code2, ShieldCheck } from 'lucide-react';
 
 interface FooterProps {
   onOpenCommandPalette: () => void;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../content';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
-import { Mail, Copy, Check, Github, Linkedin, Code2, ExternalLink } from 'lucide-react';
+import { Github, Linkedin } from '../common/SocialIcons';
+import { Mail, Copy, Check, Code2, ExternalLink } from 'lucide-react';
 
 export const ContactSection: React.FC = () => {
   const { content } = usePortfolio();

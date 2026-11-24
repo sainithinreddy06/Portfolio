@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { usePortfolio } from '../../content';
-import { X, Printer, Download, Mail, Github, Linkedin, Code2, ExternalLink, FileText, Eye } from 'lucide-react';
+import { Github, Linkedin } from './SocialIcons';
+import { X, Printer, Download, Mail, Code2, ExternalLink, FileText, Eye } from 'lucide-react';
 import { downloadResume, getResumeFileUrl } from '../../utils/resumeManager';
 
 export const ResumeModal: React.FC = () => {

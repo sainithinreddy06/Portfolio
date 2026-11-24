@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { usePortfolio } from '../content';
 import { EngineeringModeBadge } from '../components/common/EngineeringModeBadge';
+import { Github } from '../components/common/SocialIcons';
 import {
   ArrowLeft,
-  Github,
   ExternalLink,
   Cpu,
   Terminal,

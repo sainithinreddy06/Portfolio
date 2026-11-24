@@ -507,7 +507,7 @@ app.post('/api/portfolio/photo/rollback', requireAdminAuth, async (req: Request,
  * DELETE /api/portfolio/photo/version/:id
  * Removes a historical photo version
  */
-app.delete('/api/portfolio/photo/version/:id', requireAdminAuth, async (req: Request, res: Response) => {
+app.delete('/api/portfolio/photo/version/:id', requireAdminAuth, async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
     const result = await deletePhotoVersion(id);
@@ -655,7 +655,7 @@ app.post('/api/portfolio/resume/rollback', requireAdminAuth, async (req: Request
  * DELETE /api/portfolio/resume/version/:id
  * Removes a historical resume version
  */
-app.delete('/api/portfolio/resume/version/:id', requireAdminAuth, async (req: Request, res: Response) => {
+app.delete('/api/portfolio/resume/version/:id', requireAdminAuth, async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
     const result = await deleteResumeVersion(id);
@@ -924,7 +924,7 @@ app.post('/api/portfolio/reset', requireAdminAuth, async (_req: Request, res: Re
 // -------------------------------------------------------------
 
 // Explicit catch-all for unknown API endpoints: ensures they always return JSON 404
-app.all('/api/*', (_req: Request, res: Response) => {
+app.use('/api', (_req: Request, res: Response) => {
   res.status(404).json({ success: false, error: 'API endpoint not found' });
 });
 
@@ -958,7 +958,7 @@ async function startServer() {
     app.use(express.static(distPath, { index: false }));
 
     // SPA fallback: send compiled index.html for client-side routing
-    app.get('*', (req: Request, res: Response) => {
+    app.get(/.*/, (req: Request, res: Response) => {
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ success: false, error: 'API endpoint not found' });
       }

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { usePortfolio } from '../../content';
 import type { ProjectItem } from '../../content/types';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
-import { ExternalLink, ArrowRight, Github, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Github } from '../common/SocialIcons';
+import { ExternalLink, ArrowRight, Award, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 // Known demo URLs retained for projects whose persisted snapshots omit liveUrl.
 // SureStep is intentionally excluded until its current deployment is verified.

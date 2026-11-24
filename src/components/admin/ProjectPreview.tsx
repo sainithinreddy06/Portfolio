@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProjectItem } from '../../content/types';
-import { Github, Award } from 'lucide-react';
+import { Github } from '../common/SocialIcons';
+import { Award } from 'lucide-react';
 
 interface ProjectPreviewProps {
   project: ProjectItem;
