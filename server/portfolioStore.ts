@@ -136,11 +136,18 @@ async function loadRemote() {
   const rows = await database('id=eq.main&select=state,updated_at&limit=1');
   if (!Array.isArray(rows)) throw new Error('Invalid portfolio response.');
   if (!rows.length) { revision = null; return; }
-  if (!rows[0].state?.content?.profile || !rows[0].state.syncedRepositories || !rows[0].updated_at) {
+  if (!isPortfolioContent(rows[0].state?.content) || !rows[0].state.syncedRepositories ||
+      !Number.isFinite(Date.parse(rows[0].state.lastUpdated)) || !rows[0].updated_at) {
     throw new Error('Invalid portfolio record.');
   }
   cachedState = rows[0].state;
   revision = rows[0].updated_at;
+}
+
+export function storageStatus(): 'local' | 'durable' | 'degraded' {
+  const { url, key } = getSupabaseConfig();
+  if (!url && !key) return localReadFailed ? 'degraded' : 'local';
+  return url && key && revision !== undefined ? 'durable' : 'degraded';
 }
 
 export async function initializePortfolioStore(): Promise<void> {

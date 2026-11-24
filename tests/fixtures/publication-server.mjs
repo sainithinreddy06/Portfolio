@@ -15,6 +15,7 @@ globalThis.fetch = async (url, options = {}) => {
   const { hostname, pathname } = new URL(url);
   appendFileSync('requests.log', JSON.stringify([options.method ?? 'GET', hostname, pathname]) + '\n');
   if (hostname === 'storage.invalid') {
+    while (existsSync('hold-initial-read')) await delay(10);
     stored ??= { state: JSON.parse(readFileSync('data/syncedPortfolio.json', 'utf8')), updated_at: '2025-01-01' };
     if (pathname.startsWith('/storage/')) return new Response(null, { status: existsSync('asset-fail') ? 503 : 200 });
     if (options.method === 'PATCH') {

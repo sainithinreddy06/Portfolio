@@ -94,24 +94,8 @@ export function getSessionSecret(): string {
   try {
     fs.writeFileSync(SECRET_FILE, newSecret, { mode: 0o600 });
   } catch (err) {
-    console.warn('[AuthService] Could not persist session secret to file, using in-memory:', err);
+    throw new Error('Session storage is unavailable.');
   }
-  return newSecret;
-}
-
-/**
- * Rotates the session secret and revokes all active sessions
- */
-export function rotateSessionSecret(): string {
-  ensureDataDir();
-  const newSecret = crypto.randomBytes(32).toString('hex');
-  try {
-    fs.writeFileSync(SECRET_FILE, newSecret, { mode: 0o600 });
-  } catch (err) {
-    console.warn('[AuthService] Could not write rotated session secret:', err);
-  }
-  // Invalidate all existing sessions upon secret rotation
-  saveSessions([]);
   return newSecret;
 }
 
@@ -131,9 +115,10 @@ function loadSessions(): StoredSession[] {
     const raw = fs.readFileSync(SESSIONS_FILE, 'utf8');
     const list: StoredSession[] = JSON.parse(raw);
     const now = Date.now();
-    return Array.isArray(list) ? list.filter((s) => s.expiresAt > now) : [];
+    if (!Array.isArray(list)) throw new Error();
+    return list.filter((s) => s.expiresAt > now);
   } catch {
-    return [];
+    throw new Error('Session storage is unavailable.');
   }
 }
 
@@ -172,7 +157,7 @@ function loadRateLimits(): Record<string, RateLimitRecord> {
     }
     return pruned;
   } catch {
-    return {};
+    throw new Error('Login rate-limit storage is unavailable.');
   }
 }
 
