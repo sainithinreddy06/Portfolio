@@ -48,7 +48,7 @@ Portfolio/
 
 ## Local Development
 
-Requirements: Node.js 22.12+ (Node 22 LTS recommended) and npm.
+Requirements: Node.js 22.18+ on the 22.x line or Node 24.11+ and npm.
 
 ```bash
 git clone https://github.com/sainithinreddy06/Portfolio.git
@@ -65,9 +65,10 @@ On PowerShell, use `Copy-Item .env.example .env` instead of `cp`.
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Start the Express/Vite development server |
-| `npm run build` | Build the frontend into `dist/` |
+| `npm run build` | Build the frontend into `dist/` and compile the Node entry point |
 | `npm run preview` | Preview the Vite production build |
-| `npm run lint` | Run the TypeScript compiler check |
+| `npm run lint` | Run ESLint on JavaScript and TypeScript |
+| `npm run typecheck` | Check TypeScript types |
 | `npm test` | Run the API and persistence tests |
 | `npm start` | Start the production Express server |
 
@@ -77,7 +78,7 @@ See [`.env.example`](./.env.example). Configure only integrations you use:
 
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET`: admin authentication.
 - `GITHUB_USERNAME`, `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`: GitHub API and webhook integration.
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` / `SUPABASE_ANON_KEY`, `SUPABASE_STORAGE_BUCKET`: optional asset storage.
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET`: optional asset storage.
 - `GEMINI_API_KEY`: optional resume parsing.
 - `PORT`, `NODE_ENV`, `APP_URL`, `ALLOWED_ORIGINS`: runtime and origin configuration.
 
@@ -88,11 +89,11 @@ Never commit populated environment files. Keep credentials in the hosting provid
 Run the portfolio as **one full-stack Node.js web service**; Express serves both the built React frontend and API.
 
 - Runtime: Node
-- Build command: `npm install && npm run build`
+- Build command: `npm ci --include=dev && npm run build`
 - Start command: `npm start`
 - Health check: `/api/health`
 
-The portfolio's durable state is stored in the Supabase `portfolio_state` table and uploaded profile assets use the public `portfolio-assets` Storage bucket. Configure `SUPABASE_URL` and the server-only `SUPABASE_SERVICE_ROLE_KEY` in Render before relying on admin edits and uploads. The service-role key must never be exposed in frontend variables or committed to Git. Local JSON files are only a fallback/cache on Render's ephemeral filesystem.
+The portfolio's durable state is stored in the Supabase `portfolio_state` table and uploaded profile assets use the configured public Storage bucket (or the `photos` and `resumes` buckets when no shared bucket is configured). Configure `SUPABASE_URL` and the server-only `SUPABASE_SERVICE_ROLE_KEY` in Render before relying on admin edits and uploads. The service-role key must never be exposed in frontend variables or committed to Git. Local JSON files are only a fallback/cache on Render's ephemeral filesystem.
 
 ## Contact
 
