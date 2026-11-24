@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCommandPalette }) => {
           <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-success)]" />
           <span>PORTFOLIO · CONTENT READY</span>
           {lastSyncedTimestamp && (
-            <span className="text-[10px] text-[var(--text-muted)] opacity-80">
+            <span className="text-[10px] text-[var(--text-muted)]">
               (Last content sync: {new Date(lastSyncedTimestamp).toLocaleDateString()})
             </span>
           )}
@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCommandPalette }) => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LeetCode Profile"
-              className="hover:text-[#FFA116] transition-colors cursor-pointer"
+              className="hover:text-[var(--leetcode-text)] transition-colors cursor-pointer"
             >
               <Code2 className="w-4 h-4" />
             </a>

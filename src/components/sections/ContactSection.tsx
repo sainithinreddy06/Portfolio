@@ -3,7 +3,7 @@ import { usePortfolio } from '../../content';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { Mail, Copy, Check, Github, Linkedin, Code2, ExternalLink } from 'lucide-react';
 
-export const ContactSection: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+export const ContactSection: React.FC = () => {
   const { content } = usePortfolio();
   const { profile } = content;
   const [copied, setCopied] = useState(false);
@@ -132,7 +132,7 @@ export const ContactSection: React.FC<{ children?: React.ReactNode }> = ({ child
 
           <div className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] flex flex-col justify-between hover:border-[#FFA116]/50 transition-colors shadow-xs">
             <div>
-              <div className="p-2.5 rounded-lg bg-[#FFA116]/10 border border-[#FFA116]/30 text-[#FFA116] w-fit mb-3">
+              <div className="p-2.5 rounded-lg bg-[#FFA116]/10 border border-[#FFA116]/30 text-[var(--leetcode-text)] w-fit mb-3">
                 <Code2 className="w-4 h-4" />
               </div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">LeetCode</h3>
@@ -145,10 +145,10 @@ export const ContactSection: React.FC<{ children?: React.ReactNode }> = ({ child
                 href={profile.leetcodeUrl || 'https://leetcode.com/u/Nithinreddy_06/'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full min-h-11 text-center py-2 px-2.5 rounded-sm border border-[#FFA116]/40 hover:bg-[#FFA116]/10 text-[#FFA116] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="w-full min-h-11 text-center py-2 px-2.5 rounded-sm border border-[#FFA116]/40 hover:bg-[#FFA116]/10 text-[var(--leetcode-text)] text-xs font-mono tracking-wider uppercase font-medium transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Solve</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#FFA116]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--leetcode-text)]" />
               </a>
             </div>
           </div>
