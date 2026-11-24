@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { usePortfolio } from '../content';
 import { EngineeringModeBadge } from '../components/common/EngineeringModeBadge';
 import {
@@ -18,7 +18,6 @@ import {
 
 export const CaseStudyPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const { content } = usePortfolio();
 
   const matchingProject = content.projects.find(
@@ -61,52 +60,40 @@ export const CaseStudyPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  const studyTitle = caseStudy?.title;
+  const overview = caseStudy?.overview;
   useEffect(() => {
-    const baseTitle = 'Sai Nithin Reddy – AI Engineer & Full-Stack Developer';
-    const baseDescription = 'Third-year Computer Science & Engineering student at CBIT Hyderabad. Explore Sai Nithin Reddy’s AI, full-stack, and software engineering projects.';
-    const baseUrl = window.location.origin + '/';
-    const description = caseStudy?.overview
-      ? caseStudy.overview.replace(/\\s+/g, ' ').slice(0, 157).trimEnd() + (caseStudy.overview.length > 157 ? '…' : '')
-      : baseDescription;
-    const title = caseStudy ? `${caseStudy.title} | Sai Nithin Reddy` : baseTitle;
-    const canonicalUrl = caseStudy ? window.location.origin + window.location.pathname : baseUrl;
-
+    const previousTitle = document.title;
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const home = canonical?.href;
+    if (!studyTitle || !overview || !canonical || !home) return;
+    const title = `${studyTitle} | Sai Nithin Reddy`;
+    const text = overview.replace(/\s+/g, ' ').trim();
+    const description = text.length > 157 ? text.slice(0, 157).trimEnd() + '…' : text;
+    const url = new URL(window.location.pathname, home).href;
+    const metadata = [
+      ['meta[name="description"]', description],
+      ['meta[property="og:description"]', description],
+      ['meta[name="twitter:description"]', description],
+      ['meta[property="og:title"]', title],
+      ['meta[name="twitter:title"]', title],
+      ['meta[property="og:url"]', url],
+    ];
+    const restore = metadata.flatMap(([selector, value]) => {
+      const meta = document.querySelector<HTMLMetaElement>(selector);
+      if (!meta) return [];
+      const previous = meta.content;
+      meta.content = value;
+      return [() => { meta.content = previous; }];
+    });
+    canonical.href = url;
     document.title = title;
-    const setMeta = (selector: string, attribute: 'name' | 'property', key: string, value: string) => {
-      let element = document.head.querySelector<HTMLMetaElement>(selector);
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute(attribute, key);
-        document.head.appendChild(element);
-      }
-      element.content = value;
-    };
-    setMeta('meta[name="description"]', 'name', 'description', description);
-    setMeta('meta[property="og:title"]', 'property', 'og:title', title);
-    setMeta('meta[property="og:description"]', 'property', 'og:description', description);
-    setMeta('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
-    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
-    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
-
-    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.rel = 'canonical';
-      document.head.appendChild(canonical);
-    }
-    canonical.href = canonicalUrl;
-
     return () => {
-      document.title = baseTitle;
-      setMeta('meta[name="description"]', 'name', 'description', baseDescription);
-      setMeta('meta[property="og:title"]', 'property', 'og:title', baseTitle);
-      setMeta('meta[property="og:description"]', 'property', 'og:description', baseDescription);
-      setMeta('meta[property="og:url"]', 'property', 'og:url', baseUrl);
-      setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', baseTitle);
-      setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', baseDescription);
-      if (canonical) canonical.href = baseUrl;
+      document.title = previousTitle;
+      canonical.href = home;
+      restore.forEach(reset => reset());
     };
-  }, [caseStudy]);
+  }, [studyTitle, overview, slug]);
 
   if (!caseStudy) {
     return (
@@ -130,13 +117,13 @@ export const CaseStudyPage: React.FC = () => {
     <div className="min-h-screen pt-28 pb-24 bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="mb-8">
-          <button
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
             className="inline-flex min-h-11 items-center gap-2 text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors py-2 focus-visible:outline-hidden cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>RETURN TO PORTFOLIO</span>
-          </button>
+          </Link>
         </div>
 
         <EngineeringModeBadge
@@ -248,7 +235,7 @@ export const CaseStudyPage: React.FC = () => {
             <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed mb-6">
               {caseStudy.architectureSummary}
             </p>
-            <section role="dialog" aria-modal="true" aria-label="Architecture & Pipeline">
+            <section aria-label="Component flow">
               <div className="text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider mb-4">
                 Component Flow
               </div>
