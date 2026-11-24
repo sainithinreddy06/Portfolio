@@ -36,7 +36,7 @@ import { downloadResume } from '../utils/resumeManager';
 
 export const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { content, updateContent, resetContent, refreshServerPortfolio } = usePortfolio();
+  const { content, resetContent, refreshServerPortfolio } = usePortfolio();
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -90,16 +90,9 @@ export const AdminPage: React.FC = () => {
   const [resumePreviewOpen, setResumePreviewOpen] = useState(false);
   const resumeFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Synchronize draft when content updates
-  useEffect(() => {
-    setDraft(content);
-    if (content.profile.photo.url) {
-      setPhotoUrlInput(content.profile.photo.url);
-    }
-    if (content.profile.resume.fileUrl) {
-      setResumeUrlInput(content.profile.resume.fileUrl);
-    }
-  }, [content]);
+  const [editorReady, setEditorReady] = useState(false);
+  const [editorLoadError, setEditorLoadError] = useState('');
+  const [editorRetry, setEditorRetry] = useState(0);
 
   // Robots meta tag for admin privacy
   useEffect(() => {
@@ -197,10 +190,37 @@ export const AdminPage: React.FC = () => {
     return res;
   };
 
+  // The editable archive includes withheld rows and never enters the public
+  // provider or localStorage. Load it again after a public snapshot refresh.
+  useEffect(() => {
+    let active = true;
+    if (!isAuthenticated || isVerifyingSession) {
+      setEditorReady(false);
+      return;
+    }
+    setEditorLoadError('');
+    authFetch('/api/admin/portfolio')
+      .then(readApiJson)
+      .then(data => {
+        if (!active) return;
+        setDraft(data.content);
+        setPhotoUrlInput(data.content.profile.photo.url || '');
+        setResumeUrlInput(data.content.profile.resume.fileUrl || '');
+        setEditorReady(true);
+      })
+      .catch(() => {
+        if (active) {
+          setEditorReady(false);
+          setEditorLoadError('Could not load the editable portfolio.');
+        }
+      });
+    return () => { active = false; };
+  }, [content, isAuthenticated, isVerifyingSession, editorRetry]);
+
   // Diagnostics for GitHub sync
   const fetchDiagnostics = async () => {
     try {
-      const res = await fetch('/api/github/status');
+      const res = await authFetch('/api/github/status');
       if (res.ok) {
         const data = await readApiJson(res);
         if (data.success) {
@@ -353,7 +373,6 @@ export const AdminPage: React.FC = () => {
             },
           };
           setDraft(updated);
-          updateContent(updated);
           setResumeUrlInput(data.resume.fileUrl);
           await refreshServerPortfolio();
 
@@ -423,7 +442,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       await refreshServerPortfolio();
       setSuccessMessage('Resume URL saved and active across all views!');
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -456,7 +474,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       await refreshServerPortfolio();
       setSuccessMessage(`Rolled back to resume version from ${version.uploadedAt}!`);
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -491,7 +508,7 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
+      await refreshServerPortfolio();
       setSuccessMessage('Resume version removed from history.');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err: any) {
@@ -520,7 +537,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       setResumeUrlInput('');
       await refreshServerPortfolio();
       setSuccessMessage('Resume reset to built-in curriculum vitae viewer.');
@@ -590,7 +606,6 @@ export const AdminPage: React.FC = () => {
             },
           };
           setDraft(updated);
-          updateContent(updated);
           setPhotoUrlInput(data.photo.url);
           await refreshServerPortfolio();
           setSuccessMessage('Portrait photograph uploaded, optimized, and active!');
@@ -654,7 +669,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       await refreshServerPortfolio();
       setSuccessMessage('Photograph URL applied and synchronized across all views!');
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -687,7 +701,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       await refreshServerPortfolio();
       setSuccessMessage(`Restored portrait from ${version.uploadedAt}!`);
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -721,7 +734,7 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
+      await refreshServerPortfolio();
       setSuccessMessage('Photo version removed from gallery.');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err: any) {
@@ -750,7 +763,6 @@ export const AdminPage: React.FC = () => {
         },
       };
       setDraft(updated);
-      updateContent(updated);
       setPhotoUrlInput('');
       await refreshServerPortfolio();
       setSuccessMessage('Portrait reset to monogram placeholder.');
@@ -770,7 +782,7 @@ export const AdminPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: draft }),
       });
-      updateContent(draft);
+      await refreshServerPortfolio();
       setSuccessMessage('Settings persisted successfully.');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err: any) {
@@ -786,7 +798,7 @@ export const AdminPage: React.FC = () => {
         body: JSON.stringify({ content: newContent }),
       });
       setDraft(newContent);
-      updateContent(newContent);
+      await refreshServerPortfolio();
       setSuccessMessage(message);
       setTimeout(() => setSuccessMessage(''), 4000);
     } catch (err: any) {
@@ -975,6 +987,15 @@ export const AdminPage: React.FC = () => {
   }
 
   // -------------------------------------------------------------
+  if (!editorReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center gap-4">
+        <span role="status">{editorLoadError || 'Loading portfolio editor…'}</span>
+        {editorLoadError && <button onClick={() => setEditorRetry(n => n + 1)}>Retry</button>}
+      </div>
+    );
+  }
+
   // RENDER: AUTHENTICATED ADMIN DASHBOARD
   // -------------------------------------------------------------
   return (
@@ -1873,7 +1894,7 @@ export const AdminPage: React.FC = () => {
                   GitHub Repository Synchronization
                 </h2>
                 <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                  Discover repositories tagged with <code>portfolio</code> on <code>sainithinreddy06</code>.
+                  Refresh eligible public repositories from the configured GitHub account.
                 </p>
               </div>
               <button
@@ -1884,7 +1905,7 @@ export const AdminPage: React.FC = () => {
                     const res = await authFetch('/api/github/sync', { method: 'POST' });
                     const data = await readApiJson(res);
                     setGithubSyncMsg(data.message || 'Repositories synced successfully.');
-                    await fetchDiagnostics();
+                    await Promise.all([fetchDiagnostics(), refreshServerPortfolio()]);
                   } catch (err: any) {
                     setErrorMessage(err.message || 'Failed to sync GitHub repositories.');
                   } finally {

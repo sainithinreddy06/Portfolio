@@ -4,19 +4,15 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { verifyGitHubSignature } from './server/githubService';
 import {
-  verifyGitHubSignature,
-  fetchRepositoryData,
-  hasPortfolioTopic,
-  syncAllPortfolioRepositories,
-  getGitHubDiagnostics,
-} from './server/githubService';
+  applyRepositoryEvent, publicSnapshot,
+  publicationDiagnostics, refreshPublication,
+} from './server/githubPublication';
 import { parseResume, generateResumeDiff } from './server/resumeService';
 import {
   getPortfolioStore,
   savePortfolioStore,
-  syncGitHubProjects,
-  handleRepositoryUntagged,
   applyApprovedResumeChanges,
   resetPortfolioStore,
   initializePortfolioStore,
@@ -286,82 +282,34 @@ app.get('/api/portfolio/resume/meta', (_req: Request, res: Response) => {
  * Single dynamic project data source consumed by the Projects page (SelectedWork).
  * Returns the latest synchronized repository data without requiring frontend builds or edits.
  */
-app.get('/api/projects', async (req: Request, res: Response, next: NextFunction) => {
-  // A GET request must remain read-only. Repository reconciliation writes to
-  // the portfolio store and consumes GitHub API quota, so require an admin
-  // session before honoring the explicit refresh query.
-  const shouldRefresh = req.query.refresh === 'true';
-  if (shouldRefresh) {
-    return requireAdminAuth(req, res, () => {
-      void refreshProjects(req, res);
-    });
-  }
-  try {
-    const store = getPortfolioStore();
-    res.json({
-      success: true,
-      source: 'synchronized_store',
-      lastUpdated: store.lastUpdated,
-      total: store.content.projects.length,
-      projects: store.content.projects,
-    });
-  } catch (err: any) {
-    console.error('[API /api/projects] Error:', err);
-    const store = getPortfolioStore();
-    res.json({
-      success: true,
-      source: 'fallback_store',
-      lastUpdated: store.lastUpdated,
-      total: store.content.projects.length,
-      projects: store.content.projects,
-      error: err.message,
-    });
-  }
+app.get('/api/projects', (_req: Request, res: Response) => {
+  const { content, lastUpdated } = publicSnapshot();
+  res.set('Cache-Control', 'no-store').json({
+    success: true, source: 'synchronized_store', lastUpdated,
+    total: content.projects.length, projects: content.projects,
+  });
 });
-
-async function refreshProjects(_req: Request, res: Response): Promise<void> {
-  try {
-    const discovered = await syncAllPortfolioRepositories(GITHUB_USERNAME, true);
-    const updatedContent = syncGitHubProjects(discovered);
-    res.json({
-      success: true,
-      source: 'github_live',
-      lastUpdated: updatedContent.lastSynced || new Date().toISOString(),
-      total: updatedContent.projects.length,
-      projects: updatedContent.projects,
-    });
-  } catch (err: any) {
-    console.error('[API /api/projects?refresh=true] Error:', err);
-    res.status(500).json({ success: false, error: 'Repository refresh failed.' });
-  }
-}
 
 /**
  * GET /api/portfolio
  * Serves merged, dynamic portfolio content (curated + github + resume approved).
  */
 app.get('/api/portfolio', (_req: Request, res: Response) => {
-  try {
-    const store = getPortfolioStore();
-    res.json({
-      success: true,
-      lastUpdated: store.lastUpdated,
-      content: store.content,
-      syncedRepositories: store.syncedRepositories,
-    });
-  } catch (err: any) {
-    console.error('[API /api/portfolio] Error reading store:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
+  res.set('Cache-Control', 'no-store').json({ success: true, ...publicSnapshot() });
 });
 
 /**
  * GET /api/github/status
  * Diagnostics endpoint: reports last sync, API rate limits remaining, discovered repositories, etc.
  */
-app.get('/api/github/status', (_req: Request, res: Response) => {
+app.get('/api/admin/portfolio', requireAdminAuth, (_req, res) => {
+  res.set('Cache-Control', 'no-store').json({ success: true, content: getPortfolioStore().content });
+});
+
+app.get('/api/github/status', requireAdminAuth, (_req: Request, res: Response) => {
   try {
-    const diagnostics = getGitHubDiagnostics();
+    res.set('Cache-Control', 'no-store');
+    const diagnostics = publicationDiagnostics();
     const store = getPortfolioStore();
     res.json({
       success: true,
@@ -477,7 +425,7 @@ app.post('/api/admin/logout', (req: Request, res: Response) => {
 app.post('/api/portfolio/save', requireAdminAuth, (req: Request, res: Response) => {
   try {
     const { content } = req.body;
-    if (!content || typeof content !== 'object') {
+    if (!content || !Array.isArray(content.projects)) {
       res.status(400).json({ success: false, error: 'Valid content object is required.' });
       return;
     }
@@ -494,9 +442,15 @@ app.post('/api/portfolio/save', requireAdminAuth, (req: Request, res: Response) 
     }
 
     const store = getPortfolioStore();
+    // Older editors may omit repositoryId when saving a manually edited card.
+    const existing = new Map(store.content.projects.map(project => [project.id, project.repositoryId]));
+    for (const project of content.projects) {
+      const previousId = existing.get(project.id);
+      if (previousId !== undefined) project.repositoryId = previousId;
+    }
     store.content = content;
     savePortfolioStore(store);
-    res.json({ success: true, message: 'Portfolio saved successfully.', content: store.content });
+    res.json({ success: true, message: 'Portfolio saved successfully.', content: publicSnapshot().content });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -828,24 +782,16 @@ app.post('/api/github/webhook', async (req: Request, res: Response) => {
     }
 
     const owner = repo.owner?.login || repo.owner?.name;
-    if (owner && owner.toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
-      console.log(`[GitHub Webhook] Ignored repo owned by ${owner} (expected ${GITHUB_USERNAME}).`);
-      res.json({ ignored: true, reason: 'Owner mismatch' });
-      return;
+    if (typeof owner !== 'string' || owner.toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
+      return res.json({ ignored: true, reason: 'Owner mismatch' });
     }
-
-    // Check if repo was deleted or made private
-    if (payload.action === 'deleted') {
-      console.log(`[GitHub Webhook] Repository ${repo.name} deleted. Archiving in portfolio.`);
-      handleRepositoryUntagged(repo.id);
-      res.json({ success: true, action: 'archived_deleted' });
-      return;
+    if (!Number.isSafeInteger(repo.id) || repo.id <= 0 || typeof repo.name !== 'string') {
+      return res.status(400).json({ error: 'Invalid repository identity.' });
     }
-
-    // A GitHub push event does not always include the latest README and metadata;
-    // query the GitHub API to retrieve complete fresh repository information.
-    console.log(`[GitHub Webhook] Fetching latest metadata for repository ${owner}/${repo.name}...`);
-    const fullProject = await fetchRepositoryData(owner || GITHUB_USERNAME, repo.name);
+    const withdrawn = ['deleted', 'privatized', 'transferred'].includes(payload.action) ||
+      repo.private === true || (repo.visibility !== undefined && repo.visibility !== 'public');
+    const fullProject = await applyRepositoryEvent(owner, repo.id, repo.name, withdrawn);
+    if (withdrawn) return res.json({ success: true, action: 'withdrawn' });
     if (!fullProject) {
       res.status(200).json({
         success: true,
@@ -855,8 +801,6 @@ app.post('/api/github/webhook', async (req: Request, res: Response) => {
       return;
     }
 
-    // Sync project into portfolio store
-    syncGitHubProjects([fullProject]);
     console.log(`[GitHub Webhook] Successfully synchronized project: ${fullProject.name} (liveUrl: ${fullProject.liveUrl || 'none'})`);
 
     res.json({
@@ -874,30 +818,12 @@ app.post('/api/github/webhook', async (req: Request, res: Response) => {
 /**
  * GET /api/github/projects
  */
-app.get('/api/github/projects', async (req: Request, res: Response) => {
-  try {
-    const forceRefresh = req.query.refresh === 'true';
-    const projects = await syncAllPortfolioRepositories(GITHUB_USERNAME, forceRefresh);
-    const updatedContent = syncGitHubProjects(projects);
-    res.json({
-      success: true,
-      username: GITHUB_USERNAME,
-      total: projects.length,
-      projects: updatedContent.projects,
-      lastSynced: new Date().toISOString(),
-    });
-  } catch (err: any) {
-    console.error('[API /api/github/projects] Error:', err);
-    const store = getPortfolioStore();
-    res.json({
-      success: true,
-      username: GITHUB_USERNAME,
-      total: store.content.projects.length,
-      projects: store.content.projects,
-      lastSynced: store.lastUpdated,
-      fromFallback: true,
-    });
-  }
+app.get('/api/github/projects', (_req: Request, res: Response) => {
+  const { content, lastUpdated } = publicSnapshot();
+  res.set('Cache-Control', 'no-store').json({
+    success: true, username: GITHUB_USERNAME, total: content.projects.length,
+    projects: content.projects, lastSynced: content.lastSynced || lastUpdated,
+  });
 });
 
 /**
@@ -907,7 +833,7 @@ app.get('/api/github/projects', async (req: Request, res: Response) => {
  */
 app.post('/api/github/sync', requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const requestedUser = req.body.username;
+    const requestedUser = req.body?.username;
     if (requestedUser && requestedUser.toLowerCase() !== GITHUB_USERNAME.toLowerCase()) {
       return res.status(400).json({
         success: false,
@@ -916,8 +842,8 @@ app.post('/api/github/sync', requireAdminAuth, async (req: Request, res: Respons
     }
     const targetUser = GITHUB_USERNAME;
     console.log(`[GitHub Sync API] Manual sync triggered for user: ${targetUser}`);
-    const projects = await syncAllPortfolioRepositories(targetUser, true);
-    const updatedContent = syncGitHubProjects(projects);
+    const projects = await refreshPublication(targetUser);
+    const updatedContent = publicSnapshot().content;
     res.json({
       success: true,
       syncedCount: projects.length,
@@ -1057,29 +983,11 @@ async function startServer() {
     console.log(`  ➜  Network: http://0.0.0.0:${PORT}/`);
     console.log(`[Portfolio Server] Running on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
 
-    // 1. Initial startup repository synchronization for sainithinreddy06
-    syncAllPortfolioRepositories(GITHUB_USERNAME)
-      .then((projects) => {
-        if (projects.length > 0) {
-          syncGitHubProjects(projects);
-          console.log(`[Portfolio Server] Pre-synced ${projects.length} repository projects from GitHub.`);
-        }
-      })
-      .catch((err) => console.warn('[Portfolio Server] Startup GitHub sync deferred:', err.message));
+    const reconcile = () => refreshPublication(GITHUB_USERNAME)
+      .catch((err) => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message));
+    void reconcile();
+    setInterval(reconcile, 30 * 60 * 1000);
 
-    // 2. Periodic scheduled reconciliation as fallback for missed webhooks (every 30 minutes)
-    const RECONCILIATION_INTERVAL_MS = 30 * 60 * 1000;
-    setInterval(() => {
-      console.log('[Portfolio Server] Scheduled reconciliation running in background...');
-      syncAllPortfolioRepositories(GITHUB_USERNAME, true)
-        .then((projects) => {
-          if (projects.length > 0) {
-            syncGitHubProjects(projects);
-            console.log(`[Portfolio Server] Scheduled reconciliation updated ${projects.length} repositories.`);
-          }
-        })
-        .catch((err) => console.warn('[Portfolio Server] Scheduled reconciliation failed:', err.message));
-    }, RECONCILIATION_INTERVAL_MS);
   });
 
   server.on('error', (err: any) => {

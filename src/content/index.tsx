@@ -2,6 +2,15 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { PortfolioContent, ProjectItem } from './types';
 import { initialPortfolioContent } from './portfolioData';
 
+// Offline content is editorial. Cached discovery results and repository links
+// must wait for the current server publication decision on each page load.
+const offlineContent: PortfolioContent = {
+  ...initialPortfolioContent,
+  projects: initialPortfolioContent.projects.map(project => ({ ...project, githubUrl: undefined })),
+  caseStudies: Object.fromEntries(Object.entries(initialPortfolioContent.caseStudies)
+    .map(([slug, study]) => [slug, { ...study, repoUrl: undefined }])),
+};
+
 export type ThemeMode = 'day' | 'night';
 
 export interface PortfolioContextType {
@@ -10,7 +19,6 @@ export interface PortfolioContextType {
   isLoadingProjects: boolean;
   projectsError: string | null;
   lastSyncedTimestamp: string | null;
-  updateContent: (newContent: PortfolioContent) => void;
   resetContent: () => void;
   refreshServerPortfolio: () => Promise<void>;
   syncWithGitHubNow: () => Promise<void>;
@@ -92,11 +100,8 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           return {
             ...initialPortfolioContent,
             ...parsed,
-            projects: normalizeProjectList(parsed.projects || initialPortfolioContent.projects),
-            caseStudies: {
-              ...initialPortfolioContent.caseStudies,
-              ...(parsed.caseStudies || {}),
-            },
+            projects: offlineContent.projects,
+            caseStudies: offlineContent.caseStudies,
             profile: {
               ...initialPortfolioContent.profile,
               ...parsed.profile,
@@ -107,9 +112,10 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch {
       // Fallback
     }
-    return initialPortfolioContent;
+    return offlineContent;
   });
 
+  const [publicationPending, setPublicationPending] = useState(false);
   const [isLoadingProjects, setIsLoadingProjects] = useState<boolean>(false);
   const [projectsError, setProjectsError] = useState<string | null>(null);
   const [lastSyncedTimestamp, setLastSyncedTimestamp] = useState<string | null>(content.lastSynced || null);
@@ -146,6 +152,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setProjectsError(null);
     try {
       const data = await fetchPortfolioSnapshot();
+      setPublicationPending(data.publicationPending === true);
       if (data.success && data.content) {
         const serverProjects = normalizeProjectList(data.content.projects || []);
         setContent((prev) => {
@@ -157,10 +164,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           const merged: PortfolioContent = {
             ...data.content,
             projects: serverProjects,
-            caseStudies: {
-              ...initialPortfolioContent.caseStudies,
-              ...(data.content.caseStudies || {}),
-            },
+            caseStudies: data.content.caseStudies ?? offlineContent.caseStudies,
             skillCategories: initialPortfolioContent.skillCategories,
             profile: {
               ...data.content.profile,
@@ -181,6 +185,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch (err: any) {
       console.warn('[Portfolio Sync] Using cached portfolio state:', err.message);
       setProjectsError(err.message);
+      setPublicationPending(false);
     } finally {
       setIsLoadingProjects(false);
     }
@@ -222,6 +227,16 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     refreshServerPortfolio();
   }, [refreshServerPortfolio]);
 
+  // Visitors who arrive during startup can see newly verified cards in the
+  // same visit. Poll only the read-only snapshot while verification is active.
+  useEffect(() => {
+    if (!publicationPending) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden && window.location.pathname !== '/admin') void refreshServerPortfolio();
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [publicationPending, refreshServerPortfolio]);
+
   // Synchronize theme attribute on HTML root
   useEffect(() => {
     const root = document.documentElement;
@@ -243,17 +258,8 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setTheme((prev) => (prev === 'day' ? 'night' : 'day'));
   };
 
-  const updateContent = (newContent: PortfolioContent) => {
-    setContent(newContent);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newContent));
-    } catch (e) {
-      console.warn('Unable to persist content to localStorage', e);
-    }
-  };
-
   const resetContent = () => {
-    setContent(initialPortfolioContent);
+    setContent(offlineContent);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
@@ -281,7 +287,6 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isLoadingProjects,
         projectsError,
         lastSyncedTimestamp,
-        updateContent,
         resetContent,
         refreshServerPortfolio,
         syncWithGitHubNow,

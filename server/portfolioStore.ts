@@ -194,13 +194,11 @@ export function mergeGitHubProject(
 
   const existingIdx = currentProjects.findIndex((p) => {
     const pExt = p as ExtendedProjectItem;
-    if (pExt.repositoryId && pExt.repositoryId === githubProj.repoId) {
-      return true;
+    if (pExt.repositoryId !== undefined) {
+      return pExt.repositoryId === githubProj.repoId;
     }
     if (p.githubUrl && githubProj.githubUrl) {
-      const pRepo = p.githubUrl.toLowerCase().replace(/\/$/, '').split('/').pop();
-      const gRepo = githubProj.githubUrl.toLowerCase().replace(/\/$/, '').split('/').pop();
-      if (pRepo && gRepo && pRepo === gRepo) return true;
+      return p.githubUrl.toLowerCase().replace(/\/$/, '') === githubProj.githubUrl.toLowerCase().replace(/\/$/, '');
     }
     const pFullName = p.name.toLowerCase().replace(/[^a-z0-9]/g, '');
     if (pFullName.includes(rawGitName) || rawGitName.includes(pFullName)) {
@@ -266,6 +264,7 @@ export function mergeGitHubProject(
     const newProjId = githubProj.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
     const newProject: ExtendedProjectItem = {
       id: newProjId,
+      source: 'github',
       name: githubProj.name,
       tagline: githubProj.tagline || 'Open-Source System',
       category: githubProj.category || 'FULL STACK',
@@ -299,7 +298,7 @@ export function syncGitHubProjects(projects: ExtractedGitHubProject[]): Portfoli
   let currentProjects = [...store.content.projects];
 
   for (const gitProj of projects) {
-    if (gitProj.isEligible && !gitProj.isFork) {
+    if (gitProj.visibility === 'public' && gitProj.isEligible && !gitProj.isFork) {
       const result = mergeGitHubProject(currentProjects, gitProj);
       currentProjects = result.projects;
       store.syncedRepositories[gitProj.repoId.toString()] = {
@@ -317,30 +316,6 @@ export function syncGitHubProjects(projects: ExtractedGitHubProject[]): Portfoli
   store.content.lastSynced = new Date().toISOString();
   savePortfolioStore(store);
   return store.content;
-}
-
-/**
- * Handles removal or untagging of a repository safely without destroying curated information.
- */
-export function handleRepositoryUntagged(repoId: number): void {
-  const store = getPortfolioStore();
-  const repoKey = repoId.toString();
-  if (store.syncedRepositories[repoKey]) {
-    delete store.syncedRepositories[repoKey];
-  }
-
-  store.content.projects = store.content.projects.map((p) => {
-    const pExt = p as ExtendedProjectItem;
-    if (pExt.repositoryId === repoId) {
-      return {
-        ...p,
-        isUnavailable: true,
-      };
-    }
-    return p;
-  });
-
-  savePortfolioStore(store);
 }
 
 /**
