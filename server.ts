@@ -201,6 +201,103 @@ app.get('/api/ready', (_req, res) => {
   });
 });
 
+/**
+ * GET /api/admin/verify
+ * Validates the currently active admin session token
+ */
+app.get('/api/admin/verify', (req: Request, res: Response) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : (req.headers['x-admin-token'] as string);
+
+  const result = verifyAdminToken(token);
+  if (result.valid) {
+    return res.json({
+      success: true,
+      user: result.user,
+      message: 'Admin session is active and valid.',
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    error: result.error || 'Invalid or expired admin session token.',
+    requiresLogin: true,
+  });
+});
+
+/**
+ * POST /api/admin/login
+ * Authenticates admin with persistent rate limiting, timing-safe password verification, and HMAC token generation
+ */
+app.post('/api/admin/login', (req: Request, res: Response) => {
+  try {
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const rateCheck = checkLoginRateLimit(ip);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: `Too many failed login attempts. Please wait ${rateCheck.waitSeconds} seconds before trying again.`,
+      });
+    }
+
+    const { email, password } = req.body;
+    if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
+      return res.status(400).json({ success: false, error: 'Email and password are required.' });
+    }
+
+    const normEmail = email.trim().toLowerCase();
+    const isUserAllowed =
+      ALLOWED_ADMIN_USERS.includes(normEmail);
+
+    if (!isUserAllowed) {
+      recordFailedLogin(ip);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials. Please enter authorized credentials.',
+      });
+    }
+
+    const passwordCheck = verifyAdminPassword(password);
+    if (!passwordCheck.valid) {
+      recordFailedLogin(ip);
+      return res.status(401).json({
+        success: false,
+        error: passwordCheck.error || 'Invalid credentials. Please enter authorized credentials.',
+      });
+    }
+
+    recordSuccessfulLogin(ip);
+    const { token, expiresAt } = createAdminSession(normEmail);
+
+    res.json({
+      success: true,
+      message: 'Authenticated successfully.',
+      token,
+      expiresAt,
+      user: normEmail,
+    });
+  } catch (err: any) {
+    sendFailure(res, err);
+  }
+});
+
+/**
+ * POST /api/admin/logout
+ */
+app.post('/api/admin/logout', (req: Request, res: Response) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : (req.headers['x-admin-token'] as string);
+
+  if (token) {
+    revokeAdminSession(token);
+  }
+  res.json({ success: true, message: 'Logged out successfully.' });
+});
+
 // HTML and immutable assets can be served while durable state is loading.
 app.use(['/api', '/resume.pdf', '/images/profile-photo.:ext'], (_req, _res, next) => { initialStore.then(() => next(), next); });
 
@@ -319,103 +416,6 @@ app.get('/api/github/status', requireAdminAuth, (_req: Request, res: Response) =
   } catch (err: any) {
     sendFailure(res, err);
   }
-});
-
-/**
- * GET /api/admin/verify
- * Validates the currently active admin session token
- */
-app.get('/api/admin/verify', (req: Request, res: Response) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice(7).trim()
-    : (req.headers['x-admin-token'] as string);
-
-  const result = verifyAdminToken(token);
-  if (result.valid) {
-    return res.json({
-      success: true,
-      user: result.user,
-      message: 'Admin session is active and valid.',
-    });
-  }
-
-  return res.status(401).json({
-    success: false,
-    error: result.error || 'Invalid or expired admin session token.',
-    requiresLogin: true,
-  });
-});
-
-/**
- * POST /api/admin/login
- * Authenticates admin with persistent rate limiting, timing-safe password verification, and HMAC token generation
- */
-app.post('/api/admin/login', (req: Request, res: Response) => {
-  try {
-    const ip = req.ip || req.socket.remoteAddress || 'unknown';
-    const rateCheck = checkLoginRateLimit(ip);
-    if (!rateCheck.allowed) {
-      return res.status(429).json({
-        success: false,
-        error: `Too many failed login attempts. Please wait ${rateCheck.waitSeconds} seconds before trying again.`,
-      });
-    }
-
-    const { email, password } = req.body;
-    if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
-      return res.status(400).json({ success: false, error: 'Email and password are required.' });
-    }
-
-    const normEmail = email.trim().toLowerCase();
-    const isUserAllowed =
-      ALLOWED_ADMIN_USERS.includes(normEmail);
-
-    if (!isUserAllowed) {
-      recordFailedLogin(ip);
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials. Please enter authorized credentials.',
-      });
-    }
-
-    const passwordCheck = verifyAdminPassword(password);
-    if (!passwordCheck.valid) {
-      recordFailedLogin(ip);
-      return res.status(401).json({
-        success: false,
-        error: passwordCheck.error || 'Invalid credentials. Please enter authorized credentials.',
-      });
-    }
-
-    recordSuccessfulLogin(ip);
-    const { token, expiresAt } = createAdminSession(normEmail);
-
-    res.json({
-      success: true,
-      message: 'Authenticated successfully.',
-      token,
-      expiresAt,
-      user: normEmail,
-    });
-  } catch (err: any) {
-    sendFailure(res, err);
-  }
-});
-
-/**
- * POST /api/admin/logout
- */
-app.post('/api/admin/logout', (req: Request, res: Response) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice(7).trim()
-    : (req.headers['x-admin-token'] as string);
-
-  if (token) {
-    revokeAdminSession(token);
-  }
-  res.json({ success: true, message: 'Logged out successfully.' });
 });
 
 /**
@@ -973,14 +973,22 @@ async function startServer() {
     });
   }
 
+  let stopping = false;
+  let pendingReconcile: Promise<unknown> | undefined;
+  const reconcile = () => {
+    if (stopping) return;
+    pendingReconcile ??= refreshPublication(GITHUB_USERNAME)
+      .catch(err => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message))
+      .finally(() => { pendingReconcile = undefined; });
+  };
+  const storageRetry = setInterval(() => {
+    if (storeInitialized && storageStatus() === 'degraded') void initializePortfolioStore();
+  }, 60000);
+  const syncTimer = setInterval(reconcile, 30 * 60 * 1000);
   const server = httpServer.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`[Portfolio Server] Listening after ${Math.round(process.uptime() * 1000)} ms on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
 
-    const reconcile = () => refreshPublication(GITHUB_USERNAME)
-      .catch((err) => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message));
     void initialStore.then(reconcile);
-    setInterval(reconcile, 30 * 60 * 1000);
-
   });
 
   server.on('error', (err: any) => {
@@ -993,8 +1001,14 @@ async function startServer() {
   });
 
   const shutdown = (signal: string) => {
+    if (stopping) return;
+    stopping = true;
+    clearInterval(syncTimer);
+    clearInterval(storageRetry);
+    setTimeout(() => process.exit(1), 25000).unref();
     console.log(`[Portfolio Server] Received ${signal}. Shutting down HTTP server cleanly...`);
-    server.close(() => {
+    server.close(async () => {
+      await pendingReconcile;
       console.log('[Portfolio Server] HTTP server closed.');
       process.exit(0);
     });

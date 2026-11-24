@@ -79,6 +79,7 @@ test('public HTTP reads, admin sync, and visibility changes share one publicatio
 
   assert.equal((await get('/api/health')).status, 200);
   assert.equal((await get('/api/ready')).status, 503);
+  assert.equal((await get('/api/admin/verify')).status, 401);
   await rm(path.join(dir, 'hold-initial-read'));
   await waitFor(async () => (await log()).includes('/users/owner/repos'));
   assert.deepEqual(await (await get('/api/ready')).json(), { readyForReads: true, storage: 'durable' });
