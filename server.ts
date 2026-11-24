@@ -85,7 +85,6 @@ import {
   recordFailedLogin,
   recordSuccessfulLogin,
   verifyAdminPassword,
-  isAuthConfigured,
   ALLOWED_ADMIN_USERS,
 } from './server/authService';
 import {
@@ -915,6 +914,11 @@ app.post('/api/portfolio/reset', requireAdminAuth, async (_req: Request, res: Re
 // Explicit catch-all for unknown API endpoints: ensures they always return JSON 404
 app.all('/api/*', (_req: Request, res: Response) => {
   res.status(404).json({ success: false, error: 'API endpoint not found' });
+});
+
+app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) return next(err);
+  sendFailure(res, err);
 });
 
 async function startServer() {
