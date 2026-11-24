@@ -12,6 +12,15 @@ const resolveTool = createRequire(path.resolve(process.env.BROWSER_TOOLS || '.',
 const { default: puppeteer } = await import(pathToFileURL(resolveTool('puppeteer-core')));
 const { default: lighthouse } = await import(pathToFileURL(resolveTool('lighthouse')));
 const axe = await readFile(resolveTool('axe-core/axe.min.js'), 'utf8');
+async function checkAccessibility(page, description) {
+  await page.evaluate(axe);
+  const issues = await page.evaluate(async () => {
+    const result = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } });
+    return result.violations.map(v => ({ id: v.id, count: v.nodes.length, examples: v.nodes.slice(0, 3).map(n => n.html) }));
+  });
+  assert.deepEqual(issues, [], description);
+}
+
 const dir = await mkdtemp(path.join(tmpdir(), 'portfolio-browser-'));
 let app, browser;
 try {
@@ -20,7 +29,7 @@ try {
   await cp('public', path.join(dir, 'public'), { recursive: true });
   await writeFile(path.join(dir, 'github.json'), '{"list":[],"details":{}}');
   app = fork(new URL('../tests/fixtures/publication-server.mjs', import.meta.url), ['--production', '--built', '--port', '0'], {
-    cwd: dir, env: { NODE_ENV: 'production', PATH: process.env.PATH, GITHUB_USERNAME: 'owner' }, execArgv: [], silent: true,
+    cwd: dir, env: { NODE_ENV: 'production', PATH: process.env.PATH, GITHUB_USERNAME: 'owner', ADMIN_EMAIL: 'editor@example.invalid', ADMIN_PASSWORD: 'fixture-password' }, execArgv: [], silent: true,
   });
   app.stdout.resume();
   app.stderr.pipe(process.stderr);
@@ -44,12 +53,7 @@ try {
       assert.equal(navigation.status(), route === '/missing' ? 404 : 200);
       await page.waitForSelector('main h1');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Horizontal overflow at ' + route);
-      await page.evaluate(axe);
-      const issues = await page.evaluate(async () => {
-        const result = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } });
-        return result.violations.map(v => ({ id: v.id, count: v.nodes.length, examples: v.nodes.slice(0, 3).map(n => n.html) }));
-      });
-      assert.deepEqual(issues, [], [theme, width, route].join(' '));
+      await checkAccessibility(page, [theme, width, route].join(' '));
       if (route === '/') {
         assert.ok(await page.$eval('picture img', img => img.naturalWidth && img.currentSrc.endsWith('.webp')));
         await page.keyboard.down('Control');
@@ -62,6 +66,16 @@ try {
       console.log(theme, width, route, 'passed');
     }
   }
+  await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+  await page.goto(origin + '/admin', { waitUntil: 'networkidle2' });
+  await page.type('#admin-email', 'editor@example.invalid');
+  await page.type('#admin-password', 'fixture-password');
+  const editor = page.waitForResponse(r => r.url() === origin + '/api/admin/portfolio' && r.status() === 200);
+  await page.click('button[type=submit]');
+  await editor;
+  await page.waitForSelector('a[href="/resume.pdf"]');
+  await checkAccessibility(page, 'Authenticated resume editor');
+  console.log('Authenticated resume editor passed');
   assert.deepEqual(errors, []);
   const { lhr } = await lighthouse(origin, {
     port: Number(new URL(browser.wsEndpoint()).port), onlyCategories: ['performance', 'seo'],
