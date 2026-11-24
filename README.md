@@ -95,6 +95,8 @@ Run the portfolio as **one full-stack Node.js web service**; Express serves both
 
 The portfolio's durable state is stored in the Supabase `portfolio_state` table and uploaded profile assets use the configured public Storage bucket (or the `photos` and `resumes` buckets when no shared bucket is configured). Configure `SUPABASE_URL` and the server-only `SUPABASE_SERVICE_ROLE_KEY` in Render before relying on admin edits and uploads. The service-role key must never be exposed in frontend variables or committed to Git. Local JSON files are only a fallback/cache on Render's ephemeral filesystem.
 
+For verification results, remaining acceptance checks and deployment/rollback guidance, see [the readiness review](docs/READINESS.md).
+
 ## Contact
 
 - **GitHub:** [@sainithinreddy06](https://github.com/sainithinreddy06)
