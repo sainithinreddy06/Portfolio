@@ -144,7 +144,11 @@ function conflict() {
 async function readRemote() {
   const rows = await database('id=eq.main&select=state,updated_at&limit=1');
   if (!Array.isArray(rows)) throw new Error('Invalid portfolio response.');
-  if (!rows.length) { revision = null; return; }
+  if (!rows.length) {
+    if (localReadFailed) throw new StoreError(503, 'Restore the local snapshot before initializing durable storage.');
+    revision = null;
+    return;
+  }
   if (!validSnapshot(rows[0]?.state) || typeof rows[0]?.updated_at !== 'string' || !rows[0].updated_at) {
     throw new Error('Invalid portfolio record.');
   }
@@ -184,7 +188,6 @@ export async function savePortfolioStore(state: PortfolioStoreState): Promise<vo
     if (Boolean(url) !== Boolean(key)) throw new StoreError(503, 'Portfolio storage configuration is incomplete.');
     if (!url && localReadFailed) throw new StoreError(503, 'Restore the local portfolio snapshot before saving.');
     if (url && revision === undefined) await loadRemote();
-    if (revision === null && localReadFailed) throw new StoreError(503, 'Restore the local snapshot before initializing durable storage.');
     if (state.lastUpdated !== getPortfolioStore().lastUpdated) throw conflict();
     state.lastUpdated = new Date(Math.max(Date.now(), Date.parse(state.lastUpdated) + 1)).toISOString();
     if (url) {

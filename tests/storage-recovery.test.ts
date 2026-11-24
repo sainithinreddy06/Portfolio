@@ -22,17 +22,21 @@ test('degraded reads recover without an edit and concurrent recovery uses one da
   process.env.SUPABASE_URL = 'https://storage.invalid';
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'fixture-role';
   let online = false;
+  let rowsAvailable = false;
   const reads = t.mock.method(globalThis, 'fetch', async () => online
-    ? Response.json([{ state: { ...stale, lastUpdated: '2025-02-01' }, updated_at: '2025-02-01' }])
+    ? Response.json(rowsAvailable ? [{ state: { ...stale, lastUpdated: '2025-02-01' }, updated_at: '2025-02-01' }] : [])
     : new Response(null, { status: 503 }));
   await store.initializePortfolioStore();
   assert.equal(store.storageStatus(), 'degraded');
   online = true;
+  await store.initializePortfolioStore();
+  assert.equal(store.storageStatus(), 'degraded');
+  rowsAvailable = true;
   await Promise.all([store.initializePortfolioStore(), store.initializePortfolioStore()]);
-  assert.equal(reads.mock.callCount(), 2);
+  assert.equal(reads.mock.callCount(), 3);
   assert.equal(store.storageStatus(), 'durable');
   assert.equal(store.getPortfolioStore().lastUpdated, '2025-02-01');
   await assert.rejects(store.savePortfolioStore(stale), { status: 409 });
   await store.initializePortfolioStore();
-  assert.equal(reads.mock.callCount(), 2);
+  assert.equal(reads.mock.callCount(), 3);
 });
