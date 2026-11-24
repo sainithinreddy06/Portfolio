@@ -98,17 +98,15 @@ export const AdminPage: React.FC = () => {
 
   // Robots meta tag for admin privacy
   useEffect(() => {
-    let metaNoIndex = document.querySelector('meta[name="robots"]');
-    if (!metaNoIndex) {
-      metaNoIndex = document.createElement('meta');
-      metaNoIndex.setAttribute('name', 'robots');
-      metaNoIndex.setAttribute('content', 'noindex, nofollow');
-      document.head.appendChild(metaNoIndex);
-    } else {
-      metaNoIndex.setAttribute('content', 'noindex, nofollow');
-    }
+    const previousTitle = document.title;
+    document.title = 'Portfolio Admin | Sai Nithin Reddy';
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
     return () => {
-      metaNoIndex?.setAttribute('content', 'index, follow');
+      meta.remove();
+      document.title = previousTitle;
     };
   }, []);
 
