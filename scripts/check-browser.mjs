@@ -79,11 +79,15 @@ try {
   assert.deepEqual(errors, []);
   const { lhr } = await lighthouse(origin, {
     port: Number(new URL(browser.wsEndpoint()).port), onlyCategories: ['performance', 'seo'],
-    blockedUrlPatterns: ['https://fonts.googleapis.com/*', 'https://fonts.gstatic.com/*'], logLevel: 'error',
+    logLevel: 'error',
   });
   assert.equal(lhr.runtimeError, undefined, lhr.runtimeError?.message);
   const audits = lhr.audits;
-  console.log('Mobile Lighthouse', Object.fromEntries(['largest-contentful-paint', 'cumulative-layout-shift', 'total-byte-weight'].map(k => [k, audits[k].numericValue])));
+  const externalTypography = audits['network-requests'].details.items.filter(item =>
+    ['Font', 'Stylesheet'].includes(item.resourceType) && new URL(item.url).origin !== origin);
+  assert.deepEqual(externalTypography.map(item => item.url), [], 'External font or stylesheet on homepage');
+  console.log('Mobile Lighthouse', Object.fromEntries(['largest-contentful-paint', 'first-contentful-paint', 'cumulative-layout-shift', 'total-blocking-time', 'total-byte-weight'].map(k => [k, audits[k].numericValue])));
+  console.log('Homepage requests', audits['network-requests'].details.items.length);
   assert.ok(audits['total-byte-weight'].numericValue < 450000, 'Homepage transfer exceeded 450 kB');
   assert.equal(audits['document-title'].score, 1);
 } finally {

@@ -2,6 +2,8 @@
 
 The review branch is `improve/portfolio-readiness`. The comparison build is `0518c14`, which already includes the first repository-publication fix. The application still serves the original React design and the existing Express API. All implementation and browser tests used local processes, disposable data and synthetic credentials. Production acceptance is pending.
 
+Roadmap status on this branch: Phases 1 and 2 were completed previously. The [Phase 3 frontend report](PHASE-3.md) records its separate verification. The later phase rows below describe existing implementation and planned acceptance checks. Phase 4 is next.
+
 ## Phase record
 
 | Phase | A · Executive summary | B · Technical findings | C · Priorities | D · Implementation |
