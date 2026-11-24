@@ -22,7 +22,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run TypeScript type check
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
+
+      - name: Run ESLint
         run: npm run lint
 
       - name: Run tests
@@ -30,3 +36,9 @@ jobs:
 
       - name: Build production bundle
         run: npm run build
+
+      - name: Install isolated browser test tools
+        run: npm install --prefix "$RUNNER_TEMP/browser-tools" --no-audit --no-fund lighthouse@13.6.0 axe-core@4.14.1 puppeteer-core@25.18.1
+
+      - name: Check responsive layouts, accessibility and transfer budget
+        run: BROWSER_TOOLS="$RUNNER_TEMP/browser-tools" CHROME_PATH="$(which google-chrome)" node scripts/check-browser.mjs

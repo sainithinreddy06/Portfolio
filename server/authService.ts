@@ -92,7 +92,7 @@ export function getSessionSecret(): string {
   }
   const newSecret = crypto.randomBytes(32).toString('hex');
   try {
-    fs.writeFileSync(SECRET_FILE, newSecret, 'utf8');
+    fs.writeFileSync(SECRET_FILE, newSecret, { mode: 0o600 });
   } catch (err) {
     console.warn('[AuthService] Could not persist session secret to file, using in-memory:', err);
   }
@@ -106,7 +106,7 @@ export function rotateSessionSecret(): string {
   ensureDataDir();
   const newSecret = crypto.randomBytes(32).toString('hex');
   try {
-    fs.writeFileSync(SECRET_FILE, newSecret, 'utf8');
+    fs.writeFileSync(SECRET_FILE, newSecret, { mode: 0o600 });
   } catch (err) {
     console.warn('[AuthService] Could not write rotated session secret:', err);
   }
@@ -139,11 +139,8 @@ function loadSessions(): StoredSession[] {
 
 function saveSessions(sessions: StoredSession[]): void {
   ensureDataDir();
-  try {
-    fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), 'utf8');
-  } catch (err) {
-    console.error('[AuthService] Failed to write admin sessions to disk:', err);
-  }
+  fs.writeFileSync(SESSIONS_FILE + '.tmp', JSON.stringify(sessions), { mode: 0o600 });
+  fs.renameSync(SESSIONS_FILE + '.tmp', SESSIONS_FILE);
 }
 
 // -------------------------------------------------------------
@@ -181,11 +178,8 @@ function loadRateLimits(): Record<string, RateLimitRecord> {
 
 function saveRateLimits(map: Record<string, RateLimitRecord>): void {
   ensureDataDir();
-  try {
-    fs.writeFileSync(RATE_LIMITS_FILE, JSON.stringify(map, null, 2), 'utf8');
-  } catch (err) {
-    console.warn('[AuthService] Could not persist rate limits:', err);
-  }
+  fs.writeFileSync(RATE_LIMITS_FILE + '.tmp', JSON.stringify(map), { mode: 0o600 });
+  fs.renameSync(RATE_LIMITS_FILE + '.tmp', RATE_LIMITS_FILE);
 }
 
 /**
@@ -279,6 +273,7 @@ export function createAdminSession(user: string): { token: string; expiresAt: nu
  * Validates a session token
  */
 export function verifyAdminToken(token: string | undefined): { valid: boolean; user?: string; error?: string } {
+  if (!isAuthConfigured()) return { valid: false, error: 'Admin access is disabled.' };
   if (!token || typeof token !== 'string') {
     return { valid: false, error: 'Token is missing' };
   }
@@ -292,14 +287,14 @@ export function verifyAdminToken(token: string | undefined): { valid: boolean; u
   const secret = getSessionSecret();
   const expectedSig = crypto.createHmac('sha256', secret).update(payloadB64).digest('base64url');
 
-  if (signature.length !== expectedSig.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expectedSig) || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
     return { valid: false, error: 'Invalid token signature' };
   }
 
   try {
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
     const now = Date.now();
-    if (!payload.exp || payload.exp < now) {
+    if (payload.user !== ADMIN_EMAIL || !payload.exp || payload.exp <= now) {
       return { valid: false, error: 'Session token has expired' };
     }
 

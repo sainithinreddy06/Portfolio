@@ -18,31 +18,7 @@ export const HomePage: React.FC = () => {
       <Architecture />
       <ExperienceEducation />
       <ResumeSection />
-      <ContactSection>
-        <div
-          className="mt-8 p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)]"
-          dangerouslySetInnerHTML={{
-            __html: `
-              <script type="application/ld+json">
-                {
-                  "@context": "https://schema.org",
-                  "@type": "Person",
-                  "name": "Sai Nithin Reddy",
-                  "url": "https://sai-nithin-portfolio.onrender.com",
-                  "image": "https://sai-nithin-portfolio.onrender.com/images/profile-photo.png",
-                  "email": "sainithinreddytadugam@gmail.com",
-                  "description": "AI Engineer & Full-Stack Developer — building AI-first full-stack systems with React, Node, and cloud infrastructure. Specializing in turning research prototypes into production-grade systems with measurable engineering outcomes.",
-                  "worksFor": "Chaitanya Bharathi Institute of Technology (CBIT)",
-                  "sameAs": [
-                    "https://github.com/sainithinreddy06",
-                    "https://www.linkedin.com/in/sai-nithin-reddy-tadugam-906825372"
-                  ]
-                }
-              </script>
-            `,
-          }}
-        />
-      </ContactSection>
+      <ContactSection />
     </div>
   );
 };

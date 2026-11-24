@@ -24,6 +24,7 @@ export default function App() {
           <Navbar onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
           <CommandPalette
             isOpen={isCommandPaletteOpen}
+            onToggle={() => setIsCommandPaletteOpen(open => !open)}
             onClose={() => setIsCommandPaletteOpen(false)}
           />
           <ResumeModal />
@@ -31,7 +32,7 @@ export default function App() {
             <main id="main-content" className="flex-1">
               <Suspense
                 fallback={
-                  <div className="min-h-[50vh] flex items-center justify-center text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">
+                  <div className="min-h-screen flex items-center justify-center text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">
                     Loading page…
                   </div>
                 }

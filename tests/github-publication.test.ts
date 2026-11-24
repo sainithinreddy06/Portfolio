@@ -145,4 +145,49 @@ test('public HTTP reads, admin sync, and visibility changes share one publicatio
   assert.deepEqual(Object.keys(view.syncedRepositories), []);
   assert.doesNotMatch(JSON.stringify(view.content), /open-library|Withheld legacy title/);
   assert.match(await (await get('/api/admin/portfolio', auth)).text(), /open-library/);
+
+  await t.test('durable write failures leave published content and assets intact', async () => {
+    const archive = async () => (await (await get('/api/admin/portfolio', auth)).json());
+    const before = await archive();
+    const changed = structuredClone(before.content);
+    changed.profile.positioning += ' test edit';
+    await writeFile(path.join(dir, 'save-fail'), '');
+    const failed = await post('/api/portfolio/save', { content: changed, lastUpdated: before.lastUpdated }, auth);
+    assert.equal(failed.status, 503);
+    assert.deepEqual(await archive(), before);
+    const upload = { fileName: 'test.pdf', dataUri: Buffer.from('%PDF-1.4 fixture').toString('base64') };
+    assert.equal((await post('/api/portfolio/resume', upload, auth)).status, 503);
+    assert.deepEqual(await archive(), before);
+    await rm(path.join(dir, 'save-fail'));
+    await writeFile(path.join(dir, 'asset-fail'), '');
+    assert.equal((await post('/api/portfolio/resume', upload, auth)).status, 503);
+    assert.deepEqual(await archive(), before);
+    assert.equal(await readFile(storePath, 'utf8'), initialState);
+    await rm(path.join(dir, 'asset-fail'));
+    const first = await (await post('/api/portfolio/resume', upload, auth)).json();
+    const second = await (await post('/api/portfolio/resume', upload, auth)).json();
+    assert.ok(first.version.id !== second.version.id);
+    assert.equal((await post('/api/portfolio/resume/rollback', { versionId: first.version.id }, auth)).status, 200);
+    const served = await fetch(`http://127.0.0.1:${port}/resume.pdf`, { redirect: 'manual' });
+    assert.equal(served.headers.get('location'), first.version.fileUrl);
+    assert.equal((await snapshot()).content.profile.resume.versions, undefined);
+    assert.equal((await post('/api/portfolio/save', { content: changed, lastUpdated: before.lastUpdated }, auth)).status, 409);
+    assert.equal((await post('/api/portfolio/photo', { imageUrl: '//example.invalid' }, auth)).status, 400);
+  });
+
+  await t.test('protected routes, request limits, CORS and revocation', async () => {
+    for (const route of ['/api/portfolio/photo', '/api/portfolio/resume', '/api/resume/parse',
+      '/api/portfolio/reset', '/api/resume/apply', '/api/portfolio/save', '/api/portfolio/photo/rollback',
+      '/api/portfolio/resume/rollback']) assert.equal((await post(route, {})).status, 401, route);
+    assert.equal((await post('/api/resume/parse', { pdfBase64: 'AAAA' }, auth)).status, 400);
+    assert.equal((await post('/api/admin/login', { value: 'x'.repeat(1024 * 1024) })).status, 413);
+    const cors = await get('/api/portfolio', { Origin: 'http://localhost:3000' });
+    assert.equal(cors.headers.has('access-control-allow-origin'), false);
+    assert.match(cors.headers.get('vary')!, /Origin/);
+    assert.ok(cors.headers.get('content-security-policy'));
+    assert.equal((await post('/api/admin/logout', {}, auth)).status, 200);
+    assert.equal((await get('/api/admin/verify', auth)).status, 401);
+    for (let i = 0; i < 5; i++) assert.equal((await post('/api/admin/login', { email: 'editor@example.invalid', password: 'incorrect' })).status, 401);
+    assert.equal((await post('/api/admin/login', { email: 'editor@example.invalid', password: 'incorrect' })).status, 429);
+  });
 });

@@ -1,3 +1,4 @@
+import { serverResourceUrl } from '../services/apiResponse';
 import { readApiJson } from '../services/apiResponse';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +50,7 @@ export const AdminPage: React.FC = () => {
     );
   });
   const [isVerifyingSession, setIsVerifyingSession] = useState<boolean>(true);
+  const [draftRevision, setDraftRevision] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -137,7 +139,7 @@ export const AdminPage: React.FC = () => {
       }
 
       try {
-        const res = await fetch('/api/admin/verify', {
+        const res = await fetch(serverResourceUrl('/api/admin/verify'), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -146,6 +148,7 @@ export const AdminPage: React.FC = () => {
             setIsAuthenticated(true);
             sessionStorage.setItem('sai_nithin_admin_auth', 'true');
             sessionStorage.setItem('sai_nithin_admin_token', token);
+            localStorage.removeItem('sai_nithin_admin_token');
           } else {
             handleSessionInvalid();
           }
@@ -177,7 +180,7 @@ export const AdminPage: React.FC = () => {
       ...getAuthHeaders(),
       ...(options.headers || {}),
     };
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetch(serverResourceUrl(url), { ...options, headers });
     if (res.status === 401) {
       handleSessionInvalid();
       setAuthError('Your admin session has expired. Please sign in again.');
@@ -203,6 +206,7 @@ export const AdminPage: React.FC = () => {
       .then(readApiJson)
       .then(data => {
         if (!active) return;
+        setDraftRevision(data.lastUpdated);
         setDraft(data.content);
         setPhotoUrlInput(data.content.profile.photo.url || '');
         setResumeUrlInput(data.content.profile.resume.fileUrl || '');
@@ -247,7 +251,7 @@ export const AdminPage: React.FC = () => {
     const password = passwordInput;
 
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(serverResourceUrl('/api/admin/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user, password }),
@@ -258,7 +262,7 @@ export const AdminPage: React.FC = () => {
         setIsAuthenticated(true);
         sessionStorage.setItem('sai_nithin_admin_auth', 'true');
         sessionStorage.setItem('sai_nithin_admin_token', data.token);
-        localStorage.setItem('sai_nithin_admin_token', data.token);
+        localStorage.removeItem('sai_nithin_admin_token');
         setAuthError('');
       } else {
         if (res.status === 503) {
@@ -283,7 +287,7 @@ export const AdminPage: React.FC = () => {
     const token = getAdminToken();
     if (token) {
       try {
-        await fetch('/api/admin/logout', {
+        await fetch(serverResourceUrl('/api/admin/logout'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -765,7 +769,7 @@ export const AdminPage: React.FC = () => {
       setDraft(updated);
       setPhotoUrlInput('');
       await refreshServerPortfolio();
-      setSuccessMessage('Portrait reset to monogram placeholder.');
+      setSuccessMessage('Default portrait restored.');
       setTimeout(() => setSuccessMessage(''), 4000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to reset photo.');
@@ -780,7 +784,7 @@ export const AdminPage: React.FC = () => {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: draft }),
+        body: JSON.stringify({ content: draft, lastUpdated: draftRevision }),
       });
       await refreshServerPortfolio();
       setSuccessMessage('Settings persisted successfully.');
@@ -795,7 +799,7 @@ export const AdminPage: React.FC = () => {
       await authFetch('/api/portfolio/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newContent }),
+        body: JSON.stringify({ content: newContent, lastUpdated: draftRevision }),
       });
       setDraft(newContent);
       await refreshServerPortfolio();
@@ -1167,7 +1171,7 @@ export const AdminPage: React.FC = () => {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <a
-                    href="/resume.pdf"
+                    href={serverResourceUrl('/resume.pdf')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 rounded-sm bg-[var(--surface-elevated)] hover:border-[var(--text-primary)] border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-primary)] flex items-center gap-1.5 cursor-pointer shadow-xs"
@@ -1223,7 +1227,7 @@ export const AdminPage: React.FC = () => {
                     <div className="space-y-2 pt-5 mt-4 border-t border-[var(--border-subtle)]">
                       <div className="flex items-center gap-2">
                         <a
-                          href="/resume.pdf"
+                          href={serverResourceUrl('/resume.pdf')}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 py-1.5 px-3 rounded-sm bg-[var(--surface-elevated)] hover:border-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-primary)] flex items-center justify-center gap-1.5 cursor-pointer"
@@ -1458,7 +1462,7 @@ export const AdminPage: React.FC = () => {
                           </button>
                         )}
                         <a
-                          href={version.fileUrl || '/resume.pdf'}
+                          href={serverResourceUrl(version.fileUrl || '/resume.pdf')}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-2.5 py-1 rounded bg-[var(--surface-elevated)] hover:bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-primary)] cursor-pointer"
@@ -1511,7 +1515,7 @@ export const AdminPage: React.FC = () => {
                     Profile Photograph Management
                   </h2>
                   <p className="text-xs text-[var(--text-secondary)] mt-0.5 max-w-2xl leading-relaxed">
-                    Upload or update Sai Nithin Reddy&apos;s real portrait photo. Files are validated, stored persistently, mirrored to <code>/api/portfolio/photo</code> and <code>/images/profile-photo.*</code>, and automatically rendered in Hero and About sections.
+                    Upload or update Sai Nithin Reddy&apos;s real portrait photo. Uploaded images are validated and versioned. You can restore an earlier portrait from its history.
                   </p>
                 </div>
 
@@ -1537,7 +1541,7 @@ export const AdminPage: React.FC = () => {
                   <div className="w-full max-w-[260px] aspect-[4/5] rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)] overflow-hidden flex items-center justify-center p-3 relative shadow-md">
                     {draft.profile.photo.url && !draft.profile.photo.isPlaceholder ? (
                       <img
-                        src={draft.profile.photo.url}
+                        src={serverResourceUrl(draft.profile.photo.url)}
                         alt={draft.profile.photo.altText || 'Portrait Preview'}
                         className="w-full h-full object-contain rounded-lg"
                       />
@@ -2108,7 +2112,7 @@ export const AdminPage: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <a
-                    href="/resume.pdf"
+                    href={serverResourceUrl('/resume.pdf')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-2.5 py-1 rounded bg-[var(--surface-elevated)] hover:border-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-primary)] flex items-center gap-1 cursor-pointer"
@@ -2135,7 +2139,7 @@ export const AdminPage: React.FC = () => {
               </div>
               <div className="flex-1 bg-black/5 relative">
                 <iframe
-                  src="/resume.pdf"
+                  src={serverResourceUrl('/resume.pdf')}
                   title="Resume PDF Preview"
                   className="w-full h-full border-none"
                 />

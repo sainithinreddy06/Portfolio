@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import compression from 'compression';
 import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import fs from 'fs';
@@ -15,7 +17,7 @@ import {
   savePortfolioStore,
   applyApprovedResumeChanges,
   resetPortfolioStore,
-  initializePortfolioStore,
+  initializePortfolioStore, draftPortfolioStore, StoreError,
 } from './server/portfolioStore';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -87,7 +89,7 @@ import {
   ALLOWED_ADMIN_USERS,
 } from './server/authService';
 import {
-  saveUploadedResume,
+  isValidPdf, saveUploadedResume,
   rollbackResumeVersion,
   deleteResumeVersion,
   getActiveResumeFile,
@@ -96,29 +98,19 @@ import {
   deletePhotoVersion,
   resetPhotoToPlaceholder,
   getActivePhotoFile,
-  ensureStorageDirectories,
+
 } from './server/assetManager';
 import { getStorageProviderStatus } from './server/cloudStorage';
 
-// Ensure storage directories are initialized
-ensureStorageDirectories();
+const initialStore = initializePortfolioStore();
 
-function isValidUrl(urlStr: string | undefined): boolean {
-  if (!urlStr) return true;
-  const trimmed = urlStr.trim().toLowerCase();
-  if (
-    trimmed.startsWith('javascript:') ||
-    trimmed.startsWith('data:') ||
-    trimmed.startsWith('vbscript:')
-  ) {
-    return false;
-  }
-  return (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('/') ||
-    trimmed.startsWith('#')
-  );
+import { isPortfolioContent, isSafeAssetUrl } from './server/portfolioValidation';
+
+function sendFailure(res: Response, error: unknown) {
+  const expected = error instanceof StoreError;
+  return res.status(expected ? error.status : 500).json({
+    success: false, error: expected ? error.message : 'The request could not be completed.',
+  });
 }
 
 // -------------------------------------------------------------
@@ -131,13 +123,15 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || process.env.APP_URL || '
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin;
+  if (req.path.startsWith('/api/')) res.set('Cache-Control', 'no-store');
 
   // Standard OWASP Security Headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  if (process.env.CSP_HEADER_VALUE) {
-    res.setHeader('Content-Security-Policy', process.env.CSP_HEADER_VALUE);
+  res.vary('Origin');
+  if (IS_PROD || process.env.CSP_HEADER_VALUE) {
+    res.setHeader('Content-Security-Policy', process.env.CSP_HEADER_VALUE || "base-uri 'self'; frame-ancestors 'self'; script-src 'self'; form-action 'self'");
   }
-  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   // Dynamic CORS Handling (supports localhost, custom domains, and Render)
@@ -147,9 +141,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const isAllowedCustom =
     origin && ALLOWED_ORIGINS.includes(origin) && !ALLOWED_ORIGINS.includes('*');
 
-  if (origin && (isLocalhost || isAllowedCustom || !IS_PROD)) {
+  if (origin && ((!IS_PROD && isLocalhost) || isAllowedCustom)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader(
       'Access-Control-Allow-Methods',
       'GET, POST, PUT, DELETE, PATCH, OPTIONS'
@@ -168,25 +161,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Middleware to capture rawBody for GitHub webhook HMAC validation
-app.use(
-  express.json({
-    limit: '25mb',
-    verify: (req: any, _res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
-
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: '25mb',
-    verify: (req: any, _res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
+// Authenticate before allocating large JSON buffers. Keep exact bytes only for the signed webhook.
+app.post(['/api/portfolio/photo', '/api/portfolio/resume', '/api/resume/parse'],
+  requireAdminAuth, express.json({ limit: '21mb' }));
+app.post('/api/github/webhook', express.json({
+  limit: '1mb', verify: (req, _res, bytes) => { Object.assign(req, { rawBody: bytes }); },
+}));
+app.use(express.json({ limit: '1mb' }), express.urlencoded({ extended: false, limit: '64kb' }));
+app.use((err: { status?: number }, _req: Request, res: Response, _next: NextFunction) => {
+  const tooLarge = err.status === 413;
+  res.status(tooLarge ? 413 : 400).json({ success: false, error: tooLarge ? 'Request too large.' : 'Invalid request body.' });
+});
 
 // -------------------------------------------------------------
 // API ROUTES
@@ -204,6 +189,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
     githubTargetUser: GITHUB_USERNAME,
   });
 });
+
+// HTML and immutable assets can be served while durable state is loading.
+app.use(['/api', '/resume.pdf', '/images/profile-photo.:ext'], (_req, _res, next) => { initialStore.then(() => next(), next); });
 
 /**
  * Storage health check endpoint
@@ -232,7 +220,7 @@ app.get('/api/storage/health', (_req: Request, res: Response) => {
       },
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -249,10 +237,10 @@ app.get('/api/portfolio/photo/meta', (_req: Request, res: Response) => {
       altText: store.content.profile.photo.altText,
       isPlaceholder: store.content.profile.photo.isPlaceholder,
       hasLocalAsset: info.found,
-      defaultAssetUrl: '/images/default-profile.png',
+      defaultAssetUrl: '/images/profile-photo.png',
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -273,7 +261,7 @@ app.get('/api/portfolio/resume/meta', (_req: Request, res: Response) => {
       hasLocalAsset: info.found,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -303,7 +291,7 @@ app.get('/api/portfolio', (_req: Request, res: Response) => {
  * Diagnostics endpoint: reports last sync, API rate limits remaining, discovered repositories, etc.
  */
 app.get('/api/admin/portfolio', requireAdminAuth, (_req, res) => {
-  res.set('Cache-Control', 'no-store').json({ success: true, content: getPortfolioStore().content });
+  res.set('Cache-Control', 'no-store').json({ success: true, lastUpdated: getPortfolioStore().lastUpdated, content: getPortfolioStore().content });
 });
 
 app.get('/api/github/status', requireAdminAuth, (_req: Request, res: Response) => {
@@ -318,7 +306,7 @@ app.get('/api/github/status', requireAdminAuth, (_req: Request, res: Response) =
       lastStoreUpdate: store.lastUpdated,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -364,7 +352,7 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
     }
 
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
       return res.status(400).json({ success: false, error: 'Email and password are required.' });
     }
 
@@ -400,7 +388,7 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
       user: normEmail,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -422,26 +410,20 @@ app.post('/api/admin/logout', (req: Request, res: Response) => {
 /**
  * POST /api/portfolio/save
  */
-app.post('/api/portfolio/save', requireAdminAuth, (req: Request, res: Response) => {
+app.post('/api/portfolio/save', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { content } = req.body;
-    if (!content || !Array.isArray(content.projects)) {
+    if (!isPortfolioContent(content)) {
       res.status(400).json({ success: false, error: 'Valid content object is required.' });
       return;
     }
 
-    if (content.projects && Array.isArray(content.projects)) {
-      for (const p of content.projects) {
-        if (!p.name || typeof p.name !== 'string') {
-          return res.status(400).json({ success: false, error: 'Every project must have a valid name.' });
-        }
-        if (!isValidUrl(p.githubUrl) || !isValidUrl(p.liveUrl)) {
-          return res.status(400).json({ success: false, error: `Invalid project URL detected in ${p.name}.` });
-        }
-      }
+    const store = draftPortfolioStore();
+    if (req.body.lastUpdated !== undefined && req.body.lastUpdated !== store.lastUpdated) {
+      throw new StoreError(409, 'Portfolio changed. Reload the editor before saving.');
     }
-
-    const store = getPortfolioStore();
+    content.profile.photo.versions = store.content.profile.photo.versions;
+    content.profile.resume.versions = store.content.profile.resume.versions;
     // Older editors may omit repositoryId when saving a manually edited card.
     const existing = new Map(store.content.projects.map(project => [project.id, project.repositoryId]));
     for (const project of content.projects) {
@@ -449,10 +431,10 @@ app.post('/api/portfolio/save', requireAdminAuth, (req: Request, res: Response) 
       if (previousId !== undefined) project.repositoryId = previousId;
     }
     store.content = content;
-    savePortfolioStore(store);
+    await savePortfolioStore(store);
     res.json({ success: true, message: 'Portfolio saved successfully.', content: publicSnapshot().content });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -460,9 +442,10 @@ app.post('/api/portfolio/save', requireAdminAuth, (req: Request, res: Response) 
  * GET /api/portfolio/photo
  * Serves the active portrait photo with cache headers
  */
-app.get('/api/portfolio/photo', (_req: Request, res: Response) => {
+app.get(['/api/portfolio/photo', '/images/profile-photo.png', '/images/profile-photo.jpg', '/images/profile-photo.jpeg', '/images/profile-photo.webp'], (_req: Request, res: Response) => {
   try {
     const info = getActivePhotoFile();
+    if (info.externalUrl) return res.redirect(info.externalUrl);
     if (info.found && info.filePath) {
       res.setHeader('Content-Type', info.mime || 'image/png');
       res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
@@ -471,7 +454,7 @@ app.get('/api/portfolio/photo', (_req: Request, res: Response) => {
     res.status(404).json({ success: false, error: 'No profile photo found.' });
   } catch (err: any) {
     console.error('[API /api/portfolio/photo] Error serving photo:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -488,7 +471,7 @@ app.get('/api/portfolio/photo/history', requireAdminAuth, (_req: Request, res: R
       currentPhoto: store.content.profile.photo,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -496,16 +479,16 @@ app.get('/api/portfolio/photo/history', requireAdminAuth, (_req: Request, res: R
  * POST /api/portfolio/photo/rollback
  * Restores a historical photo version
  */
-app.post('/api/portfolio/photo/rollback', requireAdminAuth, (req: Request, res: Response) => {
+app.post('/api/portfolio/photo/rollback', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { versionId } = req.body;
     if (!versionId) {
       return res.status(400).json({ success: false, error: 'versionId is required.' });
     }
-    const result = rollbackPhotoVersion(versionId);
+    const result = await rollbackPhotoVersion(versionId);
     res.json(result);
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -513,13 +496,13 @@ app.post('/api/portfolio/photo/rollback', requireAdminAuth, (req: Request, res: 
  * DELETE /api/portfolio/photo/version/:id
  * Removes a historical photo version
  */
-app.delete('/api/portfolio/photo/version/:id', requireAdminAuth, (req: Request, res: Response) => {
+app.delete('/api/portfolio/photo/version/:id', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = deletePhotoVersion(id);
+    const result = await deletePhotoVersion(id);
     res.json(result);
   } catch (err: any) {
-    res.status(400).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -532,17 +515,18 @@ app.post('/api/portfolio/photo', requireAdminAuth, async (req: Request, res: Res
     const { dataUri, imageUrl, altText, fileName, reset } = req.body;
 
     if (reset) {
-      const result = resetPhotoToPlaceholder();
+      const result = await resetPhotoToPlaceholder();
       return res.json(result);
     }
 
     if (imageUrl) {
-      if (!isValidUrl(imageUrl)) {
+      if (!isSafeAssetUrl(imageUrl)) {
         return res.status(400).json({ success: false, error: 'Invalid image URL provided.' });
       }
-      const store = getPortfolioStore();
+      const store = draftPortfolioStore();
       store.content.profile.photo = {
         ...store.content.profile.photo,
+        versions: store.content.profile.photo.versions?.map(v => ({ ...v, isActive: false })),
         url: imageUrl,
         altText:
           altText ||
@@ -551,7 +535,7 @@ app.post('/api/portfolio/photo', requireAdminAuth, async (req: Request, res: Res
         showInAbout: false,
         isPlaceholder: false,
       };
-      savePortfolioStore(store);
+      await savePortfolioStore(store);
       return res.json({ success: true, photo: store.content.profile.photo });
     }
 
@@ -568,7 +552,7 @@ app.post('/api/portfolio/photo', requireAdminAuth, async (req: Request, res: Res
     });
   } catch (err: any) {
     console.error('[API /api/portfolio/photo] Error persisting photo:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -618,7 +602,7 @@ app.get('/api/portfolio/resume', (req: Request, res: Response) => {
     }
     return res.status(404).json({ success: false, error: 'No custom resume file found.' });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -628,14 +612,14 @@ app.get('/api/portfolio/resume', (req: Request, res: Response) => {
  */
 app.get('/api/portfolio/resume/history', requireAdminAuth, (_req: Request, res: Response) => {
   try {
-    const store = getPortfolioStore();
+    const store = draftPortfolioStore();
     res.json({
       success: true,
       versions: store.content.profile.resume.versions || [],
       currentResume: store.content.profile.resume,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -643,16 +627,16 @@ app.get('/api/portfolio/resume/history', requireAdminAuth, (_req: Request, res: 
  * POST /api/portfolio/resume/rollback
  * Restores a historical resume version as active
  */
-app.post('/api/portfolio/resume/rollback', requireAdminAuth, (req: Request, res: Response) => {
+app.post('/api/portfolio/resume/rollback', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { versionId } = req.body;
     if (!versionId) {
       return res.status(400).json({ success: false, error: 'versionId is required.' });
     }
-    const result = rollbackResumeVersion(versionId);
+    const result = await rollbackResumeVersion(versionId);
     res.json(result);
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -660,13 +644,13 @@ app.post('/api/portfolio/resume/rollback', requireAdminAuth, (req: Request, res:
  * DELETE /api/portfolio/resume/version/:id
  * Removes a historical resume version
  */
-app.delete('/api/portfolio/resume/version/:id', requireAdminAuth, (req: Request, res: Response) => {
+app.delete('/api/portfolio/resume/version/:id', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = deleteResumeVersion(id);
+    const result = await deleteResumeVersion(id);
     res.json(result);
   } catch (err: any) {
-    res.status(400).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -677,18 +661,8 @@ app.delete('/api/portfolio/resume/version/:id', requireAdminAuth, (req: Request,
 app.post('/api/portfolio/resume', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { dataUri, fileUrl, fileName, fileSize, comingSoonMessage, isAvailable, reset } = req.body;
-    const store = getPortfolioStore();
-    const dataDir = path.resolve(process.cwd(), 'data');
-    const resumePath = path.join(dataDir, 'uploaded-resume.pdf');
-    const publicResumePath = path.resolve(process.cwd(), 'public', 'resume.pdf');
-
+    const store = draftPortfolioStore();
     if (reset) {
-      if (fs.existsSync(resumePath)) {
-        try { fs.unlinkSync(resumePath); } catch {}
-      }
-      if (fs.existsSync(publicResumePath)) {
-        try { fs.unlinkSync(publicResumePath); } catch {}
-      }
       const versions = (store.content.profile.resume.versions || []).map((v) => ({
         ...v,
         isActive: false,
@@ -702,12 +676,12 @@ app.post('/api/portfolio/resume', requireAdminAuth, async (req: Request, res: Re
         comingSoonMessage: 'Verified curriculum vitae available to view and download.',
         versions,
       };
-      savePortfolioStore(store);
+      await savePortfolioStore(store);
       return res.json({ success: true, resume: store.content.profile.resume });
     }
 
     if (fileUrl) {
-      if (!isValidUrl(fileUrl)) {
+      if (!isSafeAssetUrl(fileUrl)) {
         return res.status(400).json({ success: false, error: 'Invalid resume URL provided.' });
       }
       const now = new Date();
@@ -718,6 +692,7 @@ app.post('/api/portfolio/resume', requireAdminAuth, async (req: Request, res: Re
       });
       store.content.profile.resume = {
         ...store.content.profile.resume,
+        versions: store.content.profile.resume.versions?.map(v => ({ ...v, isActive: false })),
         fileUrl: fileUrl.trim(),
         fileName: fileName || (fileUrl.split('/').pop() || 'Sai_Nithin_Reddy_Resume.pdf'),
         fileSize: fileSize || 'Cloud Document',
@@ -725,7 +700,7 @@ app.post('/api/portfolio/resume', requireAdminAuth, async (req: Request, res: Re
         isAvailable: isAvailable !== false,
         comingSoonMessage: comingSoonMessage || 'Verified curriculum vitae available.',
       };
-      savePortfolioStore(store);
+      await savePortfolioStore(store);
       return res.json({ success: true, resume: store.content.profile.resume });
     }
 
@@ -739,7 +714,7 @@ app.post('/api/portfolio/resume', requireAdminAuth, async (req: Request, res: Re
     res.status(400).json({ success: false, error: 'Please provide either dataUri, fileUrl, or reset flag.' });
   } catch (err: any) {
     console.error('[API /api/portfolio/resume] Error persisting resume:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -811,7 +786,7 @@ app.post('/api/github/webhook', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('[GitHub Webhook] Error processing event:', err);
-    res.status(500).json({ error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -860,7 +835,7 @@ app.post('/api/github/sync', requireAdminAuth, async (req: Request, res: Respons
     });
   } catch (err: any) {
     console.error('[GitHub Sync API] Error:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -872,13 +847,15 @@ app.post('/api/github/sync', requireAdminAuth, async (req: Request, res: Respons
 app.post('/api/resume/parse', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { pdfBase64, fileName } = req.body;
-    if (!pdfBase64) {
+    if (typeof pdfBase64 !== 'string') {
       res.status(400).json({ success: false, error: 'pdfBase64 is required.' });
       return;
     }
     const cleanBase64 = pdfBase64.replace(/^data:application\/pdf;base64,/, '');
     const buffer = Buffer.from(cleanBase64, 'base64');
-    console.log(`[Resume API] Parsing resume (${buffer.length} bytes, file: ${fileName || 'resume.pdf'})...`);
+    if (!isValidPdf(buffer) || buffer.length > 15 * 1024 * 1024) {
+      return res.status(400).json({ success: false, error: 'A PDF up to 15 MB is required.' });
+    }
     const parsedData = await parseResume(buffer);
     const currentStore = getPortfolioStore();
     const diff = generateResumeDiff(parsedData, currentStore.content);
@@ -888,7 +865,7 @@ app.post('/api/resume/parse', requireAdminAuth, async (req: Request, res: Respon
     });
   } catch (err: any) {
     console.error('[Resume API] Parsing error:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -897,15 +874,15 @@ app.post('/api/resume/parse', requireAdminAuth, async (req: Request, res: Respon
  * Applies approved diff changes from parsed resume to portfolio store.
  * Protected: Requires verified admin authentication.
  */
-app.post('/api/resume/apply', requireAdminAuth, (req: Request, res: Response) => {
+app.post('/api/resume/apply', requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const { diff, approvedChangeIds } = req.body;
-    if (!diff || !Array.isArray(approvedChangeIds)) {
+    if (!Array.isArray(diff?.changes) || !Array.isArray(approvedChangeIds) || !approvedChangeIds.every((id: unknown) => typeof id === 'string')) {
       res.status(400).json({ success: false, error: 'diff and approvedChangeIds are required.' });
       return;
     }
     console.log(`[Resume API] Applying ${approvedChangeIds.length} approved changes...`);
-    const updatedContent = applyApprovedResumeChanges(diff, approvedChangeIds);
+    const updatedContent = await applyApprovedResumeChanges(diff, approvedChangeIds);
     res.json({
       success: true,
       message: `Successfully applied ${approvedChangeIds.length} change(s).`,
@@ -913,7 +890,7 @@ app.post('/api/resume/apply', requireAdminAuth, (req: Request, res: Response) =>
     });
   } catch (err: any) {
     console.error('[Resume API] Error applying changes:', err);
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -922,12 +899,12 @@ app.post('/api/resume/apply', requireAdminAuth, (req: Request, res: Response) =>
  * Resets portfolio store to baseline curated configuration.
  * Protected: Requires verified admin authentication.
  */
-app.post('/api/portfolio/reset', requireAdminAuth, (_req: Request, res: Response) => {
+app.post('/api/portfolio/reset', requireAdminAuth, async (_req: Request, res: Response) => {
   try {
-    const content = resetPortfolioStore();
+    const content = await resetPortfolioStore();
     res.json({ success: true, message: 'Portfolio reset to curated baseline.', content });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
+    sendFailure(res, err);
   }
 });
 
@@ -961,7 +938,8 @@ async function startServer() {
     }
 
     // Serve static compiled assets from dist with caching
-    app.use(express.static(distPath, { maxAge: '1d', index: false }));
+    app.use('/assets', compression(), express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '1y' }));
+    app.use(express.static(distPath, { index: false }));
 
     // SPA fallback: send compiled index.html for client-side routing
     app.get('*', (req: Request, res: Response) => {
@@ -978,14 +956,11 @@ async function startServer() {
   }
 
   const server = httpServer.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`\n  VITE v8.3.0  ready in 120 ms\n`);
-    console.log(`  ➜  Local:   http://localhost:${PORT}/`);
-    console.log(`  ➜  Network: http://0.0.0.0:${PORT}/`);
     console.log(`[Portfolio Server] Running on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
 
     const reconcile = () => refreshPublication(GITHUB_USERNAME)
       .catch((err) => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message));
-    void reconcile();
+    void initialStore.then(reconcile);
     setInterval(reconcile, 30 * 60 * 1000);
 
   });
@@ -1010,9 +985,7 @@ async function startServer() {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-initializePortfolioStore()
-  .catch((err) => console.error('[PortfolioStore] Initialization warning:', err))
-  .finally(() => startServer().catch((err) => {
-    console.error('[Portfolio Server] Fatal start error:', err);
-    process.exit(1);
-  }));
+startServer().catch(() => {
+  console.error('[Portfolio Server] Startup failed.');
+  process.exit(1);
+});

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { getPortfolioStore, savePortfolioStore } from './portfolioStore';
+import { draftPortfolioStore, getPortfolioStore, savePortfolioStore, StoreError } from './portfolioStore';
 import { ResumeVersionItem, PhotoVersionItem } from '../src/content/types';
 import { uploadAssetToStorage } from './cloudStorage';
 
@@ -12,25 +12,6 @@ const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
 const PUBLIC_IMAGES_DIR = path.join(PUBLIC_DIR, 'images');
 const DIST_DIR = path.resolve(process.cwd(), 'dist');
 const DIST_IMAGES_DIR = path.join(DIST_DIR, 'images');
-
-export function ensureStorageDirectories(): void {
-  const dirs = [DATA_DIR, RESUMES_DIR, PHOTOS_DIR, PUBLIC_DIR, PUBLIC_IMAGES_DIR];
-  if (fs.existsSync(DIST_DIR)) {
-    dirs.push(DIST_IMAGES_DIR);
-  }
-  dirs.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      try {
-        fs.mkdirSync(dir, { recursive: true });
-      } catch (err) {
-        console.warn(`[AssetManager] Warning creating dir ${dir}:`, err);
-      }
-    }
-  });
-}
-
-// Initial directory setup
-ensureStorageDirectories();
 
 // -------------------------------------------------------------
 // RESUME ASSET MANAGEMENT
@@ -52,24 +33,18 @@ export function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/**
- * Atomically saves an uploaded PDF resume, creates a version entry,
- * mirrors to public/resume.pdf, data/uploaded-resume.pdf, dist/resume.pdf,
- * and uploads to durable cloud storage if configured.
- */
 export async function saveUploadedResume(
   buffer: Buffer,
   originalFileName: string = 'Sai_Nithin_Reddy_Resume.pdf',
   customFileSize?: string
 ) {
-  ensureStorageDirectories();
 
   if (buffer.length > 15 * 1024 * 1024) {
-    throw new Error('Resume PDF exceeds the 15 MB maximum size limit.');
+    throw new StoreError(400, 'Resume PDF exceeds the 15 MB maximum size limit.');
   }
 
   if (!isValidPdf(buffer)) {
-    throw new Error('Invalid file format. The uploaded file does not contain a valid PDF signature (%PDF-).');
+    throw new StoreError(400, 'Invalid file format. The uploaded file does not contain a valid PDF signature (%PDF-).');
   }
 
   const now = new Date();
@@ -82,31 +57,15 @@ export async function saveUploadedResume(
   const versionFileName = `resume-${versionId}.pdf`;
   const versionFilePath = path.join(RESUMES_DIR, versionFileName);
 
-  // Write version file to persistent archive
-  fs.writeFileSync(versionFilePath, buffer);
-
-  // Atomic mirror to active locations
-  const activeDataPath = path.join(DATA_DIR, 'uploaded-resume.pdf');
-  const activePublicPath = path.join(PUBLIC_DIR, 'resume.pdf');
-  fs.writeFileSync(activeDataPath, buffer);
-  try {
-    fs.writeFileSync(activePublicPath, buffer);
-  } catch (err) {
-    console.warn('[AssetManager] Could not mirror to public/resume.pdf:', err);
+  const remoteUrl = await uploadAssetToStorage(buffer, versionFileName, 'resume', 'application/pdf');
+  if (!remoteUrl) {
+    fs.mkdirSync(RESUMES_DIR, { recursive: true });
+    fs.writeFileSync(versionFilePath, buffer, { flag: 'wx' });
   }
-  if (fs.existsSync(DIST_DIR)) {
-    try {
-      fs.writeFileSync(path.join(DIST_DIR, 'resume.pdf'), buffer);
-    } catch {}
-  }
-
-  // Attempt durable cloud storage upload (Supabase Free Tier)
-  const cloudResult = await uploadAssetToStorage(buffer, originalFileName, 'resume');
-  // Prefer durable Supabase Storage URLs when configured.
-  const activeFileUrl = cloudResult.provider === 'supabase' && cloudResult.url ? cloudResult.url : '/resume.pdf';
+  const activeFileUrl = remoteUrl || '/resume.pdf';
 
   const sizeStr = customFileSize || formatFileSize(buffer.length);
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
 
   const newVersion: ResumeVersionItem = {
     id: versionId,
@@ -136,52 +95,36 @@ export async function saveUploadedResume(
     versions: updatedVersions,
   };
 
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
 
   return {
     success: true,
     resume: store.content.profile.resume,
     version: newVersion,
-    storageProvider: cloudResult.provider,
+    storageProvider: remoteUrl ? 'supabase' : 'repository_static',
   };
 }
 
 /**
  * Rolls back to a previous resume version
  */
-export function rollbackResumeVersion(versionId: string) {
+export async function rollbackResumeVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
-    throw new Error('Invalid resume version ID format.');
+    throw new StoreError(400, 'Invalid resume version ID format.');
   }
-  ensureStorageDirectories();
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
   const versions = store.content.profile.resume.versions || [];
   const target = versions.find((v) => v.id === versionId);
 
   if (!target) {
-    throw new Error(`Resume version ${versionId} not found in history.`);
+    throw new StoreError(400, `Resume version ${versionId} not found in history.`);
   }
 
   const versionFileName = `resume-${versionId}.pdf`;
   const versionFilePath = path.join(RESUMES_DIR, versionFileName);
 
-  if (!fs.existsSync(versionFilePath)) {
-    throw new Error(`Archived resume file for version ${versionId} is missing on disk.`);
-  }
-
-  const buffer = fs.readFileSync(versionFilePath);
-  const activeDataPath = path.join(DATA_DIR, 'uploaded-resume.pdf');
-  const activePublicPath = path.join(PUBLIC_DIR, 'resume.pdf');
-  fs.writeFileSync(activeDataPath, buffer);
-  try {
-    fs.writeFileSync(activePublicPath, buffer);
-  } catch (err) {
-    console.warn('[AssetManager] Could not mirror to public/resume.pdf:', err);
-  }
-  if (fs.existsSync(DIST_DIR)) {
-    try {
-      fs.writeFileSync(path.join(DIST_DIR, 'resume.pdf'), buffer);
-    } catch {}
+  if (!isRemote(target.fileUrl) && !fs.existsSync(versionFilePath)) {
+    throw new StoreError(400, 'Archived resume is unavailable.');
   }
 
   const updatedVersions = versions.map((v) => ({
@@ -189,7 +132,7 @@ export function rollbackResumeVersion(versionId: string) {
     isActive: v.id === versionId,
   }));
 
-  const rollbackUrl = '/resume.pdf';
+  const rollbackUrl = target.fileUrl || '/resume.pdf';
 
   store.content.profile.resume = {
     ...store.content.profile.resume,
@@ -201,7 +144,7 @@ export function rollbackResumeVersion(versionId: string) {
     versions: updatedVersions,
   };
 
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
   return {
     success: true,
     resume: store.content.profile.resume,
@@ -211,22 +154,24 @@ export function rollbackResumeVersion(versionId: string) {
 /**
  * Deletes a historical resume version
  */
-export function deleteResumeVersion(versionId: string) {
+export async function deleteResumeVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
-    throw new Error('Invalid resume version ID format.');
+    throw new StoreError(400, 'Invalid resume version ID format.');
   }
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
   const versions = store.content.profile.resume.versions || [];
   const target = versions.find((v) => v.id === versionId);
 
   if (!target) {
-    throw new Error(`Resume version ${versionId} not found.`);
+    throw new StoreError(400, `Resume version ${versionId} not found.`);
   }
 
   if (target.isActive) {
-    throw new Error('Cannot delete the currently active published resume version. Switch to another version first.');
+    throw new StoreError(400, 'Cannot delete the currently active published resume version. Switch to another version first.');
   }
 
+  store.content.profile.resume.versions = versions.filter((v) => v.id !== versionId);
+  await savePortfolioStore(store);
   const versionFileName = `resume-${versionId}.pdf`;
   const versionFilePath = path.join(RESUMES_DIR, versionFileName);
   if (fs.existsSync(versionFilePath)) {
@@ -237,8 +182,7 @@ export function deleteResumeVersion(versionId: string) {
     }
   }
 
-  store.content.profile.resume.versions = versions.filter((v) => v.id !== versionId);
-  savePortfolioStore(store);
+
 
   return {
     success: true,
@@ -246,55 +190,22 @@ export function deleteResumeVersion(versionId: string) {
   };
 }
 
-/**
- * Retrieves the currently active resume file buffer or path.
- * Prioritizes local disk files first for speed, stability, and zero CORS/iframe restrictions.
- */
 export function getActiveResumeFile(): {
   found: boolean;
   filePath?: string;
   buffer?: Buffer;
   externalUrl?: string;
 } {
-  const store = getPortfolioStore();
-
-  const searchPaths = [
-    path.join(PUBLIC_DIR, 'resume.pdf'),
-    path.join(DATA_DIR, 'uploaded-resume.pdf'),
-    path.join(DIST_DIR, 'resume.pdf'),
-  ];
-
-  for (const p of searchPaths) {
-    if (fs.existsSync(p)) {
-      try {
-        const stat = fs.statSync(p);
-        if (stat.size > 1000) {
-          return { found: true, filePath: p };
-        }
-      } catch {}
-    }
+  const { resume } = getPortfolioStore().content.profile;
+  if (isRemote(resume.fileUrl)) return { found: true, externalUrl: resume.fileUrl };
+  const active = resume.versions?.find(v => v.isActive);
+  if (active && safeId(active.id)) {
+    const filePath = path.join(RESUMES_DIR, `resume-${active.id}.pdf`);
+    if (fs.existsSync(filePath)) return { found: true, filePath };
   }
-
-  // Check version history for active version
-  const versions = store.content.profile.resume.versions || [];
-  const activeVer = versions.find((v) => v.isActive) || versions[0];
-  if (activeVer) {
-    const vPath = path.join(RESUMES_DIR, `resume-${activeVer.id}.pdf`);
-    if (fs.existsSync(vPath)) {
-      try {
-        const stat = fs.statSync(vPath);
-        if (stat.size > 1000) {
-          return { found: true, filePath: vPath };
-        }
-      } catch {}
-    }
+  for (const filePath of [path.join(PUBLIC_DIR, 'resume.pdf'), path.join(DIST_DIR, 'resume.pdf'), path.join(DATA_DIR, 'uploaded-resume.pdf')]) {
+    if (fs.existsSync(filePath)) return { found: true, filePath };
   }
-
-  const fileUrl = store.content.profile.resume.fileUrl;
-  if (fileUrl && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://'))) {
-    return { found: true, externalUrl: fileUrl };
-  }
-
   return { found: false };
 }
 
@@ -307,7 +218,7 @@ export function getActiveResumeFile(): {
  */
 export function validateImageSignature(buffer: Buffer): { valid: boolean; ext: 'png' | 'jpg' | 'webp'; mime: string } {
   if (buffer.length < 12) {
-    throw new Error('File buffer is too small to be a valid image.');
+    throw new StoreError(400, 'File buffer is too small to be a valid image.');
   }
 
   // PNG: 89 50 4E 47 0D 0A 1A 0A
@@ -315,7 +226,7 @@ export function validateImageSignature(buffer: Buffer): { valid: boolean; ext: '
     buffer[0] === 0x89 &&
     buffer[1] === 0x50 &&
     buffer[2] === 0x4e &&
-    buffer[3] === 0x47
+    buffer.subarray(3, 8).equals(Buffer.from([0x47, 13, 10, 26, 10]))
   ) {
     return { valid: true, ext: 'png', mime: 'image/png' };
   }
@@ -332,23 +243,17 @@ export function validateImageSignature(buffer: Buffer): { valid: boolean; ext: '
     return { valid: true, ext: 'webp', mime: 'image/webp' };
   }
 
-  throw new Error('Unsupported image format. Please upload a standard JPEG, PNG, or WEBP image.');
+  throw new StoreError(400, 'Unsupported image format. Please upload a standard JPEG, PNG, or WEBP image.');
 }
 
-/**
- * Saves an uploaded profile photo, creates a version entry,
- * mirrors to data/, public/images/, and dist/images/,
- * and uploads to durable cloud storage if configured.
- */
 export async function saveUploadedPhoto(
   buffer: Buffer,
   originalFileName: string = 'portrait.png',
   altText?: string
 ) {
-  ensureStorageDirectories();
 
   if (buffer.length > 10 * 1024 * 1024) {
-    throw new Error('Profile photo exceeds 10 MB maximum limit.');
+    throw new StoreError(400, 'Profile photo exceeds 10 MB maximum limit.');
   }
 
   const { ext, mime } = validateImageSignature(buffer);
@@ -357,43 +262,12 @@ export async function saveUploadedPhoto(
   const versionFileName = `${versionId}.${ext}`;
   const versionFilePath = path.join(PHOTOS_DIR, versionFileName);
 
-  // Write version file
-  fs.writeFileSync(versionFilePath, buffer);
-
-  // Write to active local paths
-  const activeDataPath = path.join(DATA_DIR, `profile-photo.${ext}`);
-  const activePublicPath = path.join(PUBLIC_IMAGES_DIR, `profile-photo.${ext}`);
-  fs.writeFileSync(activeDataPath, buffer);
-  try {
-    fs.writeFileSync(activePublicPath, buffer);
-  } catch (err) {
-    console.warn('[AssetManager] Could not mirror photo to public/images:', err);
+  const remoteUrl = await uploadAssetToStorage(buffer, versionFileName, 'photo', mime);
+  if (!remoteUrl) {
+    fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+    fs.writeFileSync(versionFilePath, buffer, { flag: 'wx' });
   }
-  if (fs.existsSync(DIST_IMAGES_DIR)) {
-    try {
-      fs.writeFileSync(path.join(DIST_IMAGES_DIR, `profile-photo.${ext}`), buffer);
-    } catch {}
-  }
-
-  // Clean other extensions in active dirs
-  const allExts = ['png', 'jpg', 'jpeg', 'webp'];
-  [DATA_DIR, PUBLIC_IMAGES_DIR, DIST_IMAGES_DIR].forEach((dir) => {
-    if (!fs.existsSync(dir)) return;
-    allExts.forEach((otherExt) => {
-      if (otherExt !== ext) {
-        const p = path.join(dir, `profile-photo.${otherExt}`);
-        if (fs.existsSync(p)) {
-          try { fs.unlinkSync(p); } catch {}
-        }
-      }
-    });
-  });
-
-  // Attempt durable cloud storage upload (Supabase Free Tier)
-  const cloudResult = await uploadAssetToStorage(buffer, originalFileName, 'photo');
-  const photoUrl = cloudResult.success && cloudResult.url && !cloudResult.url.startsWith('/')
-    ? cloudResult.url
-    : `/api/portfolio/photo?v=${Date.now()}`;
+  const photoUrl = remoteUrl || `/api/portfolio/photo?v=${versionId}`;
 
   const now = new Date();
   const dateFormatted = now.toLocaleDateString('en-US', {
@@ -402,7 +276,7 @@ export async function saveUploadedPhoto(
     year: 'numeric',
   });
 
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
 
   const newVersion: PhotoVersionItem = {
     id: versionId,
@@ -433,13 +307,13 @@ export async function saveUploadedPhoto(
     versions: updatedVersions,
   };
 
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
 
   return {
     success: true,
     photo: store.content.profile.photo,
     version: newVersion,
-    storageProvider: cloudResult.provider,
+    storageProvider: remoteUrl ? 'supabase' : 'repository_static',
     mime,
   };
 }
@@ -447,54 +321,19 @@ export async function saveUploadedPhoto(
 /**
  * Rolls back to a previous photo version
  */
-export function rollbackPhotoVersion(versionId: string) {
+export async function rollbackPhotoVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
-    throw new Error('Invalid photo version ID format.');
+    throw new StoreError(400, 'Invalid photo version ID format.');
   }
-  ensureStorageDirectories();
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
   const versions = store.content.profile.photo.versions || [];
   const target = versions.find((v) => v.id === versionId);
 
   if (!target) {
-    throw new Error(`Photo version ${versionId} not found in history.`);
+    throw new StoreError(400, `Photo version ${versionId} not found in history.`);
   }
 
-  // Find file on disk in PHOTOS_DIR
-  const files = fs.readdirSync(PHOTOS_DIR);
-  const matchedFile = files.find((f) => f.startsWith(versionId));
-  if (!matchedFile) {
-    throw new Error(`Archived photo file for version ${versionId} is missing on disk.`);
-  }
-
-  const ext = path.extname(matchedFile).replace('.', '');
-  const buffer = fs.readFileSync(path.join(PHOTOS_DIR, matchedFile));
-
-  // Mirror to active paths
-  const activeDataPath = path.join(DATA_DIR, `profile-photo.${ext}`);
-  const activePublicPath = path.join(PUBLIC_IMAGES_DIR, `profile-photo.${ext}`);
-  fs.writeFileSync(activeDataPath, buffer);
-  try {
-    fs.writeFileSync(activePublicPath, buffer);
-  } catch {}
-  if (fs.existsSync(DIST_IMAGES_DIR)) {
-    try {
-      fs.writeFileSync(path.join(DIST_IMAGES_DIR, `profile-photo.${ext}`), buffer);
-    } catch {}
-  }
-
-  const allExts = ['png', 'jpg', 'jpeg', 'webp'];
-  [DATA_DIR, PUBLIC_IMAGES_DIR, DIST_IMAGES_DIR].forEach((dir) => {
-    if (!fs.existsSync(dir)) return;
-    allExts.forEach((otherExt) => {
-      if (otherExt !== ext) {
-        const p = path.join(dir, `profile-photo.${otherExt}`);
-        if (fs.existsSync(p)) {
-          try { fs.unlinkSync(p); } catch {}
-        }
-      }
-    });
-  });
+  if (!isRemote(target.url) && !archivedPhoto(versionId)) throw new StoreError(400, 'Archived photo is unavailable.');
 
   const photoUrl = target.url || `/api/portfolio/photo?v=${Date.now()}`;
   const updatedVersions = versions.map((v) => ({
@@ -509,7 +348,7 @@ export function rollbackPhotoVersion(versionId: string) {
     versions: updatedVersions,
   };
 
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
 
   return {
     success: true,
@@ -520,9 +359,8 @@ export function rollbackPhotoVersion(versionId: string) {
 /**
  * Resets profile photo to default permanent portrait asset
  */
-export function resetPhotoToPlaceholder() {
-  ensureStorageDirectories();
-  const store = getPortfolioStore();
+export async function resetPhotoToPlaceholder() {
+  const store = draftPortfolioStore();
 
   const versions = (store.content.profile.photo.versions || []).map((v) => ({
     ...v,
@@ -530,7 +368,7 @@ export function resetPhotoToPlaceholder() {
   }));
 
   // Point to permanent default uploaded photo asset
-  const defaultUrl = '/images/default-profile.png';
+  const defaultUrl = '/images/profile-photo.png';
 
   store.content.profile.photo = {
     url: defaultUrl,
@@ -541,7 +379,7 @@ export function resetPhotoToPlaceholder() {
     versions,
   };
 
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
 
   return {
     success: true,
@@ -552,32 +390,29 @@ export function resetPhotoToPlaceholder() {
 /**
  * Deletes a historical photo version
  */
-export function deletePhotoVersion(versionId: string) {
+export async function deletePhotoVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
-    throw new Error('Invalid photo version ID format.');
+    throw new StoreError(400, 'Invalid photo version ID format.');
   }
-  const store = getPortfolioStore();
+  const store = draftPortfolioStore();
   const versions = store.content.profile.photo.versions || [];
   const target = versions.find((v) => v.id === versionId);
 
   if (!target) {
-    throw new Error(`Photo version ${versionId} not found.`);
+    throw new StoreError(400, `Photo version ${versionId} not found.`);
   }
 
   if (target.isActive) {
-    throw new Error('Cannot delete the currently active profile photo version. Switch to another photo first.');
-  }
-
-  if (fs.existsSync(PHOTOS_DIR)) {
-    const files = fs.readdirSync(PHOTOS_DIR);
-    const matched = files.filter((f) => f.startsWith(versionId));
-    matched.forEach((f) => {
-      try { fs.unlinkSync(path.join(PHOTOS_DIR, f)); } catch {}
-    });
+    throw new StoreError(400, 'Cannot delete the currently active profile photo version. Switch to another photo first.');
   }
 
   store.content.profile.photo.versions = versions.filter((v) => v.id !== versionId);
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
+  const file = archivedPhoto(versionId);
+  if (file) {
+    try { fs.rmSync(file, { force: true }); } catch { console.warn('[AssetManager] Inactive archive could not be removed.'); }
+  }
+
 
   return {
     success: true,
@@ -585,12 +420,22 @@ export function deletePhotoVersion(versionId: string) {
   };
 }
 
-/**
- * Gets active photo file on disk.
- * Searches DATA_DIR, PUBLIC_IMAGES_DIR, and DIST_IMAGES_DIR.
- * Falls back to default-profile.png (the user's permanent uploaded portrait).
- */
-export function getActivePhotoFile(): { found: boolean; filePath?: string; mime?: string } {
+function safeId(id: string) { return /^[a-zA-Z0-9_-]+$/.test(id); }
+function isRemote(url?: string) { return !!url && /^https?:\/\//i.test(url); }
+function archivedPhoto(id: string) {
+  return safeId(id) && ['png','jpg','webp','jpeg'].map(ext => path.join(PHOTOS_DIR, id + '.' + ext)).find(p => fs.existsSync(p));
+}
+
+export function getActivePhotoFile(): { found: boolean; filePath?: string; mime?: string; externalUrl?: string } {
+  const photo = getPortfolioStore().content.profile.photo;
+  if (isRemote(photo.url)) return { found: true, externalUrl: photo.url };
+  const active = photo.versions?.find(v => v.isActive);
+  const file = active && archivedPhoto(active.id);
+  if (file) return { found: true, filePath: file, mime: 'image/' + path.extname(file).slice(1).replace(/^jpg$/, 'jpeg') };
+  if (photo.url === '/images/profile-photo.png') {
+    const filePath = path.join(PUBLIC_IMAGES_DIR, 'profile-photo.png');
+    if (fs.existsSync(filePath)) return { found: true, filePath, mime: 'image/png' };
+  }
   const searchDirs = [DATA_DIR, PUBLIC_IMAGES_DIR, DIST_IMAGES_DIR];
   const extensions = [
     { ext: 'png', mime: 'image/png' },

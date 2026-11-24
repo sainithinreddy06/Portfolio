@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { isPortfolioContent } from './portfolioValidation';
 import path from 'path';
 import { PortfolioContent, ProjectItem } from '../src/content/types';
 import { initialPortfolioContent } from '../src/content/portfolioData';
@@ -6,7 +7,9 @@ import { ExtractedGitHubProject } from './githubService';
 import { PortfolioStoreState, ExtendedProjectItem, ResumeDiffResult } from './types';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
-const STORE_FILE = path.join(DATA_DIR, 'syncedPortfolio.json');
+const SEED_FILE = path.join(DATA_DIR, 'syncedPortfolio.json');
+const STORE_FILE = path.join(DATA_DIR, 'portfolio-runtime.json');
+let localReadFailed = false;
 
 // In-memory cache
 let cachedState: PortfolioStoreState | null = null;
@@ -36,11 +39,10 @@ export function getPortfolioStore(): PortfolioStoreState {
     return cachedState;
   }
 
-  ensureDataDir();
-
-  if (fs.existsSync(STORE_FILE)) {
+  const source = fs.existsSync(STORE_FILE) ? STORE_FILE : SEED_FILE;
+  if (fs.existsSync(source)) {
     try {
-      const fileData = fs.readFileSync(STORE_FILE, 'utf8');
+      const fileData = fs.readFileSync(source, 'utf8');
       const parsed: PortfolioStoreState = JSON.parse(fileData);
 
       // Verify photo file on disk in data/ or public/images/
@@ -57,12 +59,12 @@ export function getPortfolioStore(): PortfolioStoreState {
       const publicImagesDir = path.resolve(process.cwd(), 'public', 'images');
       const foundInPublic = photoFiles.find((f) => fs.existsSync(path.join(publicImagesDir, f)));
       const foundInData = photoFiles.find((f) => fs.existsSync(path.join(DATA_DIR, f)));
-      let stateModified = false;
+
 
       if ((foundInData || foundInPublic) && (!parsed.content.profile.photo.url || parsed.content.profile.photo.isPlaceholder)) {
         parsed.content.profile.photo.url = foundInPublic ? `/images/${foundInPublic}` : '/api/portfolio/photo';
         parsed.content.profile.photo.isPlaceholder = false;
-        stateModified = true;
+
       }
 
       // Ensure verified baseline curated case studies and skills exist
@@ -70,15 +72,14 @@ export function getPortfolioStore(): PortfolioStoreState {
         ...initialPortfolioContent.caseStudies,
         ...parsed.content.caseStudies,
       };
-      parsed.content.skillCategories = initialPortfolioContent.skillCategories;
+      parsed.content.skillCategories ??= initialPortfolioContent.skillCategories;
 
-      if (stateModified) {
-        savePortfolioStore(parsed);
-      }
+
       cachedState = parsed;
       return cachedState;
     } catch (err) {
-      console.warn('[PortfolioStore] Failed to read existing store file, falling back to base curated data:', err);
+      localReadFailed = true;
+      console.warn('[PortfolioStore] Cannot read the existing snapshot. Local edits are disabled until recovery.');
     }
   }
 
@@ -86,7 +87,7 @@ export function getPortfolioStore(): PortfolioStoreState {
   const defaultState: PortfolioStoreState = {
     version: 1,
     lastUpdated: new Date().toISOString(),
-    content: initialPortfolioContent,
+    content: structuredClone(initialPortfolioContent),
     syncedRepositories: {},
     manualOverrides: {
       hiddenProjectIds: [],
@@ -96,7 +97,6 @@ export function getPortfolioStore(): PortfolioStoreState {
     },
   };
 
-  savePortfolioStore(defaultState);
   cachedState = defaultState;
   return defaultState;
 }
@@ -109,67 +109,92 @@ const getSupabaseConfig = () => ({
   key: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
 });
 
-let supabaseWriteQueue: Promise<void> = Promise.resolve();
+let revision: string | null | undefined;
+let saving = false;
 
-function queueSupabaseSave(state: PortfolioStoreState): void {
+export class StoreError extends Error {
+  constructor(readonly status: number, message: string) { super(message); }
+}
+
+async function database(query: string, options: RequestInit = {}) {
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return;
-  const snapshot = JSON.parse(JSON.stringify(state));
-  supabaseWriteQueue = supabaseWriteQueue.catch(() => undefined).then(async () => {
-    const response = await fetch(`${url}/rest/v1/portfolio_state?on_conflict=id`, {
-      method: 'POST',
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        'Content-Type': 'application/json',
-        Prefer: 'resolution=merge-duplicates,return=minimal',
-      },
-      body: JSON.stringify({ id: 'main', state: snapshot, updated_at: new Date().toISOString() }),
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!response.ok) throw new Error(`Supabase portfolio save failed (${response.status}): ${await response.text()}`);
-  }).catch((error) => console.error('[PortfolioStore] Supabase persistence failed:', error));
+  const response = await fetch(url + '/rest/v1/portfolio_state?' + query, {
+    ...options,
+    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (response.status === 409) throw conflict();
+  if (!response.ok) throw new StoreError(503, 'Portfolio storage is unavailable.');
+  return response.json();
+}
+
+function conflict() {
+  return new StoreError(409, 'Portfolio changed. Reload the editor before saving.');
+}
+
+async function loadRemote() {
+  const rows = await database('id=eq.main&select=state,updated_at&limit=1');
+  if (!Array.isArray(rows)) throw new Error('Invalid portfolio response.');
+  if (!rows.length) { revision = null; return; }
+  if (!rows[0].state?.content?.profile || !rows[0].state.syncedRepositories || !rows[0].updated_at) {
+    throw new Error('Invalid portfolio record.');
+  }
+  cachedState = rows[0].state;
+  revision = rows[0].updated_at;
 }
 
 export async function initializePortfolioStore(): Promise<void> {
-  ensureDataDir();
+  getPortfolioStore();
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) {
-    console.warn('[PortfolioStore] Supabase persistence is not configured; using the local JSON snapshot.');
-    getPortfolioStore();
-    return;
-  }
-  try {
-    const response = await fetch(`${url}/rest/v1/portfolio_state?id=eq.main&select=state&limit=1`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!response.ok) throw new Error(`Supabase portfolio load failed (${response.status}): ${await response.text()}`);
-    const rows = await response.json() as Array<{ state?: PortfolioStoreState }>;
-    if (rows[0]?.state) {
-      cachedState = rows[0].state;
-      console.log('[PortfolioStore] Loaded durable portfolio state from Supabase.');
-      return;
-    }
-    const initial = getPortfolioStore();
-    queueSupabaseSave(initial);
-    await supabaseWriteQueue;
-    console.log('[PortfolioStore] Seeded Supabase with the curated portfolio snapshot.');
-  } catch (error) {
-    console.error('[PortfolioStore] Supabase unavailable; using local JSON fallback:', error);
-    getPortfolioStore();
-  }
+  if (!url || !key) return;
+  try { await loadRemote(); }
+  catch { console.warn('[PortfolioStore] Durable storage unavailable. Serving the local snapshot.'); }
 }
 
-export function savePortfolioStore(state: PortfolioStoreState): void {
-  ensureDataDir();
-  state.lastUpdated = new Date().toISOString();
+export function draftPortfolioStore() {
+  return structuredClone(getPortfolioStore());
+}
+
+export async function savePortfolioStore(state: PortfolioStoreState): Promise<void> {
+  if (saving) throw conflict();
+  saving = true;
   try {
-    fs.writeFileSync(STORE_FILE, JSON.stringify(state, null, 2), 'utf8');
+    const { url, key } = getSupabaseConfig();
+    if (Boolean(url) !== Boolean(key)) throw new StoreError(503, 'Portfolio storage configuration is incomplete.');
+    if (!url && localReadFailed) throw new StoreError(503, 'Restore the local portfolio snapshot before saving.');
+    if (url && revision === undefined) await loadRemote();
+    if (state.lastUpdated !== getPortfolioStore().lastUpdated) throw conflict();
+    state.lastUpdated = new Date(Math.max(Date.now(), Date.parse(state.lastUpdated) + 1)).toISOString();
+    if (url) {
+      const query = revision === null ? '' : 'id=eq.main&updated_at=eq.' + encodeURIComponent(revision!);
+      try {
+        const rows = await database(query, {
+          method: revision === null ? 'POST' : 'PATCH',
+          body: JSON.stringify({ id: 'main', state, updated_at: state.lastUpdated }),
+        });
+        if (!rows[0]?.updated_at) throw conflict();
+        revision = rows[0].updated_at;
+      } catch (error) {
+        revision = undefined;
+        // Reconcile an ambiguous write before an editor can retry it.
+        try { await loadRemote(); } catch { /* retry on the next write */ }
+        throw error;
+      }
+    }
+    try {
+      ensureDataDir();
+      fs.writeFileSync(STORE_FILE + '.tmp', JSON.stringify(state, null, 2), { mode: 0o600 });
+      fs.renameSync(STORE_FILE + '.tmp', STORE_FILE);
+    } catch {
+      if (!url) throw new StoreError(503, 'Local portfolio storage is unavailable.');
+      console.warn('[PortfolioStore] Could not update the local cache.');
+    }
     cachedState = state;
-    queueSupabaseSave(state);
-  } catch (err) {
-    console.error('[PortfolioStore] Error saving store file:', err);
+  } catch (error) {
+    if (error instanceof StoreError) throw error;
+    throw new StoreError(503, 'Portfolio storage is unavailable.');
+  } finally {
+    saving = false;
   }
 }
 
@@ -293,8 +318,8 @@ export function mergeGitHubProject(
 /**
  * Applies a batch of GitHub projects to the store.
  */
-export function syncGitHubProjects(projects: ExtractedGitHubProject[]): PortfolioContent {
-  const store = getPortfolioStore();
+export async function syncGitHubProjects(projects: ExtractedGitHubProject[]): Promise<PortfolioContent> {
+  const store = draftPortfolioStore();
   let currentProjects = [...store.content.projects];
 
   for (const gitProj of projects) {
@@ -314,18 +339,18 @@ export function syncGitHubProjects(projects: ExtractedGitHubProject[]): Portfoli
 
   store.content.projects = currentProjects;
   store.content.lastSynced = new Date().toISOString();
-  savePortfolioStore(store);
+  await savePortfolioStore(store);
   return store.content;
 }
 
 /**
  * Applies approved resume changes to the portfolio store.
  */
-export function applyApprovedResumeChanges(
+export async function applyApprovedResumeChanges(
   diff: ResumeDiffResult,
   approvedIds: string[]
-): PortfolioContent {
-  const store = getPortfolioStore();
+): Promise<PortfolioContent> {
+  const store = draftPortfolioStore();
   const approvedSet = new Set(approvedIds);
   const changesToApply = diff.changes.filter((c) => approvedSet.has(c.id));
 
@@ -387,21 +412,22 @@ export function applyApprovedResumeChanges(
     }
   }
 
-  savePortfolioStore(store);
+  if (!isPortfolioContent(store.content)) throw new StoreError(400, 'Invalid resume changes.');
+  await savePortfolioStore(store);
   return store.content;
 }
 
 /**
  * Resets portfolio store to initial curated baseline.
  */
-export function resetPortfolioStore(): PortfolioContent {
+export async function resetPortfolioStore(): Promise<PortfolioContent> {
   const defaultState: PortfolioStoreState = {
     version: 1,
-    lastUpdated: new Date().toISOString(),
-    content: initialPortfolioContent,
+    lastUpdated: getPortfolioStore().lastUpdated,
+    content: structuredClone(initialPortfolioContent),
     syncedRepositories: {},
     manualOverrides: {},
   };
-  savePortfolioStore(defaultState);
+  await savePortfolioStore(defaultState);
   return defaultState.content;
 }

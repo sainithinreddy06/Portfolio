@@ -1,4 +1,3 @@
-import { GoogleGenAI, Type } from '@google/genai';
 import { PortfolioContent } from '../src/content/types';
 import { ParsedResumeData, ResumeChangeItem, ResumeDiffResult } from './types';
 
@@ -44,6 +43,7 @@ async function parseWithGemini(
   }
 
   try {
+    const { GoogleGenAI, Type } = await import('@google/genai');
     const ai = new GoogleGenAI({
       apiKey,
       httpOptions: {
@@ -168,7 +168,7 @@ CRITICAL RULES:
       return parsed;
     }
   } catch (err) {
-    console.warn('[Resume Parser] Gemini parsing attempt failed, falling back to local heuristic parser:', err);
+    console.warn('[Resume Parser] Gemini unavailable. Using the local parser.');
   }
   return null;
 }

@@ -1,3 +1,4 @@
+import { serverResourceUrl } from '../../services/apiResponse';
 import React, { useEffect, useState } from 'react';
 import { PhotoConfig } from '../../content/types';
 
@@ -12,7 +13,7 @@ interface PhotoFrameProps {
 // Stable permanent default profile photo asset (user's uploaded portrait)
 const DEFAULT_PROFILE_PHOTO_URL = '/images/profile-photo.png';
 
-function processImageTransparencyUncached(sourceUrl: string, onProcessed: (url: string) => void) {
+export function processImageTransparency(sourceUrl: string, onProcessed: (url: string) => void) {
   if (!sourceUrl) {
     onProcessed('');
     return;
@@ -152,26 +153,7 @@ function processImageTransparencyUncached(sourceUrl: string, onProcessed: (url: 
   img.src = sourceUrl;
 }
 
-let defaultProcessedPhoto: Promise<string> | null = null;
-
 export const DEFAULT_PROFILE_PHOTO = DEFAULT_PROFILE_PHOTO_URL;
-
-// The same local portrait is used by multiple PhotoFrame instances. Share its
-// one-time canvas processing result instead of repeating the flood fill.
-export function processImageTransparency(sourceUrl: string, onProcessed: (url: string) => void) {
-  if (sourceUrl !== DEFAULT_PROFILE_PHOTO_URL) {
-    processImageTransparencyUncached(sourceUrl, onProcessed);
-    return;
-  }
-
-  if (!defaultProcessedPhoto) {
-    defaultProcessedPhoto = new Promise((resolve) => {
-      processImageTransparencyUncached(sourceUrl, resolve);
-    });
-  }
-
-  defaultProcessedPhoto.then(onProcessed);
-}
 
 export const PhotoFrame: React.FC<PhotoFrameProps> = ({
   photo,
@@ -182,7 +164,7 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
 }) => {
   // Determine primary candidate image:
   // Use configured photo.url if not explicitly a placeholder, otherwise use DEFAULT_PROFILE_PHOTO
-  const configuredUrl = photo.url && !photo.isPlaceholder ? photo.url : DEFAULT_PROFILE_PHOTO;
+  const configuredUrl = photo.url && !photo.isPlaceholder ? serverResourceUrl(photo.url) : DEFAULT_PROFILE_PHOTO;
   const [activeUrl, setActiveUrl] = useState<string>(configuredUrl);
   const [processedUrl, setProcessedUrl] = useState<string>(configuredUrl);
   const [fallbackAttempted, setFallbackAttempted] = useState<boolean>(false);
@@ -202,17 +184,20 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
 
   // Synchronize when photo configuration changes
   useEffect(() => {
-    const nextUrl = photo.url && !photo.isPlaceholder ? photo.url : DEFAULT_PROFILE_PHOTO;
+    const nextUrl = photo.url && !photo.isPlaceholder ? serverResourceUrl(photo.url) : DEFAULT_PROFILE_PHOTO;
     setActiveUrl(nextUrl);
     setProcessedUrl(nextUrl);
     setFallbackAttempted(false);
     setIsCompletelyFailed(false);
 
+    if (nextUrl === DEFAULT_PROFILE_PHOTO) return;
+    let current = true;
     processImageTransparency(nextUrl, (transparentUrl) => {
-      if (transparentUrl) {
+      if (current && transparentUrl) {
         setProcessedUrl(transparentUrl);
       }
     });
+    return () => { current = false; };
   }, [photo.url, photo.isPlaceholder]);
 
   // Handle image load error: fall back to DEFAULT_PROFILE_PHOTO before showing monogram
@@ -221,11 +206,6 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
       setFallbackAttempted(true);
       setActiveUrl(DEFAULT_PROFILE_PHOTO);
       setProcessedUrl(DEFAULT_PROFILE_PHOTO);
-      processImageTransparency(DEFAULT_PROFILE_PHOTO, (transparentUrl) => {
-        if (transparentUrl) {
-          setProcessedUrl(transparentUrl);
-        }
-      });
     } else {
       setIsCompletelyFailed(true);
     }
@@ -247,7 +227,13 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
           className="relative inline-block cursor-default"
           aria-label={photo.altText || 'Portrait of Sai Nithin Reddy'}
         >
+          <picture>
+            {activeUrl === DEFAULT_PROFILE_PHOTO && (
+              <source type="image/webp" srcSet="/images/portrait-340.webp 340w, /images/portrait-680.webp 680w" sizes="(min-width: 640px) 340px, 280px" />
+            )}
           <img
+            width={activeUrl === DEFAULT_PROFILE_PHOTO ? 1136 : undefined}
+            height={activeUrl === DEFAULT_PROFILE_PHOTO ? 1385 : undefined}
             src={processedUrl || activeUrl}
             alt={photo.altText || 'Portrait of Sai Nithin Reddy'}
             loading={size === 'hero' ? 'eager' : 'lazy'}
@@ -257,6 +243,7 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
             className="max-h-[360px] sm:max-h-[430px] w-auto max-w-[280px] sm:max-w-[340px] object-contain object-bottom drop-shadow-sm transition-all duration-300 block select-none pointer-events-none"
             referrerPolicy="no-referrer"
           />
+          </picture>
         </div>
         {caption && (
           <div className={`w-full ${textAlign} mt-2 flex items-center justify-center gap-1.5`}>
