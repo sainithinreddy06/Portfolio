@@ -1,4 +1,3 @@
-import { GoogleGenAI, Type } from '@google/genai';
 import { PortfolioContent } from '../src/content/types';
 import { ParsedResumeData, ResumeChangeItem, ResumeDiffResult } from './types';
 
@@ -44,6 +43,7 @@ async function parseWithGemini(
   }
 
   try {
+    const { GoogleGenAI, Type } = await import('@google/genai');
     const ai = new GoogleGenAI({
       apiKey,
       httpOptions: {

@@ -16,3 +16,5 @@ data/githubProjectsCache.json
 
 data/uploads/
 data/*.tmp
+portfolio-server.mjs
+lighthouse-report.json

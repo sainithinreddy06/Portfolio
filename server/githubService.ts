@@ -1,4 +1,3 @@
-import { env } from './runtimeEnv';
 import crypto from 'crypto';
 
 export interface GitHubRepoPayload {
@@ -109,7 +108,7 @@ function getGitHubHeaders(): Record<string, string> {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'sainithinreddy-portfolio-discovery',
   };
-  const token = env('GITHUB_TOKEN');
+  const token = process.env.GITHUB_TOKEN;
   if (token && token.trim() !== '') {
     headers.Authorization = `Bearer ${token.trim()}`;
   }
@@ -928,12 +927,12 @@ export async function discoverPublicProjects(username: string): Promise<Extracte
 /** Admin-only sync health. Historical repository payloads are never replayed. */
 export function getGitHubDiagnostics(projects: ExtractedGitHubProject[], lastSyncedAt: string | null) {
   return {
-    username: env('GITHUB_USERNAME') || DEFAULT_GITHUB_USERNAME,
+    username: process.env.GITHUB_USERNAME || DEFAULT_GITHUB_USERNAME,
     lastSyncedAt,
     rateLimitRemaining: lastRateLimitRemaining,
     rateLimitReset: lastRateLimitReset,
-    hasTokenConfigured: Boolean(env('GITHUB_TOKEN')?.trim()),
-    hasWebhookSecretConfigured: Boolean(env('GITHUB_WEBHOOK_SECRET')?.trim()),
+    hasTokenConfigured: Boolean(process.env.GITHUB_TOKEN?.trim()),
+    hasWebhookSecretConfigured: Boolean(process.env.GITHUB_WEBHOOK_SECRET?.trim()),
     totalReposDiscovered: projects.length,
     eligibleReposCount: projects.length,
     projects,

@@ -14,23 +14,9 @@ const DIST_DIR = path.resolve(process.cwd(), 'dist');
 const DIST_IMAGES_DIR = path.join(DIST_DIR, 'images');
 
 export function ensureStorageDirectories(): void {
-  const dirs = [DATA_DIR, RESUMES_DIR, PHOTOS_DIR, PUBLIC_DIR, PUBLIC_IMAGES_DIR];
-  if (fs.existsSync(DIST_DIR)) {
-    dirs.push(DIST_IMAGES_DIR);
-  }
-  dirs.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      try {
-        fs.mkdirSync(dir, { recursive: true });
-      } catch (err) {
-        console.warn(`[AssetManager] Warning creating dir ${dir}:`, err);
-      }
-    }
-  });
+  fs.mkdirSync(RESUMES_DIR, { recursive: true });
+  fs.mkdirSync(PHOTOS_DIR, { recursive: true });
 }
-
-// Initial directory setup
-ensureStorageDirectories();
 
 // -------------------------------------------------------------
 // RESUME ASSET MANAGEMENT
@@ -52,11 +38,6 @@ export function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/**
- * Atomically saves an uploaded PDF resume, creates a version entry,
- * mirrors to public/resume.pdf, data/uploaded-resume.pdf, dist/resume.pdf,
- * and uploads to durable cloud storage if configured.
- */
 export async function saveUploadedResume(
   buffer: Buffer,
   originalFileName: string = 'Sai_Nithin_Reddy_Resume.pdf',
@@ -216,10 +197,6 @@ export async function deleteResumeVersion(versionId: string) {
   };
 }
 
-/**
- * Retrieves the currently active resume file buffer or path.
- * Prioritizes local disk files first for speed, stability, and zero CORS/iframe restrictions.
- */
 export function getActiveResumeFile(): {
   found: boolean;
   filePath?: string;
@@ -276,11 +253,6 @@ export function validateImageSignature(buffer: Buffer): { valid: boolean; ext: '
   throw new StoreError(400, 'Unsupported image format. Please upload a standard JPEG, PNG, or WEBP image.');
 }
 
-/**
- * Saves an uploaded profile photo, creates a version entry,
- * mirrors to data/, public/images/, and dist/images/,
- * and uploads to durable cloud storage if configured.
- */
 export async function saveUploadedPhoto(
   buffer: Buffer,
   originalFileName: string = 'portrait.png',
@@ -456,11 +428,6 @@ export async function deletePhotoVersion(versionId: string) {
   };
 }
 
-/**
- * Gets active photo file on disk.
- * Searches DATA_DIR, PUBLIC_IMAGES_DIR, and DIST_IMAGES_DIR.
- * Falls back to default-profile.png (the user's permanent uploaded portrait).
- */
 function safeId(id: string) { return /^[a-zA-Z0-9_-]+$/.test(id); }
 function isRemote(url?: string) { return !!url && /^https?:\/\//i.test(url); }
 function archivedPhoto(id: string) {

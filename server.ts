@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import compression from 'compression';
 import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import fs from 'fs';
@@ -96,12 +98,11 @@ import {
   deletePhotoVersion,
   resetPhotoToPlaceholder,
   getActivePhotoFile,
-  ensureStorageDirectories,
+
 } from './server/assetManager';
 import { getStorageProviderStatus } from './server/cloudStorage';
 
-// Ensure storage directories are initialized
-ensureStorageDirectories();
+const initialStore = initializePortfolioStore();
 
 import { isPortfolioContent, isSafeAssetUrl } from './server/portfolioValidation';
 
@@ -188,6 +189,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
     githubTargetUser: GITHUB_USERNAME,
   });
 });
+
+// HTML and immutable assets can be served while durable state is loading.
+app.use(['/api', '/resume.pdf'], (_req, _res, next) => { initialStore.then(() => next(), next); });
 
 /**
  * Storage health check endpoint
@@ -934,7 +938,8 @@ async function startServer() {
     }
 
     // Serve static compiled assets from dist with caching
-    app.use(express.static(distPath, { maxAge: '1d', index: false }));
+    app.use('/assets', compression(), express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '1y' }));
+    app.use(express.static(distPath, { index: false }));
 
     // SPA fallback: send compiled index.html for client-side routing
     app.get('*', (req: Request, res: Response) => {
@@ -951,14 +956,11 @@ async function startServer() {
   }
 
   const server = httpServer.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`\n  VITE v8.3.0  ready in 120 ms\n`);
-    console.log(`  ➜  Local:   http://localhost:${PORT}/`);
-    console.log(`  ➜  Network: http://0.0.0.0:${PORT}/`);
     console.log(`[Portfolio Server] Running on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
 
     const reconcile = () => refreshPublication(GITHUB_USERNAME)
       .catch((err) => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message));
-    void reconcile();
+    void initialStore.then(reconcile);
     setInterval(reconcile, 30 * 60 * 1000);
 
   });
@@ -983,9 +985,7 @@ async function startServer() {
   process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
-initializePortfolioStore()
-  .catch((err) => console.error('[PortfolioStore] Initialization warning:', err))
-  .finally(() => startServer().catch((err) => {
-    console.error('[Portfolio Server] Fatal start error:', err);
-    process.exit(1);
-  }));
+startServer().catch(() => {
+  console.error('[Portfolio Server] Startup failed.');
+  process.exit(1);
+});
