@@ -34,6 +34,15 @@
 
 **F. Comparison.** The same test suite now runs against an installation without development packages and checks five sitemap round trips, keyboard focus transfer, modal exclusivity, and the social preview bytes. The Phase 4 build failed the new keyboard gate. The Phase 6 build passed it.
 
+**Compatibility with current main.** A simulated merge with `main` at `cb3b194` applied cleanly but initially failed TypeScript. The newer Lucide release removed two brand exports, and the Express 5 type definitions widened untyped route parameters. Preserved the existing icon geometry and its license, typed the two named version parameters, and replaced the version-specific wildcard route strings. Both dependency sets now pass type checking, lint, 12 Node tests, production compilation, npm audit and the production-only browser suite. The simulation used a temporary checkout and did not update main.
+
+| Final local mobile Lighthouse run | Review branch | Simulated merge with main |
+|---|---:|---:|
+| LCP | 2.56 s | 2.56 s |
+| CLS | 0 | 0.083 |
+| Homepage transfer | 229,079 bytes | 230,366 bytes |
+| Requests | 11 | 11 |
+
 **G. Remaining risks.** The local release checks do not verify GitHub-hosted Actions or CodeQL permissions, production Supabase grants, real webhook delivery, Render configuration, CDN headers, or real-user Web Vitals. Those items remain in the [deployment acceptance and rollback plan](READINESS.md#production-gates-and-rollback).
 
 **H. Next step.** Phase 7 requires owner approval to create a separate static preview. Production traffic switching requires its own approval after the preview passes acceptance.
