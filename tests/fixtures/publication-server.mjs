@@ -38,4 +38,5 @@ globalThis.fetch = async (url, options = {}) => {
   return new Response(null, { status: 404 });
 };
 
-await import('../../server.ts');
+if (process.argv.includes('--built')) await import('../../portfolio-server.mjs');
+else await import('../../server.ts');

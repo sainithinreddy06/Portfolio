@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist portfolio-server.mjs",
     "lint": "eslint . --max-warnings=0",
-    "test": "node --import tsx --test tests/portfolio-core.test.ts tests/github-publication.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
     "lighthouse": "npx --yes lighthouse@13.6.0 http://localhost:3000 --output=json --output-path=lighthouse-report.json",
     "typecheck": "tsc --noEmit"
   },
