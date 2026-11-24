@@ -103,3 +103,12 @@ select grantee, privilege_type
 from information_schema.role_table_grants
 where table_schema = 'public' and table_name = 'portfolio_state';
 ```
+
+## Remaining improvement priorities
+
+- Complete the owner-approved production preview and acceptance gates above; independently verify cold-start and warm timings, uptime, real mobile browsers, screen-reader flows, security headers and social previews.
+- Strengthen PRAVAAH and TAPAS case studies with personally attributable contributions, linked commits/tests, real screenshots, verified outcomes, trade-offs and limitations. Review the prototype case studies for consistency; avoid unsupported metrics and claims.
+- Verify résumé, contact, project and profile links on real devices; reconcile résumé, skills, achievements and project-status claims with owner-confirmed evidence.
+- Add reliable project CI/release status and a minimal uptime alert only if useful. Original technical writing is optional; defer additional analytics, interactive showcases and tooling unless a real need arises.
+
+The older internal evaluation, gap analysis, plan and tracker are archived in Git history. This file is the current verification and deployment record.
