@@ -31,6 +31,7 @@ try {
     args: JSON.parse(process.env.CHROME_FLAGS || '["--no-sandbox"]'),
   });
   const page = await browser.newPage();
+  await page.setCacheEnabled(false);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.setRequestInterception(true);
