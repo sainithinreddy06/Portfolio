@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Terminal } from 'lucide-react';
 
 export const NotFoundPage: React.FC = () => {
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = 'Page Not Found | Sai Nithin Reddy';
+    return () => { document.title = previousTitle; };
+  }, []);
+
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <div className="max-w-md w-full p-8 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] text-center shadow-xl">

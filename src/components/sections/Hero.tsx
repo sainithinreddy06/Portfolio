@@ -3,7 +3,8 @@ import { usePortfolio } from '../../content';
 import { PhotoFrame } from '../common/PhotoFrame';
 import { EngineeringModeBadge } from '../common/EngineeringModeBadge';
 import { WarpedMeshBackground } from '../common/WarpedMeshBackground';
-import { ArrowDown, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { Github, Linkedin } from '../common/SocialIcons';
+import { ArrowDown, ExternalLink } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   const { content } = usePortfolio();

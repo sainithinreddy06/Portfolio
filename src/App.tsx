@@ -29,7 +29,7 @@ export default function App() {
           />
           <ResumeModal />
           <ErrorBoundary fallback={<div className="p-8 text-center text-[var(--text-secondary)]">Something went wrong. Please try again.</div>}>
-            <main id="main-content" className="flex-1">
+            <main id="main-content" tabIndex={-1} className="flex-1">
               <Suspense
                 fallback={
                   <div className="min-h-screen flex items-center justify-center text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">
