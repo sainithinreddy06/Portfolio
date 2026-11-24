@@ -950,6 +950,8 @@ async function startServer() {
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ success: false, error: 'API endpoint not found' });
       }
+      if (path.extname(req.path) || !req.accepts('html')) return res.sendStatus(404);
+      if (!['/', '/admin', '/admin/'].includes(req.path) && !/^\/work\/[^/]+\/?$/.test(req.path)) res.status(404);
       const indexPath = path.join(distPath, 'index.html');
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);

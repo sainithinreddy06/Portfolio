@@ -39,7 +39,8 @@ try {
     await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: theme }]);
     for (const [route, width] of [['/', 390], ['/', 1365], ['/work/pravaah', 390], ['/admin', 390], ['/missing', 390]]) {
       await page.setViewport({ width, height: 820 });
-      await page.goto(origin + route, { waitUntil: 'networkidle2' });
+      const navigation = await page.goto(origin + route, { waitUntil: 'networkidle2' });
+      assert.equal(navigation.status(), route === '/missing' ? 404 : 200);
       await page.waitForSelector('main h1');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Horizontal overflow at ' + route);
       await page.evaluate(axe);
