@@ -17,7 +17,7 @@ import {
   savePortfolioStore,
   applyApprovedResumeChanges,
   resetPortfolioStore,
-  initializePortfolioStore, draftPortfolioStore, StoreError,
+  initializePortfolioStore, draftPortfolioStore, storageStatus, StoreError,
 } from './server/portfolioStore';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,7 +101,12 @@ import {
 } from './server/assetManager';
 import { getStorageProviderStatus } from './server/cloudStorage';
 
-const initialStore = initializePortfolioStore();
+let storeInitialized = false;
+const storeStart = performance.now();
+const initialStore = initializePortfolioStore().then(() => {
+  storeInitialized = true;
+  console.log(`[PortfolioStore] Initial read finished in ${Math.round(performance.now() - storeStart)} ms (${storageStatus()}).`);
+});
 
 import { isPortfolioContent, isSafeAssetUrl } from './server/portfolioValidation';
 
@@ -186,6 +191,13 @@ app.get('/api/health', (_req: Request, res: Response) => {
     environment: IS_PROD ? 'production' : 'development',
     storageProvider: getStorageProviderStatus(),
     githubTargetUser: GITHUB_USERNAME,
+  });
+});
+
+// Read readiness includes the curated fallback. Report durable storage health separately.
+app.get('/api/ready', (_req, res) => {
+  res.status(storeInitialized ? 200 : 503).json({
+    readyForReads: storeInitialized, storage: storeInitialized ? storageStatus() : 'starting',
   });
 });
 
@@ -962,7 +974,7 @@ async function startServer() {
   }
 
   const server = httpServer.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`[Portfolio Server] Running on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
+    console.log(`[Portfolio Server] Listening after ${Math.round(process.uptime() * 1000)} ms on http://0.0.0.0:${PORT} (mode: ${IS_PROD ? 'production' : 'development'})`);
 
     const reconcile = () => refreshPublication(GITHUB_USERNAME)
       .catch((err) => console.warn('[Portfolio Server] GitHub reconciliation deferred:', err.message));

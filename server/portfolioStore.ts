@@ -144,6 +144,12 @@ async function loadRemote() {
   revision = rows[0].updated_at;
 }
 
+export function storageStatus(): 'local' | 'durable' | 'degraded' {
+  const { url, key } = getSupabaseConfig();
+  if (!url && !key) return localReadFailed ? 'degraded' : 'local';
+  return url && key && revision !== undefined ? 'durable' : 'degraded';
+}
+
 export async function initializePortfolioStore(): Promise<void> {
   getPortfolioStore();
   const { url, key } = getSupabaseConfig();

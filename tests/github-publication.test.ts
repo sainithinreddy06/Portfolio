@@ -41,6 +41,7 @@ test('public HTTP reads, admin sync, and visibility changes share one publicatio
   }
   await configure([], '/users/owner/repos');
   const log = () => readFile(path.join(dir, 'requests.log'), 'utf8');
+  await writeFile(path.join(dir, 'hold-initial-read'), '');
   const child = fork(new URL('./fixtures/publication-server.mjs', import.meta.url), ['--production', '--port', '0'], {
     cwd: dir, execArgv: ['--import', import.meta.resolve('tsx')], silent: true,
     env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, NODE_ENV: 'production',
@@ -76,7 +77,11 @@ test('public HTTP reads, admin sync, and visibility changes share one publicatio
     return post('/api/github/webhook', body, { 'x-github-event': 'repository', 'x-hub-signature-256': 'sha256=' + signature });
   };
 
+  assert.equal((await get('/api/health')).status, 200);
+  assert.equal((await get('/api/ready')).status, 503);
+  await rm(path.join(dir, 'hold-initial-read'));
   await waitFor(async () => (await log()).includes('/users/owner/repos'));
+  assert.deepEqual(await (await get('/api/ready')).json(), { readyForReads: true, storage: 'durable' });
   const login = await (await post('/api/admin/login', { email: 'editor@example.invalid', password: 'disposable-password' })).json();
   assert.ok(login.token);
   const auth = { Authorization: 'Bearer ' + login.token };
