@@ -53,19 +53,66 @@ try {
       assert.equal(navigation.status(), route === '/missing' ? 404 : 200);
       await page.waitForSelector('main h1');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Horizontal overflow at ' + route);
+      if (route === '/admin') {
+        assert.equal(navigation.headers()['x-robots-tag'], 'noindex, nofollow');
+        assert.match(await page.title(), /Portfolio Admin/);
+      }
+      if (route === '/missing') assert.match(await page.title(), /Page Not Found/);
       await checkAccessibility(page, [theme, width, route].join(' '));
       if (route === '/') {
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.getAttribute('href')), '#main-content');
+        await page.keyboard.press('Enter');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'main-content');
         assert.ok(await page.$eval('picture img', img => img.naturalWidth && img.currentSrc.endsWith('.webp')));
         await page.keyboard.down('Control');
         await page.keyboard.press('k');
         await page.keyboard.up('Control');
         await page.waitForSelector('[aria-label="Command Palette"]');
-        await page.keyboard.press('Escape');
+        await page.focus('[aria-label="Close command palette"]');
+        await page.keyboard.press('Enter');
         await page.waitForSelector('[aria-label="Command Palette"]', { hidden: true });
+        const index = '[aria-label="Open index menu"]';
+        await page.click(index);
+        await page.waitForSelector('[aria-label="Site Index Navigation"]');
+        await page.keyboard.down('Control');
+        await page.keyboard.press('k');
+        await page.keyboard.up('Control');
+        assert.equal(await page.$$eval('[aria-modal="true"]', nodes => nodes.length), 1);
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(selector => document.activeElement.matches(selector), {}, index);
+        const email = await page.$eval('#contact a[href^="mailto:"]', link => link.getAttribute('href'));
+        assert.match(email, /^mailto:[^@\s]+@[^@\s]+$/);
       }
       console.log(theme, width, route, 'passed');
     }
   }
+  const sitemap = await (await fetch(origin + '/sitemap.xml')).text();
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => new URL(match[1]));
+  const home = urls.find(url => url.pathname === '/');
+  assert.ok(home);
+  const studies = urls.filter(url => url.pathname.startsWith('/work/'));
+  assert.ok(studies.length);
+  for (const url of studies) {
+    const response = await page.goto(origin + url.pathname, { waitUntil: 'networkidle2' });
+    assert.equal(response.status(), 200);
+    await page.waitForFunction(() => document.title.endsWith('| Sai Nithin Reddy'));
+    assert.equal(await page.$eval('link[rel="canonical"]', el => el.href), url.href);
+    assert.equal(await page.$eval('meta[property="og:url"]', el => el.content), url.href);
+    assert.equal(await page.$$eval('main [aria-modal="true"]', nodes => nodes.length), 0);
+    await page.click('main a[href="/"]');
+    await page.waitForSelector('picture img');
+    assert.equal(await page.$eval('link[rel="canonical"]', el => el.href), home.href);
+    assert.equal(await page.$eval('meta[property="og:url"]', el => el.content), home.href);
+  }
+  assert.equal(await page.$$eval('meta[property="og:image:width"]', nodes => nodes.length), 1);
+  const preview = new URL(await page.$eval('meta[property="og:image"]', el => el.content));
+  const previewResponse = await fetch(origin + preview.pathname);
+  assert.equal(previewResponse.status, 200);
+  const png = Buffer.from(await previewResponse.arrayBuffer());
+  assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [1200, 630]);
+  console.log(studies.length, 'sitemap case studies, return navigation and social preview passed');
   await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
   await page.goto(origin + '/admin', { waitUntil: 'networkidle2' });
   await page.type('#admin-email', 'editor@example.invalid');
