@@ -18,3 +18,4 @@ data/uploads/
 data/*.tmp
 portfolio-server.mjs
 lighthouse-report.json
+data/portfolio-runtime.json

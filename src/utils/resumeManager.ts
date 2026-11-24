@@ -23,49 +23,21 @@ export async function downloadResume(content: PortfolioContent): Promise<void> {
   const fileUrl = getResumeFileUrl(content);
   const preferredFilename = content.profile.resume.fileName || 'Sai_Nithin_Reddy_Resume.pdf';
 
+  const anchor = document.createElement('a');
+  anchor.href = fileUrl;
+  anchor.download = preferredFilename;
+  anchor.rel = 'noopener noreferrer';
+  let objectUrl: string | undefined;
   try {
-    // If it's a data URL or blob, download directly via anchor
-    if (fileUrl.startsWith('data:') || fileUrl.startsWith('blob:')) {
-      const a = document.createElement('a');
-      a.href = fileUrl;
-      a.download = preferredFilename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return;
+    const response = await fetch(fileUrl);
+    if (response.ok) {
+      objectUrl = URL.createObjectURL(await response.blob());
+      anchor.href = objectUrl;
     }
-
-    // Try fetching the file as a Blob to enforce the exact download filename
-    const res = await fetch(fileUrl);
-    if (!res.ok) {
-      // If direct fetch fails (e.g. CORS or 404), fall back to opening or downloading via window/anchor
-      const a = document.createElement('a');
-      a.href = fileUrl;
-      a.download = preferredFilename;
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return;
-    }
-
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = objectUrl;
-    a.download = preferredFilename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-  } catch {
-    // Fallback: direct navigation download
-    const a = document.createElement('a');
-    a.href = fileUrl;
-    a.download = preferredFilename;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
+  } catch { /* A remote host may only permit a direct download. */ }
+  if (!objectUrl) anchor.target = '_blank';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }

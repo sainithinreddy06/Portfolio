@@ -162,6 +162,7 @@ test('public HTTP reads, admin sync, and visibility changes share one publicatio
     await writeFile(path.join(dir, 'asset-fail'), '');
     assert.equal((await post('/api/portfolio/resume', upload, auth)).status, 503);
     assert.deepEqual(await archive(), before);
+    assert.equal(await readFile(storePath, 'utf8'), initialState);
     await rm(path.join(dir, 'asset-fail'));
     const first = await (await post('/api/portfolio/resume', upload, auth)).json();
     const second = await (await post('/api/portfolio/resume', upload, auth)).json();

@@ -13,11 +13,6 @@ const PUBLIC_IMAGES_DIR = path.join(PUBLIC_DIR, 'images');
 const DIST_DIR = path.resolve(process.cwd(), 'dist');
 const DIST_IMAGES_DIR = path.join(DIST_DIR, 'images');
 
-export function ensureStorageDirectories(): void {
-  fs.mkdirSync(RESUMES_DIR, { recursive: true });
-  fs.mkdirSync(PHOTOS_DIR, { recursive: true });
-}
-
 // -------------------------------------------------------------
 // RESUME ASSET MANAGEMENT
 // -------------------------------------------------------------
@@ -43,7 +38,6 @@ export async function saveUploadedResume(
   originalFileName: string = 'Sai_Nithin_Reddy_Resume.pdf',
   customFileSize?: string
 ) {
-  ensureStorageDirectories();
 
   if (buffer.length > 15 * 1024 * 1024) {
     throw new StoreError(400, 'Resume PDF exceeds the 15 MB maximum size limit.');
@@ -63,12 +57,12 @@ export async function saveUploadedResume(
   const versionFileName = `resume-${versionId}.pdf`;
   const versionFilePath = path.join(RESUMES_DIR, versionFileName);
 
-  // Write version file to persistent archive
-  fs.writeFileSync(versionFilePath, buffer);
-
-  const cloudResult = await uploadAssetToStorage(buffer, versionFileName, 'resume');
-  if (!cloudResult.success) throw new StoreError(503, 'Resume storage is unavailable.');
-  const activeFileUrl = cloudResult.url || '/resume.pdf';
+  const remoteUrl = await uploadAssetToStorage(buffer, versionFileName, 'resume', 'application/pdf');
+  if (!remoteUrl) {
+    fs.mkdirSync(RESUMES_DIR, { recursive: true });
+    fs.writeFileSync(versionFilePath, buffer, { flag: 'wx' });
+  }
+  const activeFileUrl = remoteUrl || '/resume.pdf';
 
   const sizeStr = customFileSize || formatFileSize(buffer.length);
   const store = draftPortfolioStore();
@@ -107,7 +101,7 @@ export async function saveUploadedResume(
     success: true,
     resume: store.content.profile.resume,
     version: newVersion,
-    storageProvider: cloudResult.provider,
+    storageProvider: remoteUrl ? 'supabase' : 'repository_static',
   };
 }
 
@@ -118,7 +112,6 @@ export async function rollbackResumeVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
     throw new StoreError(400, 'Invalid resume version ID format.');
   }
-  ensureStorageDirectories();
   const store = draftPortfolioStore();
   const versions = store.content.profile.resume.versions || [];
   const target = versions.find((v) => v.id === versionId);
@@ -258,7 +251,6 @@ export async function saveUploadedPhoto(
   originalFileName: string = 'portrait.png',
   altText?: string
 ) {
-  ensureStorageDirectories();
 
   if (buffer.length > 10 * 1024 * 1024) {
     throw new StoreError(400, 'Profile photo exceeds 10 MB maximum limit.');
@@ -270,12 +262,12 @@ export async function saveUploadedPhoto(
   const versionFileName = `${versionId}.${ext}`;
   const versionFilePath = path.join(PHOTOS_DIR, versionFileName);
 
-  // Write version file
-  fs.writeFileSync(versionFilePath, buffer);
-
-  const cloudResult = await uploadAssetToStorage(buffer, versionFileName, 'photo');
-  if (!cloudResult.success) throw new StoreError(503, 'Photo storage is unavailable.');
-  const photoUrl = cloudResult.provider === 'supabase' ? cloudResult.url! : `/api/portfolio/photo?v=${versionId}`;
+  const remoteUrl = await uploadAssetToStorage(buffer, versionFileName, 'photo', mime);
+  if (!remoteUrl) {
+    fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+    fs.writeFileSync(versionFilePath, buffer, { flag: 'wx' });
+  }
+  const photoUrl = remoteUrl || `/api/portfolio/photo?v=${versionId}`;
 
   const now = new Date();
   const dateFormatted = now.toLocaleDateString('en-US', {
@@ -321,7 +313,7 @@ export async function saveUploadedPhoto(
     success: true,
     photo: store.content.profile.photo,
     version: newVersion,
-    storageProvider: cloudResult.provider,
+    storageProvider: remoteUrl ? 'supabase' : 'repository_static',
     mime,
   };
 }
@@ -333,7 +325,6 @@ export async function rollbackPhotoVersion(versionId: string) {
   if (!versionId || !/^[a-zA-Z0-9_-]+$/.test(versionId)) {
     throw new StoreError(400, 'Invalid photo version ID format.');
   }
-  ensureStorageDirectories();
   const store = draftPortfolioStore();
   const versions = store.content.profile.photo.versions || [];
   const target = versions.find((v) => v.id === versionId);
@@ -369,7 +360,6 @@ export async function rollbackPhotoVersion(versionId: string) {
  * Resets profile photo to default permanent portrait asset
  */
 export async function resetPhotoToPlaceholder() {
-  ensureStorageDirectories();
   const store = draftPortfolioStore();
 
   const versions = (store.content.profile.photo.versions || []).map((v) => ({
@@ -419,7 +409,9 @@ export async function deletePhotoVersion(versionId: string) {
   store.content.profile.photo.versions = versions.filter((v) => v.id !== versionId);
   await savePortfolioStore(store);
   const file = archivedPhoto(versionId);
-  if (file) fs.rmSync(file, { force: true });
+  if (file) {
+    try { fs.rmSync(file, { force: true }); } catch { console.warn('[AssetManager] Inactive archive could not be removed.'); }
+  }
 
 
   return {

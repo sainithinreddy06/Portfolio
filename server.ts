@@ -191,7 +191,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 // HTML and immutable assets can be served while durable state is loading.
-app.use(['/api', '/resume.pdf'], (_req, _res, next) => { initialStore.then(() => next(), next); });
+app.use(['/api', '/resume.pdf', '/images/profile-photo.:ext'], (_req, _res, next) => { initialStore.then(() => next(), next); });
 
 /**
  * Storage health check endpoint
@@ -442,7 +442,7 @@ app.post('/api/portfolio/save', requireAdminAuth, async (req: Request, res: Resp
  * GET /api/portfolio/photo
  * Serves the active portrait photo with cache headers
  */
-app.get('/api/portfolio/photo', (_req: Request, res: Response) => {
+app.get(['/api/portfolio/photo', '/images/profile-photo.png', '/images/profile-photo.jpg', '/images/profile-photo.jpeg', '/images/profile-photo.webp'], (_req: Request, res: Response) => {
   try {
     const info = getActivePhotoFile();
     if (info.externalUrl) return res.redirect(info.externalUrl);

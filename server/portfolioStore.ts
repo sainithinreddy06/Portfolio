@@ -7,7 +7,9 @@ import { ExtractedGitHubProject } from './githubService';
 import { PortfolioStoreState, ExtendedProjectItem, ResumeDiffResult } from './types';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
-const STORE_FILE = path.join(DATA_DIR, 'syncedPortfolio.json');
+const SEED_FILE = path.join(DATA_DIR, 'syncedPortfolio.json');
+const STORE_FILE = path.join(DATA_DIR, 'portfolio-runtime.json');
+let localReadFailed = false;
 
 // In-memory cache
 let cachedState: PortfolioStoreState | null = null;
@@ -37,11 +39,10 @@ export function getPortfolioStore(): PortfolioStoreState {
     return cachedState;
   }
 
-  ensureDataDir();
-
-  if (fs.existsSync(STORE_FILE)) {
+  const source = fs.existsSync(STORE_FILE) ? STORE_FILE : SEED_FILE;
+  if (fs.existsSync(source)) {
     try {
-      const fileData = fs.readFileSync(STORE_FILE, 'utf8');
+      const fileData = fs.readFileSync(source, 'utf8');
       const parsed: PortfolioStoreState = JSON.parse(fileData);
 
       // Verify photo file on disk in data/ or public/images/
@@ -77,7 +78,8 @@ export function getPortfolioStore(): PortfolioStoreState {
       cachedState = parsed;
       return cachedState;
     } catch (err) {
-      console.warn('[PortfolioStore] Failed to read existing store file, falling back to base curated data:', err);
+      localReadFailed = true;
+      console.warn('[PortfolioStore] Cannot read the existing snapshot. Local edits are disabled until recovery.');
     }
   }
 
@@ -159,6 +161,7 @@ export async function savePortfolioStore(state: PortfolioStoreState): Promise<vo
   try {
     const { url, key } = getSupabaseConfig();
     if (Boolean(url) !== Boolean(key)) throw new StoreError(503, 'Portfolio storage configuration is incomplete.');
+    if (!url && localReadFailed) throw new StoreError(503, 'Restore the local portfolio snapshot before saving.');
     if (url && revision === undefined) await loadRemote();
     if (state.lastUpdated !== getPortfolioStore().lastUpdated) throw conflict();
     state.lastUpdated = new Date(Math.max(Date.now(), Date.parse(state.lastUpdated) + 1)).toISOString();
