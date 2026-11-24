@@ -44,3 +44,12 @@ test('README discovery recognizes Render deployments', () => {
   const result = parseReadmeContent('Project description with enough detail to be considered an overview.\n\nLive demo: https://sample-project.onrender.com');
   assert.equal(result.discoveredLiveUrl, 'https://sample-project.onrender.com');
 });
+
+test('split hosting resolves mutable resources and keeps frontend assets local', async () => {
+  const { serverResourceUrl } = await import('../src/services/apiResponse.ts');
+  const origin = 'https://api.example.invalid';
+  for (const resource of ['/api/portfolio/photo?v=2', '/resume.pdf']) assert.equal(serverResourceUrl(resource, origin), origin + resource);
+  for (const resource of ['/images/profile-photo.png', 'https://example.invalid/cv.pdf']) assert.equal(serverResourceUrl(resource, origin), resource);
+  assert.equal(serverResourceUrl('/api/projects', ''), '/api/projects');
+  assert.throws(() => serverResourceUrl('/api/projects', 'https://api.example.invalid/path'));
+});

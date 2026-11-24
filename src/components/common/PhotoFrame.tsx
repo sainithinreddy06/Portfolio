@@ -1,3 +1,4 @@
+import { serverResourceUrl } from '../../services/apiResponse';
 import React, { useEffect, useState } from 'react';
 import { PhotoConfig } from '../../content/types';
 
@@ -163,7 +164,7 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
 }) => {
   // Determine primary candidate image:
   // Use configured photo.url if not explicitly a placeholder, otherwise use DEFAULT_PROFILE_PHOTO
-  const configuredUrl = photo.url && !photo.isPlaceholder ? photo.url : DEFAULT_PROFILE_PHOTO;
+  const configuredUrl = photo.url && !photo.isPlaceholder ? serverResourceUrl(photo.url) : DEFAULT_PROFILE_PHOTO;
   const [activeUrl, setActiveUrl] = useState<string>(configuredUrl);
   const [processedUrl, setProcessedUrl] = useState<string>(configuredUrl);
   const [fallbackAttempted, setFallbackAttempted] = useState<boolean>(false);
@@ -183,7 +184,7 @@ export const PhotoFrame: React.FC<PhotoFrameProps> = ({
 
   // Synchronize when photo configuration changes
   useEffect(() => {
-    const nextUrl = photo.url && !photo.isPlaceholder ? photo.url : DEFAULT_PROFILE_PHOTO;
+    const nextUrl = photo.url && !photo.isPlaceholder ? serverResourceUrl(photo.url) : DEFAULT_PROFILE_PHOTO;
     setActiveUrl(nextUrl);
     setProcessedUrl(nextUrl);
     setFallbackAttempted(false);

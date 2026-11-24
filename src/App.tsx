@@ -24,6 +24,7 @@ export default function App() {
           <Navbar onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
           <CommandPalette
             isOpen={isCommandPaletteOpen}
+            onToggle={() => setIsCommandPaletteOpen(open => !open)}
             onClose={() => setIsCommandPaletteOpen(false)}
           />
           <ResumeModal />

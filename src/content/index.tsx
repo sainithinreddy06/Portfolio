@@ -1,3 +1,4 @@
+import { serverResourceUrl } from '../services/apiResponse';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PortfolioContent, ProjectItem } from './types';
 import { initialPortfolioContent } from './portfolioData';
@@ -22,7 +23,6 @@ export interface PortfolioContextType {
   resetContent: () => void;
   refreshServerPortfolio: () => Promise<void>;
   syncWithGitHubNow: () => Promise<void>;
-  isCustomized: boolean;
   engineeringMode: boolean;
   toggleEngineeringMode: () => void;
   theme: ThemeMode;
@@ -42,7 +42,7 @@ let portfolioSnapshotRequest: Promise<any> | null = null;
 
 function fetchPortfolioSnapshot(): Promise<any> {
   if (!portfolioSnapshotRequest) {
-    portfolioSnapshotRequest = fetch('/api/portfolio', {
+    portfolioSnapshotRequest = fetch(serverResourceUrl('/api/portfolio'), {
       headers: { Accept: 'application/json' },
     })
       .then(async (response) => {
@@ -202,7 +202,7 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         sessionStorage.getItem('sai_nithin_admin_token') ||
         localStorage.getItem('sai_nithin_admin_token');
       if (token) {
-        const res = await fetch('/api/github/sync', {
+        const res = await fetch(serverResourceUrl('/api/github/sync'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -290,7 +290,6 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         resetContent,
         refreshServerPortfolio,
         syncWithGitHubNow,
-        isCustomized: JSON.stringify(content) !== JSON.stringify(initialPortfolioContent),
         engineeringMode,
         toggleEngineeringMode,
         theme,
