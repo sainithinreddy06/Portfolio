@@ -31,6 +31,12 @@ export function normalizeProjectName(name: string): string {
     .trim();
 }
 
+function validSnapshot(state?: PortfolioStoreState) {
+  return isPortfolioContent(state?.content) && typeof state?.lastUpdated === 'string' &&
+    Number.isFinite(Date.parse(state.lastUpdated)) && state.syncedRepositories !== null &&
+    typeof state.syncedRepositories === 'object' && !Array.isArray(state.syncedRepositories);
+}
+
 /**
  * Initializes or loads the portfolio store state from disk.
  */
@@ -75,6 +81,9 @@ export function getPortfolioStore(): PortfolioStoreState {
       parsed.content.skillCategories ??= initialPortfolioContent.skillCategories;
 
 
+      if (!validSnapshot(parsed)) {
+        throw new Error('Invalid local portfolio record.');
+      }
       cachedState = parsed;
       return cachedState;
     } catch (err) {
@@ -132,16 +141,25 @@ function conflict() {
   return new StoreError(409, 'Portfolio changed. Reload the editor before saving.');
 }
 
-async function loadRemote() {
+async function readRemote() {
   const rows = await database('id=eq.main&select=state,updated_at&limit=1');
   if (!Array.isArray(rows)) throw new Error('Invalid portfolio response.');
-  if (!rows.length) { revision = null; return; }
-  if (!isPortfolioContent(rows[0].state?.content) || !rows[0].state.syncedRepositories ||
-      !Number.isFinite(Date.parse(rows[0].state.lastUpdated)) || !rows[0].updated_at) {
+  if (!rows.length) {
+    if (localReadFailed) throw new StoreError(503, 'Restore the local snapshot before initializing durable storage.');
+    revision = null;
+    return;
+  }
+  if (!validSnapshot(rows[0]?.state) || typeof rows[0]?.updated_at !== 'string' || !rows[0].updated_at) {
     throw new Error('Invalid portfolio record.');
   }
   cachedState = rows[0].state;
   revision = rows[0].updated_at;
+}
+
+let pendingRead: Promise<void> | undefined;
+function loadRemote() {
+  pendingRead ??= readRemote().finally(() => { pendingRead = undefined; });
+  return pendingRead;
 }
 
 export function storageStatus(): 'local' | 'durable' | 'degraded' {
@@ -153,7 +171,7 @@ export function storageStatus(): 'local' | 'durable' | 'degraded' {
 export async function initializePortfolioStore(): Promise<void> {
   getPortfolioStore();
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return;
+  if (!url || !key || revision !== undefined) return;
   try { await loadRemote(); }
   catch { console.warn('[PortfolioStore] Durable storage unavailable. Serving the local snapshot.'); }
 }
@@ -173,7 +191,7 @@ export async function savePortfolioStore(state: PortfolioStoreState): Promise<vo
     if (state.lastUpdated !== getPortfolioStore().lastUpdated) throw conflict();
     state.lastUpdated = new Date(Math.max(Date.now(), Date.parse(state.lastUpdated) + 1)).toISOString();
     if (url) {
-      const query = revision === null ? '' : 'id=eq.main&updated_at=eq.' + encodeURIComponent(revision!);
+      const query = revision === null ? 'select=updated_at' : 'select=updated_at&id=eq.main&updated_at=eq.' + encodeURIComponent(revision!);
       try {
         const rows = await database(query, {
           method: revision === null ? 'POST' : 'PATCH',

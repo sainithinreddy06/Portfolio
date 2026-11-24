@@ -22,6 +22,7 @@ globalThis.fetch = async (url, options = {}) => {
       if (existsSync('save-fail')) return new Response(null, {status: 503});
       if (new URL(url).searchParams.get('updated_at') !== 'eq.' + stored.updated_at) return Response.json([]);
       stored = JSON.parse(options.body);
+      if (new URL(url).searchParams.get('select') === 'updated_at') return Response.json([{ updated_at: stored.updated_at }]);
     }
     return Response.json([stored]);
   }
