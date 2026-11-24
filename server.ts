@@ -122,6 +122,7 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || process.env.APP_URL || '
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin;
+  if (req.path.startsWith('/api/')) res.set('Cache-Control', 'no-store');
 
   // Standard OWASP Security Headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -347,7 +348,7 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
     }
 
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
       return res.status(400).json({ success: false, error: 'Email and password are required.' });
     }
 

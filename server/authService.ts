@@ -273,6 +273,7 @@ export function createAdminSession(user: string): { token: string; expiresAt: nu
  * Validates a session token
  */
 export function verifyAdminToken(token: string | undefined): { valid: boolean; user?: string; error?: string } {
+  if (!isAuthConfigured()) return { valid: false, error: 'Admin access is disabled.' };
   if (!token || typeof token !== 'string') {
     return { valid: false, error: 'Token is missing' };
   }
@@ -293,7 +294,7 @@ export function verifyAdminToken(token: string | undefined): { valid: boolean; u
   try {
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
     const now = Date.now();
-    if (!payload.exp || payload.exp < now) {
+    if (payload.user !== ADMIN_EMAIL || !payload.exp || payload.exp <= now) {
       return { valid: false, error: 'Session token has expired' };
     }
 

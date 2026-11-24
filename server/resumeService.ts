@@ -168,7 +168,7 @@ CRITICAL RULES:
       return parsed;
     }
   } catch (err) {
-    console.warn('[Resume Parser] Gemini parsing attempt failed, falling back to local heuristic parser:', err);
+    console.warn('[Resume Parser] Gemini unavailable. Using the local parser.');
   }
   return null;
 }

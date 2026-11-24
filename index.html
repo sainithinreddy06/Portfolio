@@ -41,21 +41,7 @@
     <meta name="twitter:image" content="https://sai-nithin-portfolio.onrender.com/og-preview.svg" />
 
     <!-- Theme initialization script (prevents flash of wrong theme) -->
-    <script>
-      (function() {
-        try {
-          var saved = localStorage.getItem('sai_nithin_theme_pref');
-          var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-          if (saved === 'day' || (!saved && prefersLight)) {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light');
-          } else {
-            document.documentElement.classList.remove('light');
-            document.documentElement.classList.add('dark');
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
 
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
