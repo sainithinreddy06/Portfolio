@@ -23,7 +23,7 @@ export const CaseStudyPage: React.FC = () => {
   const matchingProject = content.projects.find(
     (p) => p.caseStudySlug === slug || p.id.toLowerCase() === slug?.toLowerCase()
   );
-  const storedCaseStudy = slug ? content.caseStudies[slug] : undefined;
+  const storedCaseStudy = slug && Object.hasOwn(content.caseStudies, slug) ? content.caseStudies[slug] : undefined;
 
   // GitHub-discovered projects receive a useful generated case study automatically.
   // Curated case studies always take precedence when richer project-specific content exists.
@@ -66,9 +66,18 @@ export const CaseStudyPage: React.FC = () => {
     const previousTitle = document.title;
     const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     const home = canonical?.href;
-    if (!studyTitle || !overview || !canonical || !home) return;
+    if (!studyTitle) {
+      document.title = 'Case Study Not Found | Sai Nithin Reddy';
+      const robots = document.createElement('meta');
+      robots.name = 'robots';
+      robots.content = 'noindex';
+      document.head.appendChild(robots);
+      return () => { robots.remove(); document.title = previousTitle; };
+    }
+    if (!canonical || !home) return;
     const title = `${studyTitle} | Sai Nithin Reddy`;
-    const text = overview.replace(/\s+/g, ' ').trim();
+    const summary = overview || document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content || '';
+    const text = summary.replace(/\s+/g, ' ').trim();
     const description = text.length > 157 ? text.slice(0, 157).trimEnd() + '…' : text;
     const url = new URL(window.location.pathname, home).href;
     const metadata = [

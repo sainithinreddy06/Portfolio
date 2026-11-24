@@ -112,6 +112,9 @@ try {
   const png = Buffer.from(await previewResponse.arrayBuffer());
   assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [1200, 630]);
+  await page.goto(origin + '/work/constructor', { waitUntil: 'networkidle2' });
+  assert.equal(await page.$eval('main h1', el => el.textContent), 'Case Study Not Found');
+  assert.equal(await page.$eval('meta[name="robots"]', el => el.content), 'noindex');
   console.log(studies.length, 'sitemap case studies, return navigation and social preview passed');
   await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
   await page.goto(origin + '/admin', { waitUntil: 'networkidle2' });
